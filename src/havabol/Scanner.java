@@ -108,16 +108,16 @@ public class Scanner {
 		StringBuilder tokenStr = new StringBuilder();
 		currentToken = new Token();
 		boolean isStringLiteral = false;
+		commentFound = false;
 		
-		// Skip until we find something other than whitespace or we finish
-		while ((iColPos >= textCharM.length || WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done) {
+		// Skip until we find something other than whitespace, comments, or we finish
+		while ((iColPos >= textCharM.length || textCharM[iColPos] == '/'
+				|| WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done) {
 			//System.out.println("SKIP");
-			advanceCursor();
-		}
-		
-		//Check if we reach comment and we are in bounds of line (array)
-		if(textCharM[iColPos] == '/' && (iColPos != textCharM.length)){
-			if(textCharM[iColPos + 1] == '/' && (iColPos != textCharM.length)){
+			
+			if ((iColPos >= textCharM.length || WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
+				advanceCursor();
+			else if (textCharM[iColPos] == '/' || textCharM[iColPos + 1] == '/'){
 				commentFound = true;
 				commentFoundOn = iSourceLineNr;
 				while (iSourceLineNr == commentFoundOn)
@@ -279,7 +279,7 @@ public class Scanner {
 	 */
 	public void advanceCursor() {
 		iColPos += 1;
-		System.out.println("Line: " + (iSourceLineNr + 1) + " Col: " + iColPos);
+		//System.out.println("Line: " + (iSourceLineNr + 1) + " Col: " + iColPos);
 		if (iColPos >= textCharM.length) {
 			iColPos = 0;
 			iSourceLineNr++;
