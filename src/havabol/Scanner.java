@@ -115,6 +115,17 @@ public class Scanner {
 			advanceCursor();
 		}
 		
+		//Check if we reach comment and we are in bounds of line (array)
+		if(textCharM[iColPos] == '/' && (iColPos != textCharM.length)){
+			if(textCharM[iColPos + 1] == '/' && (iColPos != textCharM.length)){
+				commentFound = true;
+				commentFoundOn = iSourceLineNr;
+				while (iSourceLineNr == commentFoundOn)
+					advanceCursor();
+			}
+		}
+		
+		
 		// Print any source lines we've read before we scan the next token
 		while (!lineBuffer.isEmpty()) {
 			System.out.println(lineBuffer.remove(0));
@@ -268,7 +279,7 @@ public class Scanner {
 	 */
 	public void advanceCursor() {
 		iColPos += 1;
-		//System.out.println("Line: " + iSourceLineNr + " Col: " + iColPos);
+		System.out.println("Line: " + (iSourceLineNr + 1) + " Col: " + iColPos);
 		if (iColPos >= textCharM.length) {
 			iColPos = 0;
 			iSourceLineNr++;
