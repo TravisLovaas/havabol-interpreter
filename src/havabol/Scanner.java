@@ -112,19 +112,25 @@ public class Scanner {
 		
 		// Skip until we find something other than whitespace, comments, or we finish
 		while ((iColPos >= textCharM.length || textCharM[iColPos] == '/'
-				|| WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done) {
+				|| WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
+		{
 			//System.out.println("SKIP");
-			
+			//System.out.println("This is i ColPos" + iColPos);
+			//System.out.println("This is textCharM" + " " + iColPos +  textCharM.length + " " + textCharM[iColPos]);
 			if ((iColPos >= textCharM.length || WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
 				advanceCursor();
-			else if (textCharM[iColPos] == '/' || textCharM[iColPos + 1] == '/'){
-				commentFound = true;
-				commentFoundOn = iSourceLineNr;
-				while (iSourceLineNr == commentFoundOn)
-					advanceCursor();
+			else if (textCharM[iColPos] == '/')
+			{
+				if(iColPos < (textCharM.length - 1) && textCharM[iColPos + 1] == '/'){
+					commentFound = true; 
+					commentFoundOn = iSourceLineNr;
+					while (iSourceLineNr == commentFoundOn)
+						advanceCursor();
+				} else {
+					throw new SyntaxError("Invalid char \' " + textCharM[iColPos] + " \' found", iSourceLineNr + 1, iColPos);
+				}
 			}
 		}
-		
 		
 		// Print any source lines we've read before we scan the next token
 		while (!lineBuffer.isEmpty()) {
@@ -160,11 +166,14 @@ public class Scanner {
 					
 					currentChar = textCharM[iColPos];
 					
-					if (currentChar == openStringChar && !escapeNext) {
+					//close string.
+					if (done || (currentChar == openStringChar && !escapeNext)) {
 						isStringLiteral = true;
 						break;
 					}
 					
+					//if(currentChar == '\\' && )
+						
 					tokenStr.append(currentChar);
 					if (currentChar == '\\' && !escapeNext) {
 						escapeNext = true;
@@ -196,7 +205,9 @@ public class Scanner {
 		
 	}
 	
-	public void setPosition(int iSourceLineNr, int iColPos) {
+
+	public void setPosition(int iSourceLineNr, int iColPos) 
+	{
 		this.iSourceLineNr = iSourceLineNr;
 		this.iColPos = iColPos;
 	}
