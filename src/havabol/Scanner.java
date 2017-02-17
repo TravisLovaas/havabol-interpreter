@@ -220,27 +220,34 @@ public class Scanner {
 			token.primClassif = Token.CONTROL;
 			token.subClassif = Token.DECLARE;
 			return;
-		}
-		
-		// Check if tokenStr is a flow operator (if, while, etc)
-		for (String op : FLOW_OPERATORS) {
-			if (tokenStr.equals(op)) {
-				token.primClassif = Token.CONTROL;
-				if (tokenStr.contains("end")) {
-					token.subClassif = Token.END;
-				} else {
-					token.subClassif = Token.FLOW;
-				}
-				return;
-			}
-		}
-		
-		// Check if tokenStr is a boolean operator
-		for (String op : WORD_OPERATORS) {
-			if (tokenStr.equals(op)) {
-				token.primClassif = Token.OPERATOR;
-				return;
-			}
+		case "if":
+		case "else":
+		case "while":
+		case "for":
+		case "select":
+		case "when":
+			token.primClassif = Token.CONTROL;
+			token.subClassif = Token.FLOW;
+			return;
+		case "endif":
+		case "endwhile":
+		case "endfor":
+			token.primClassif = Token.CONTROL;
+			token.subClassif = Token.END;
+			return;
+		case "and":
+		case "or":
+		case "not":
+			token.primClassif = Token.OPERATOR;
+			return;
+		case "in":
+		case "notin":
+			token.primClassif = Token.OPERATOR;
+			return;
+		case "T":
+		case "F":
+			token.primClassif = Token.OPERAND;
+			token.subClassif = Token.BOOLEAN;
 		}
 		
 		if (OPERATORS.contains(tokenStr)) {
