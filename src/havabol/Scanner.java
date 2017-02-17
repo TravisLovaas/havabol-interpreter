@@ -37,6 +37,7 @@ public class Scanner {
 	private final static String QUOTES = "\"'";
 	private final static String OPERATORS = "!=<>+-*/#^";
 	private final static String SEPARATORS = ",;:[]()";
+	private final static String ESCAPEPRINT ="\\'\"";
 	private final static String[] WORD_OPERATORS = {"and", "or", "not", "in", "notin"};
 	private final static String[] FLOW_OPERATORS = {"if", "endif", "else", "while", "endwhile", "for", "endfor"};
 	private final static String[] DATA_TYPES = {"Int", "Float", "String", "Bool"};
@@ -102,12 +103,20 @@ public class Scanner {
 		 * 		set commentFoundOn = iSourceLineNr
 		 * 		while iSourceLineNr == commentFoundOn:
 		 * 			advanceCursor()
+		 * 
+		 * Handling escaped chars
+		 * ---------------------------
+		 * if find a "/" followed by a printable char,
+		 * 		continue
+		 * if the string contains non printable char,
+		 * 		then replace with hex
 		 */
 		
 		//System.out.println("Scanning for token...");
 		StringBuilder tokenStr = new StringBuilder();
 		currentToken = new Token();
 		boolean isStringLiteral = false;
+		boolean nonPrintable = false;
 		commentFound = false;
 		
 		// Skip until we find something other than whitespace, comments, or we finish
@@ -171,18 +180,24 @@ public class Scanner {
 						isStringLiteral = true;
 						break;
 					}
-					
-					//if(currentChar == '\\' && )
 						
-					tokenStr.append(currentChar);
 					if (currentChar == '\\' && !escapeNext) {
 						escapeNext = true;
+						if(ESCAPEPRINT.contains(Character.toString(textCharM[iColPos + 1])))
+							continue;
+						else
+							nonPrintable = true;
 					} else {
 						escapeNext = false;
 					}
-				} 
-				advanceCursor();
+					tokenStr.append(currentChar);
+				}
 				
+				//if a string that contains a non printable char was found
+				if (nonPrintable)
+					hexPrint(iColPos, tokenStr.toString());
+				advanceCursor();
+
 			} else {
 				//System.out.println("Single delimiter token found.");
 				tokenStr.append(currentChar);
@@ -205,6 +220,43 @@ public class Scanner {
 		
 	}
 	
+
+	private void hexPrint(int indent, String tokenStr)
+	{
+		int len = tokenStr.length();
+        char [] charray = tokenStr.toCharArray();
+        char ch;
+        // print each character in the string
+        for (int i = 0; i < len; i++)
+        {
+            ch = charray[i];
+            if (ch > 31 && ch < 127){  // ASCII printable characters
+                System.out.printf("%c", ch);
+            }
+            else{
+                System.out.printf(". ");
+            }
+        }
+        System.out.printf("\n");
+        // indent the second line to the number of specified spaces
+        for (int i = 0; i < indent; i++)
+        {
+            System.out.printf(" ");
+        }
+        // print the second line.  Non-printable characters will be shown
+        // as their hex value.  Printable will simply be a space
+        for (int i = 0; i < len; i++)
+        {
+            ch = charray[i];
+            // only deal with the printable characters
+            if (ch > 31 && ch < 127)   // ASCII printable characters
+                System.out.printf(" ", ch);
+            else
+                System.out.printf("%02X", (int) ch);
+        }    
+        System.out.printf("\n");
+		
+	}
 
 	public void setPosition(int iSourceLineNr, int iColPos) 
 	{
