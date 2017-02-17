@@ -26,6 +26,9 @@ public class Scanner {
 	// Current and lookahead tokens
 	public Token currentToken;
 	public Token nextToken;
+	// Comment found
+	public boolean commentFound = false;
+	public int commentFoundOn = 0;
 	// Done scanning this file
 	public boolean done = false;
 	
@@ -34,6 +37,9 @@ public class Scanner {
 	private final static String QUOTES = "\"'";
 	private final static String OPERATORS = "!=<>+-*/#^";
 	private final static String SEPARATORS = ",;:[]()";
+	private final static String[] WORD_OPERATORS = {"and", "or", "not", "in", "notin"};
+	private final static String[] FLOW_OPERATORS = {"if", "endif", "else", "while", "endwhile", "for", "endfor"};
+	private final static String[] DATA_TYPES = {"Int", "Float", "String", "Bool"};
 	
 	/**
 	 * Reads a Havabol source file and initializes environment for scanning.
@@ -87,6 +93,15 @@ public class Scanner {
 		 * 		Until we find a delimiter:
 		 * 			Append chars
 		 * 		Return token
+		 * 
+		 * 
+		 * Comment parsing
+		 * ---------------------------
+		 * If we find a "//":
+		 * 		set commentFound = true
+		 * 		set commentFoundOn = iSourceLineNr
+		 * 		while iSourceLineNr == commentFoundOn:
+		 * 			advanceCursor()
 		 */
 		
 		//System.out.println("Scanning for token...");
@@ -184,6 +199,38 @@ public class Scanner {
 	public void classifyToken(Token token, String tokenStr, boolean isStringLiteral) throws SyntaxError {
 		
 		token.tokenStr = tokenStr;
+		
+		// Check if tokenStr is a data type
+		switch (tokenStr) {
+		case "Int":
+		case "Float":
+		case "String":
+		case "Bool":
+			token.primClassif = Token.CONTROL;
+			token.subClassif = Token.DECLARE;
+			return;
+		}
+		
+		// Check if tokenStr is a flow operator (if, while, etc)
+		for (String op : FLOW_OPERATORS) {
+			if (tokenStr.equals(op)) {
+				token.primClassif = Token.CONTROL;
+				if (tokenStr.contains("end")) {
+					token.subClassif = Token.END;
+				} else {
+					token.subClassif = Token.FLOW;
+				}
+				return;
+			}
+		}
+		
+		// Check if tokenStr is a boolean operator
+		for (String op : WORD_OPERATORS) {
+			if (tokenStr.equals(op)) {
+				token.primClassif = Token.OPERATOR;
+				return;
+			}
+		}
 		
 		if (OPERATORS.contains(tokenStr)) {
 			token.primClassif = Token.OPERATOR;
