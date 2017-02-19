@@ -120,5 +120,15 @@ public class Token
             , primClassifStr
             , subClassifStr
             , tokenStr);
+        
+        /*if(iHexString){
+        	 System.out.printf("                         \n");
+	        for (int i = 0; i < hexArr.length; i++)
+	        {
+	            // only deal with the printable characters
+	        	System.out.printf("%02X", (int) hexArr[i]);
+	        }    
+        }*/
+
     }
 }      

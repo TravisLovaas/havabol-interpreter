@@ -109,14 +109,14 @@ public class Scanner {
 		 * if find a "/" followed by a printable char,
 		 * 		continue
 		 * if the string contains non printable char,
-		 * 		then replace with hex
+		 * 		then call the hex printing method
 		 */
-		
-		//System.out.println("Scanning for token...");
+
 		StringBuilder tokenStr = new StringBuilder();
 		currentToken = new Token();
 		boolean isStringLiteral = false;
 		boolean nonPrintable = false;
+		boolean doubleOperator = false;
 		commentFound = false;
 		
 		// Skip until we find something other than whitespace, comments, or we finish
@@ -124,8 +124,6 @@ public class Scanner {
 				|| WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
 		{
 			//System.out.println("SKIP");
-			//System.out.println("This is i ColPos" + iColPos);
-			//System.out.println("This is textCharM" + " " + iColPos +  textCharM.length + " " + textCharM[iColPos]);
 			if ((iColPos >= textCharM.length || WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
 				advanceCursor();
 			else if (textCharM[iColPos] == '/')
@@ -152,6 +150,7 @@ public class Scanner {
 			return "";
 		}
 		
+		
 		//System.out.println("Found non-whitespace: " + textCharM[iColPos]);
 		// Save the start position of this token in case of error
 		debugColPos = iColPos;
@@ -163,7 +162,6 @@ public class Scanner {
 				char openStringChar = currentChar;
 				boolean escapeNext = false;
 				int openQuoteLineNr = iSourceLineNr;
-				
 				for (;;) {
 					
 					advanceCursor();	
@@ -174,8 +172,6 @@ public class Scanner {
 					}
 					
 					currentChar = textCharM[iColPos];
-					
-					//close string.
 					if (done || (currentChar == openStringChar && !escapeNext)) {
 						isStringLiteral = true;
 						break;
@@ -187,20 +183,26 @@ public class Scanner {
 							continue;
 						else
 							nonPrintable = true;
-					} else {
+						
+					} else 
 						escapeNext = false;
-					}
 					tokenStr.append(currentChar);
 				}
-				
-				//if a string that contains a non printable char was found
-				if (nonPrintable)
-					hexPrint(iColPos, tokenStr.toString());
+			
+				if(nonPrintable)
+					tokenStr = hexPrint(25, tokenStr.toString());
 				advanceCursor();
 
 			} else {
-				//System.out.println("Single delimiter token found.");
-				tokenStr.append(currentChar);
+				//Double delimiter token found, else single delimiter token found
+				if(OPERATORS.contains(Character.toString(textCharM[iColPos])) && 
+						OPERATORS.contains(Character.toString(textCharM[iColPos + 1])))
+				{
+					tokenStr.append(textCharM[iColPos]);
+					tokenStr.append(textCharM[iColPos + 1]);
+					advanceCursor();
+				}else
+					tokenStr.append(currentChar);
 				//System.out.println("Appended: " + currentChar);
 				advanceCursor();
 			}
@@ -215,48 +217,81 @@ public class Scanner {
 		}
 		
 		classifyToken(currentToken, tokenStr.toString(), isStringLiteral);
-		
 		return tokenStr.toString();
 		
 	}
 	
-
-	private void hexPrint(int indent, String tokenStr)
-	{
-		int len = tokenStr.length();
-        char [] charray = tokenStr.toCharArray();
+	/**
+	 * This method prints Strings that contain non printable chars
+	 * @param indent	- the number of spaces to indent second line
+	 * @param str		- the string to be modified to print non
+	 * 					  printable ASCII chars, including (\t, \n, & \a)
+	 * @return			- returns StringBuilder containing modified String
+	 * 					  that accommodates for non-printable ASCII chars
+	 */
+	public StringBuilder hexPrint(int indent, String str)
+    {
+        int len = str.length();	
+        char [] charray = str.toCharArray();
         char ch;
+		StringBuilder tokenStr = new StringBuilder();
         // print each character in the string
-        for (int i = 0; i < len; i++)
+    	ArrayList<Character> chars = new ArrayList<Character>();
+    	
+    	//create new char array of corrected String showing hex values 
+    	for (int i = 0; i < len; i++) {
+    		//if we find escaped non-printable, change to hex
+    		if(charray[i] == '\\'){
+    			switch (charray[i+1]){
+	        		case 'a':
+	        			chars.add((char) 0x07);
+	        			i++;
+	        			break;
+	        		case 'n':
+	        			chars.add((char) 0x0A);
+	        			i++;
+	        			break;
+	        		case 't':
+	        			chars.add((char) 0x09);
+	        			i++;
+	        			break;
+	        		default:
+	        			System.out.println("Invalid ascii non printable character found: ' " + textCharM[iColPos - 1]
+	        					+ textCharM[iColPos] + " '");
+    			}
+    		}else{
+    			chars.add(charray[i]);
+    		}
+    	}
+
+        for (int i = 0; i < chars.size(); i++)
         {
-            ch = charray[i];
-            if (ch > 31 && ch < 127){  // ASCII printable characters
-                System.out.printf("%c", ch);
-            }
-            else{
-                System.out.printf(". ");
-            }
+            ch = chars.get(i);
+            if (ch > 31 && ch < 127)   // ASCII printable characters
+                tokenStr.append(ch);
+            else
+                tokenStr.append(". ");
         }
-        System.out.printf("\n");
+        tokenStr.append("\n");
         // indent the second line to the number of specified spaces
         for (int i = 0; i < indent; i++)
         {
-            System.out.printf(" ");
+            tokenStr.append(" ");
         }
-        // print the second line.  Non-printable characters will be shown
+        // Non-printable characters will be shown
         // as their hex value.  Printable will simply be a space
-        for (int i = 0; i < len; i++)
+        for (int i = 0; i < chars.size(); i++)
         {
-            ch = charray[i];
+            ch = chars.get(i);
             // only deal with the printable characters
             if (ch > 31 && ch < 127)   // ASCII printable characters
-                System.out.printf(" ", ch);
+                tokenStr.append(" ");
             else
-                System.out.printf("%02X", (int) ch);
-        }    
-        System.out.printf("\n");
-		
-	}
+                tokenStr.append(String.format("%02X", (int) ch));
+        }
+        return tokenStr;
+    }
+
 
 	public void setPosition(int iSourceLineNr, int iColPos) 
 	{
@@ -276,41 +311,41 @@ public class Scanner {
 		
 		// Check if tokenStr is a data type
 		switch (tokenStr) {
-		case "Int":
-		case "Float":
-		case "String":
-		case "Bool":
-			token.primClassif = Token.CONTROL;
-			token.subClassif = Token.DECLARE;
-			return;
-		case "if":
-		case "else":
-		case "while":
-		case "for":
-		case "select":
-		case "when":
-			token.primClassif = Token.CONTROL;
-			token.subClassif = Token.FLOW;
-			return;
-		case "endif":
-		case "endwhile":
-		case "endfor":
-			token.primClassif = Token.CONTROL;
-			token.subClassif = Token.END;
-			return;
-		case "and":
-		case "or":
-		case "not":
-			token.primClassif = Token.OPERATOR;
-			return;
-		case "in":
-		case "notin":
-			token.primClassif = Token.OPERATOR;
-			return;
-		case "T":
-		case "F":
-			token.primClassif = Token.OPERAND;
-			token.subClassif = Token.BOOLEAN;
+			case "Int":
+			case "Float":
+			case "String":
+			case "Bool":
+				token.primClassif = Token.CONTROL;
+				token.subClassif = Token.DECLARE;
+				return;
+			case "if":
+			case "else":
+			case "while":
+			case "for":
+			case "select":
+			case "when":
+				token.primClassif = Token.CONTROL;
+				token.subClassif = Token.FLOW;
+				return;
+			case "endif":
+			case "endwhile":
+			case "endfor":
+				token.primClassif = Token.CONTROL;
+				token.subClassif = Token.END;
+				return;
+			case "and":
+			case "or":
+			case "not":
+				token.primClassif = Token.OPERATOR;
+				return;
+			case "in":
+			case "notin":
+				token.primClassif = Token.OPERATOR;
+				return;
+			case "T":
+			case "F":
+				token.primClassif = Token.OPERAND;
+				token.subClassif = Token.BOOLEAN;
 		}
 		
 		if (OPERATORS.contains(tokenStr)) {
