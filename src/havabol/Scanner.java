@@ -203,7 +203,6 @@ public class Scanner {
 					advanceCursor();
 				}else
 					tokenStr.append(currentChar);
-				//System.out.println("Appended: " + currentChar);
 				advanceCursor();
 			}
 		} else {
