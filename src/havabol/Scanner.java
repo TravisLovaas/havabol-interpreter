@@ -181,10 +181,10 @@ public class Scanner {
 					
 					advanceCursor();	
 					
-					if(currentToken.nonPrintable){
-						currentToken.nonPrintable = false;
+					//if(currentToken.nonPrintable){
+						//currentToken.nonPrintable = false;
 						//continue;
-					}
+					//}
 					if (iSourceLineNr != openQuoteLineNr) {
 						// Quote literal must end on opening line
 						throw new SyntaxError("String literal must begin and end on same line", openQuoteLineNr + 1);
