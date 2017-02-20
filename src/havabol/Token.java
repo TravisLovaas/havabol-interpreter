@@ -130,7 +130,7 @@ public class Token
         	System.out.printf("%s\n", tokenStr);
        
         // Debug
-        System.out.println("INFO: [str: '" + tokenStr + "'] [nonPrintable: " + nonPrintable + "] [column: " + iColPos + "] [lineNumber: " + iSourceLineNr + "]");
+        //System.out.println("INFO: [str: '" + tokenStr + "'] [nonPrintable: " + nonPrintable + "] [column: " + iColPos + "] [lineNumber: " + iSourceLineNr + "]");
 
     }
     
