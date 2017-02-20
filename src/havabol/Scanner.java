@@ -324,6 +324,13 @@ public class Scanner {
 				token.primClassif = Token.FUNCTION;
 				token.subClassif = Token.BUILTIN;
 				return;
+			// Two-char operators
+			case ">=":
+			case "<=":
+			case "==":
+			case "!=":
+				token.primClassif = Token.OPERATOR;
+				return;
 		}
 		
 		if (OPERATORS.contains(tokenStr)) {
