@@ -131,4 +131,15 @@ public class Token
         }*/
 
     }
+    
+    public Token clone() {
+    	Token newToken = new Token();
+    	newToken.tokenStr = this.tokenStr;
+    	newToken.primClassif = this.primClassif;
+    	newToken.subClassif = this.subClassif;
+    	newToken.iColPos = this.subClassif;
+    	newToken.iSourceLineNr = this.subClassif;
+    	return newToken;
+    }
+    
 }      

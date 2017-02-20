@@ -62,6 +62,7 @@ public class Scanner {
 		// Initialize scanning environment
 		currentToken = new Token();
 		nextToken = new Token();
+
 		if (sourceLineM.size() > 0) {
 			textCharM = sourceLineM.get(0).toCharArray();
 			lineBuffer.add(iSourceLineNr + 1 + " " + sourceLineM.get(iSourceLineNr));
@@ -69,6 +70,7 @@ public class Scanner {
 			done = true;
 		}
 		
+		getNext();
 	}
 	
 	/**
@@ -110,10 +112,21 @@ public class Scanner {
 		 * 		continue
 		 * if the string contains non printable char,
 		 * 		then call the hex printing method
+		 * 
+		 * 
+		 * 
+		 * currentToken = nextToken.clone()
+		 * read the next available token into nextToken
+		 * return currentToken if set, otherwise nextToken
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
 		 */
+		currentToken = nextToken.clone();
 
 		StringBuilder tokenStr = new StringBuilder();
-		currentToken = new Token();
 		boolean isStringLiteral = false;
 		boolean nonPrintable = false;
 		boolean doubleOperator = false;
@@ -146,13 +159,15 @@ public class Scanner {
 		
 		// If the done flag was set, there are no more tokens
 		if (done) {
-			currentToken.primClassif = Token.EOF;
+			nextToken.primClassif = Token.EOF;
 			return "";
 		}
 		
 		
 		//System.out.println("Found non-whitespace: " + textCharM[iColPos]);
 		// Save the start position of this token in case of error
+		nextToken.iColPos = iColPos;
+		nextToken.iSourceLineNr = iSourceLineNr;
 		debugColPos = iColPos;
 		char currentChar = textCharM[iColPos];
 		
@@ -215,7 +230,12 @@ public class Scanner {
 			}
 		}
 		
-		classifyToken(currentToken, tokenStr.toString(), isStringLiteral);
+		classifyToken(nextToken, tokenStr.toString(), isStringLiteral);
+		
+		if (currentToken.tokenStr.isEmpty()) {
+			currentToken = nextToken;
+		}
+		
 		return tokenStr.toString();
 		
 	}
@@ -345,6 +365,10 @@ public class Scanner {
 			case "F":
 				token.primClassif = Token.OPERAND;
 				token.subClassif = Token.BOOLEAN;
+			// Built-in functions
+			case "print":
+				token.primClassif = Token.FUNCTION;
+				token.subClassif = Token.BUILTIN;
 		}
 		
 		if (OPERATORS.contains(tokenStr)) {
