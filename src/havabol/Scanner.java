@@ -75,7 +75,7 @@ public class Scanner {
 
 		if (sourceLineM.size() > 0) {
 			textCharM = sourceLineM.get(0).toCharArray();
-			lineBuffer.add(iSourceLineNr + 1 + " " + sourceLineM.get(iSourceLineNr));
+			bufferLine(0);
 		} else {
 			done = true;
 		}
@@ -350,6 +350,10 @@ public class Scanner {
 		
 	}
 	
+	public void bufferLine(int lineNumber) {
+		lineBuffer.add("  " + (lineNumber + 1) + " " + sourceLineM.get(lineNumber));
+	}
+	
 	/**
 	 * Advances the scanner's cursor location by one, reading in new lines
 	 * as necessary.
@@ -362,7 +366,7 @@ public class Scanner {
 			iSourceLineNr++;
 			if (iSourceLineNr < sourceLineM.size()) {
 				textCharM = sourceLineM.get(iSourceLineNr).toCharArray();
-				lineBuffer.add(iSourceLineNr + 1 + " " + sourceLineM.get(iSourceLineNr));
+				bufferLine(iSourceLineNr);
 			} else {
 				done = true;
 			}
