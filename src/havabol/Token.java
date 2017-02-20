@@ -130,7 +130,7 @@ public class Token
         	System.out.printf("%s\n", tokenStr);
        
         // Debug
-        System.out.println("INFO: [nonPrintable: " + nonPrintable + "] [column: " + iColPos + "] [lineNumber: " + iSourceLineNr + "]");
+        System.out.println("INFO: [str: '" + tokenStr + "'] [nonPrintable: " + nonPrintable + "] [column: " + iColPos + "] [lineNumber: " + iSourceLineNr + "]");
 
     }
     
@@ -139,8 +139,8 @@ public class Token
     	newToken.tokenStr = this.tokenStr;
     	newToken.primClassif = this.primClassif;
     	newToken.subClassif = this.subClassif;
-    	newToken.iColPos = this.subClassif;
-    	newToken.iSourceLineNr = this.subClassif;
+    	newToken.iColPos = this.iColPos;
+    	newToken.iSourceLineNr = this.iSourceLineNr;
     	newToken.nonPrintable = this.nonPrintable;
     	return newToken;
     }
