@@ -249,7 +249,7 @@ public class Scanner {
 			}
 		}
 		
-		classifyToken(nextToken, tokenStr.toString(), isStringLiteral);
+		classifyToken(currentToken, tokenStr.toString(), isStringLiteral);
 		
 		if (currentToken.tokenStr.isEmpty()) {
 			currentToken = nextToken;
