@@ -313,10 +313,17 @@ public class Scanner {
 			case "F":
 				token.primClassif = Token.OPERAND;
 				token.subClassif = Token.BOOLEAN;
+				return;
 			// Built-in functions
 			case "print":
+			case "LENGTH":
+			case "SPACES":
+			case "MAXLENGTH":
+			case "ELEM":
+			case "MAXELEM":
 				token.primClassif = Token.FUNCTION;
 				token.subClassif = Token.BUILTIN;
+				return;
 		}
 		
 		if (OPERATORS.contains(tokenStr)) {
