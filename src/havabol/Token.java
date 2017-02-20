@@ -10,6 +10,7 @@ public class Token
     public int subClassif = 0;
     public int iSourceLineNr = 0;
     public int iColPos = 0;
+	boolean nonPrintable = false;
     // Constants for primClassif
     public static final int OPERAND = 1;    // constants, identifier
     public static final int OPERATOR = 2;   // + - * / < > = ! 
@@ -116,19 +117,16 @@ public class Token
                 subClassifStr = "-";
         }
     
-        System.out.printf("%-11s %-12s %s\n"
+        System.out.printf("%-11s %-12s"
             , primClassifStr
-            , subClassifStr
-            , tokenStr);
+            , subClassifStr);
+                
+        if(nonPrintable){
+        	hexPrint(24, tokenStr);
+        }
         
-        /*if(iHexString){
-        	 System.out.printf("                         \n");
-	        for (int i = 0; i < hexArr.length; i++)
-	        {
-	            // only deal with the printable characters
-	        	System.out.printf("%02X", (int) hexArr[i]);
-	        }    
-        }*/
+        else
+        	System.out.printf("%s\n", tokenStr);
 
     }
     
@@ -142,4 +140,62 @@ public class Token
     	return newToken;
     }
     
+    /**
+     * Prints a string that may contain non-printable characters as two lines.  
+     * <p>
+     * On the first line, it prints printable characters by simply
+     * printing the character.  For non-printable characters
+     * in the string, it prints ". ".  
+     * <p>
+     * The second line prints a two character hex value for the non printable
+     * characters in the string line.  For the printable characters, it prints 
+     * a space.
+     * <p>
+     * It is sometimes necessary to print the first line on the end of
+     * an existing line of output.  This would make it difficult to properly 
+     * align the second line of output.  The indent parameter is for indenting 
+     * the second line.
+     * <p><blockquote><pre>
+     * Example for the string "\tTX\tTexas\n"
+     *      . TX. Texas.
+     *      09  09     0A
+     * </pre></blockquote><p>    
+     * @param indent  the number of spaces to indent the second printed line
+     * @param str     the string to print which may contain non-printable characters
+    
+    */
+    public void hexPrint(int indent, String str)
+    {
+        int len = str.length();	
+        char [] charray = str.toCharArray();
+        char ch;
+        // print each character in the string
+        for (int i = 0; i < len; i++)
+        {
+            ch = charray[i];
+            if (ch > 31 && ch < 127)   // ASCII printable characters
+                System.out.printf("%c", ch);
+            else
+                System.out.printf(". ");
+        }
+        System.out.printf("\n");
+        // indent the second line to the number of specified spaces
+        for (int i = 0; i < indent; i++)
+        {
+            System.out.printf(" ");
+        }
+        // print the second line.  Non-printable characters will be shown
+        // as their hex value.  Printable will simply be a space
+        for (int i = 0; i < len; i++)
+        {
+            ch = charray[i];
+            // only deal with the printable characters
+            if (ch > 31 && ch < 127)   // ASCII printable characters
+                System.out.printf(" ", ch);
+            else
+                System.out.printf("%02X", (int) ch);
+        }    
+        System.out.printf("\n");
+    }
+
 }      

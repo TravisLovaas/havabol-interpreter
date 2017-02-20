@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Scanner {
 	
@@ -38,6 +39,14 @@ public class Scanner {
 	private final static String OPERATORS = "!=<>+-*/#^";
 	private final static String SEPARATORS = ",;:[]()";
 	private final static String ESCAPEPRINT ="\\'\"";
+	private final static HashMap<Character, Character> escapeMap = new HashMap<Character, Character>(){
+		private static final long serialVersionUID = 1L;
+
+	{
+		put('t', '\t');
+		put('n', '\n');
+		put('a', (char) 0x07);    
+		}};
 	private final static String[] WORD_OPERATORS = {"and", "or", "not", "in", "notin"};
 	private final static String[] FLOW_OPERATORS = {"if", "endif", "else", "while", "endwhile", "for", "endfor"};
 	private final static String[] DATA_TYPES = {"Int", "Float", "String", "Bool"};
@@ -128,7 +137,6 @@ public class Scanner {
 
 		StringBuilder tokenStr = new StringBuilder();
 		boolean isStringLiteral = false;
-		boolean nonPrintable = false;
 		boolean doubleOperator = false;
 		commentFound = false;
 		
@@ -170,7 +178,9 @@ public class Scanner {
 		nextToken.iSourceLineNr = iSourceLineNr;
 		debugColPos = iColPos;
 		char currentChar = textCharM[iColPos];
-		
+		char [] retCharM = new char[textCharM.length];
+		int iRet = 0;
+		int i = 0;
 		if (DELIMITERS.contains(Character.toString(currentChar))) {
 			if (QUOTES.contains(Character.toString(currentChar))) {
 				//System.out.println("Quote found.");
@@ -181,6 +191,10 @@ public class Scanner {
 					
 					advanceCursor();	
 					
+					//if(currentToken.nonPrintable){
+						//currentToken.nonPrintable = false;
+						//continue;
+					//}
 					if (iSourceLineNr != openQuoteLineNr) {
 						// Quote literal must end on opening line
 						throw new SyntaxError("String literal must begin and end on same line", openQuoteLineNr + 1);
@@ -192,24 +206,29 @@ public class Scanner {
 						break;
 					}
 						
+
 					if (currentChar == '\\' && !escapeNext) {
 						escapeNext = true;
 						if(ESCAPEPRINT.contains(Character.toString(textCharM[iColPos + 1])))
 							continue;
-						else
-							nonPrintable = true;
-						
+						else{
+							currentToken.nonPrintable = true;
+							if (escapeMap.containsKey(textCharM[iColPos + 1])){
+								retCharM[iRet++] = escapeMap.get(textCharM[iColPos + 1]);
+								continue;
+							}
+						}
 					} else 
 						escapeNext = false;
-					tokenStr.append(currentChar);
+					if(textCharM[iColPos - 1] != '\\')
+						retCharM[iRet++] = textCharM[iColPos];
 				}
 			
-				if(nonPrintable)
-					tokenStr = hexPrint(25, tokenStr.toString());
+				tokenStr =  tokenStr.insert(0, retCharM, 0, iRet);
+				tokenStr.delete(iRet, tokenStr.length() + 1);
 				advanceCursor();
 
 			} else {
-				//Double delimiter token found, else single delimiter token found
 				if(OPERATORS.contains(Character.toString(textCharM[iColPos])) && 
 						OPERATORS.contains(Character.toString(textCharM[iColPos + 1])))
 				{
@@ -240,77 +259,6 @@ public class Scanner {
 		
 	}
 	
-	/**
-	 * This method prints Strings that contain non printable chars
-	 * @param indent	- the number of spaces to indent second line
-	 * @param str		- the string to be modified to print non
-	 * 					  printable ASCII chars, including (\t, \n, & \a)
-	 * @return			- returns StringBuilder containing modified String
-	 * 					  that accommodates for non-printable ASCII chars
-	 */
-	public StringBuilder hexPrint(int indent, String str)
-    {
-        int len = str.length();	
-        char [] charray = str.toCharArray();
-        char ch;
-		StringBuilder tokenStr = new StringBuilder();
-        // print each character in the string
-    	ArrayList<Character> chars = new ArrayList<Character>();
-    	
-    	//create new char array of corrected String showing hex values 
-    	for (int i = 0; i < len; i++) {
-    		//if we find escaped non-printable, change to hex
-    		if(charray[i] == '\\'){
-    			switch (charray[i+1]){
-	        		case 'a':
-	        			chars.add((char) 0x07);
-	        			i++;
-	        			break;
-	        		case 'n':
-	        			chars.add((char) 0x0A);
-	        			i++;
-	        			break;
-	        		case 't':
-	        			chars.add((char) 0x09);
-	        			i++;
-	        			break;
-	        		default:
-	        			System.out.println("Invalid ascii non printable character found: ' " + textCharM[iColPos - 1]
-	        					+ textCharM[iColPos] + " '");
-    			}
-    		}else{
-    			chars.add(charray[i]);
-    		}
-    	}
-
-        for (int i = 0; i < chars.size(); i++)
-        {
-            ch = chars.get(i);
-            if (ch > 31 && ch < 127)   // ASCII printable characters
-                tokenStr.append(ch);
-            else
-                tokenStr.append(". ");
-        }
-        tokenStr.append("\n");
-        // indent the second line to the number of specified spaces
-        for (int i = 0; i < indent; i++)
-        {
-            tokenStr.append(" ");
-        }
-        // Non-printable characters will be shown
-        // as their hex value.  Printable will simply be a space
-        for (int i = 0; i < chars.size(); i++)
-        {
-            ch = chars.get(i);
-            // only deal with the printable characters
-            if (ch > 31 && ch < 127)   // ASCII printable characters
-                tokenStr.append(" ");
-            else
-                tokenStr.append(String.format("%02X", (int) ch));
-        }
-        return tokenStr;
-    }
-
 
 	public void setPosition(int iSourceLineNr, int iColPos) 
 	{
