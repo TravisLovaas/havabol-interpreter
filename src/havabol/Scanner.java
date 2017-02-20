@@ -124,6 +124,7 @@ public class Scanner {
 		 * 		then call the hex printing method
 		 */
 		currentToken = nextToken.clone();
+		nextToken = new Token();
 
 		StringBuilder tokenStr = new StringBuilder();
 		boolean isStringLiteral = false;
