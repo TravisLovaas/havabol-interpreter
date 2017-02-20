@@ -11,6 +11,7 @@ public class Token
     public int iSourceLineNr = 0;
     public int iColPos = 0;
 	boolean nonPrintable = false;
+	
     // Constants for primClassif
     public static final int OPERAND = 1;    // constants, identifier
     public static final int OPERATOR = 2;   // + - * / < > = ! 
@@ -127,6 +128,9 @@ public class Token
         
         else
         	System.out.printf("%s\n", tokenStr);
+       
+        // Debug
+        System.out.println("INFO: [nonPrintable: " + nonPrintable + "] [column: " + iColPos + "] [lineNumber: " + iSourceLineNr + "]");
 
     }
     
@@ -137,6 +141,7 @@ public class Token
     	newToken.subClassif = this.subClassif;
     	newToken.iColPos = this.subClassif;
     	newToken.iSourceLineNr = this.subClassif;
+    	newToken.nonPrintable = this.nonPrintable;
     	return newToken;
     }
     

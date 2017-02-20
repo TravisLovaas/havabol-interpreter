@@ -24,6 +24,12 @@ public class HavaBol
         // Create the SymbolTable
         SymbolTable symbolTable = new SymbolTable();
         
+        if (args.length < 1) {
+        	System.err.println("Error: no arguments given");
+        	System.err.println("Usage: java havabol.HavaBol inputFile");
+        	System.exit(-1);
+        }
+        
         try
         {
             // Print a column heading 

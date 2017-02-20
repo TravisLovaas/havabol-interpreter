@@ -32,6 +32,7 @@ public class Scanner {
 	public int commentFoundOn = 0;
 	// Done scanning this file
 	public boolean done = false;
+	public boolean printBufferOnNext = false;
 	
 	private final static String DELIMITERS = " \t;:()\'\"=!<>+-*/[]#^,\n"; // terminate a token
 	private final static String WHITESPACE = " \t\n";
@@ -121,17 +122,6 @@ public class Scanner {
 		 * 		continue
 		 * if the string contains non printable char,
 		 * 		then call the hex printing method
-		 * 
-		 * 
-		 * 
-		 * currentToken = nextToken.clone()
-		 * read the next available token into nextToken
-		 * return currentToken if set, otherwise nextToken
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
 		 */
 		currentToken = nextToken.clone();
 
@@ -212,7 +202,7 @@ public class Scanner {
 						if(ESCAPEPRINT.contains(Character.toString(textCharM[iColPos + 1])))
 							continue;
 						else{
-							currentToken.nonPrintable = true;
+							nextToken.nonPrintable = true;
 							if (escapeMap.containsKey(textCharM[iColPos + 1])){
 								retCharM[iRet++] = escapeMap.get(textCharM[iColPos + 1]);
 								continue;
@@ -249,11 +239,7 @@ public class Scanner {
 			}
 		}
 		
-		classifyToken(currentToken, tokenStr.toString(), isStringLiteral);
-		
-		if (currentToken.tokenStr.isEmpty()) {
-			currentToken = nextToken;
-		}
+		classifyToken(nextToken, tokenStr.toString(), isStringLiteral);
 		
 		return tokenStr.toString();
 		
@@ -267,7 +253,7 @@ public class Scanner {
 	}
 	
 	/**
-	 * Classifies a token and sets all necessary token fields.
+	 * Classifies a token and sets necessary token fields.
 	 * @param token Token to populate
 	 * @param tokenStr Token string
 	 * @param isStringLiteral Identifies this token as a string literal
