@@ -5,7 +5,7 @@ import java.util.*;
 public class SymbolTable
 {
 	public HashMap<String, STEntry> ST = new HashMap<>();
-	
+	int VAR_ARGS;
 	public SymbolTable()
 	{
 		initGlobal();
@@ -26,22 +26,22 @@ public class SymbolTable
 		ST.put("enddef", new STControl("def", Token.CONTROL, Token.END));
 		ST.put("if", new STControl("if",Token.CONTROL,Token.FLOW));
 		ST.put("endif", new STControl("endif",Token.CONTROL,Token.END));
-		ST.put("else", 10);
+		ST.put("else", new STControl("else", Token.CONTROL, Token.FLOW));
 		ST.put("for", new STControl("for",Token.CONTROL,Token.FLOW));
-		ST.put("endfor", 10);
-		ST.put("while", 10);
-		ST.put("endwhile", 10);
-		ST.put("print", new STFunction("print",Token.FUNCTION,Token.VOID));
+		ST.put("endfor", new STControl("endfor",Token.CONTROL,Token.END));
+		ST.put("while", new STControl("while",Token.CONTROL,Token.FLOW));
+		ST.put("endwhile", new STControl("endwhile",Token.CONTROL,Token.END));
+		ST.put("print", new STFunction("print",Token.FUNCTION,Token.VOID,Token.BUILTIN, VAR_ARGS));
 		ST.put("Int", new STControl("Int",Token.CONTROL,Token.DECLARE));
 		ST.put("Float", new STControl("Float",Token.CONTROL,Token.DECLARE));
 		ST.put("String", new STControl("String",Token.CONTROL,Token.DECLARE));
 		ST.put("Bool", new STControl("Bool",Token.CONTROL,Token.DECLARE));
 		ST.put("Date", new STControl("Date",Token.CONTROL,Token.DECLARE));
-		ST.put("LENGTH", 10);
-		ST.put("MAXLENGTH", 10);
-		ST.put("SPACES", 10);
-		ST.put("ELEM", 10);
-		ST.put("MAXELEM", 10);
+		ST.put("LENGTH", new STFunction("LENGTH",Token.FUNCTION,Token.INTEGER,Token.BUILTIN, VAR_ARGS));
+		ST.put("MAXLENGTH", new STFunction("MAXLENGTH",Token.FUNCTION,Token.INTEGER,Token.BUILTIN, VAR_ARGS));
+		ST.put("SPACES", new STFunction("SPACES",Token.FUNCTION,Token.INTEGER,Token.BUILTIN, VAR_ARGS));
+		ST.put("ELEM", new STFunction("ELEM",Token.FUNCTION,Token.INTEGER,Token.BUILTIN, VAR_ARGS));
+		ST.put("MAXELEM", new STFunction("MAXELEM",Token.FUNCTION,Token.INTEGER,Token.BUILTIN, VAR_ARGS));
 		ST.put("and", new STEntry("and", Token.OPERATOR));
 		ST.put("or", new STEntry("or", Token.OPERATOR));
 		ST.put("not", new STEntry("not", Token.OPERATOR));
@@ -62,7 +62,7 @@ public class SymbolTable
 	}
 }
 
-abstract class STEntry
+class STEntry
 {
 	
 	public STEntry(String tokenStr, int primClassif) {
@@ -94,24 +94,23 @@ class STIdentifier extends STEntry
 
 class STFunction extends STEntry
 {
-	public STFunction(String string, int operator, int void1) {
-		super(string, operator);
-		// TODO Auto-generated constructor stub
+	public STFunction(String tokenStr, int primClassif, int returnType, int builtin, int numArgs) {
+		super(tokenStr, primClassif);
+		this.returnType = returnType;
+		this.definedBy = builtin;
+		this.numArgs = numArgs;
 	}
-	HashMap STFunction = new HashMap();
-	String returnType;
-	String definedBy;
+	int returnType;
+	int definedBy;
 	int numArgs;
-	ArrayList parmList;
 	SymbolTable symbolTable;
 }
 
 class STControl extends STEntry
 {
-	public STControl(String string, int operator, int declare) {
-		super(string, operator);
-		// TODO Auto-generated constructor stub
+	public STControl(String tokenStr, int primClassif, int subClassif) {
+		super(tokenStr, primClassif);
+		this.subClassif = subClassif;
 	}
-	HashMap STControl = new HashMap();
-	String subClassif;
+	int subClassif;
 }
