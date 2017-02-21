@@ -1,0 +1,429 @@
+primClassif subClassif   tokenStr
+  1 Int i;
+CONTROL     DECLARE      Int
+OPERAND     IDENTFIER    i
+  2 Float pi;
+SEPARATOR   -            ;
+CONTROL     DECLARE      Float
+OPERAND     IDENTFIER    pi
+  3 String day;
+SEPARATOR   -            ;
+CONTROL     DECLARE      String
+OPERAND     IDENTFIER    day
+  4    day 
+SEPARATOR   -            ;
+  5    = 
+OPERAND     IDENTFIER    day
+  6    "Sunday";
+OPERATOR    -            =
+OPERAND     STRING       Sunday
+                               
+  7 String name;
+SEPARATOR   -            ;
+CONTROL     DECLARE      String
+OPERAND     IDENTFIER    name
+  8 name = "Anita Goodgrade";
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    name
+OPERATOR    -            =
+OPERAND     STRING       Anita Goodgrade
+                                        
+  9 String weird;
+SEPARATOR   -            ;
+CONTROL     DECLARE      String
+OPERAND     IDENTFIER    weird
+ 10 weird = "\tTX\tTexas\n";
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    weird
+OPERATOR    -            =
+OPERAND     STRING       . TX. Texas. 
+                         09  09     0A
+ 11 String loc;
+SEPARATOR   -            ;
+CONTROL     DECLARE      String
+OPERAND     IDENTFIER    loc
+ 12 loc = "TX";
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    loc
+OPERATOR    -            =
+OPERAND     STRING       TX
+                           
+ 13 
+ 14 // numeric stuff
+ 15 print(">>> Checking datatype results based on left operand");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       >>> Checking datatype results based on left operand
+                                                                            
+SEPARATOR   -            )
+ 16 pi = 3.14;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    pi
+OPERATOR    -            =
+OPERAND     FLOAT        3.14
+ 17 Float area;
+SEPARATOR   -            ;
+CONTROL     DECLARE      Float
+OPERAND     IDENTFIER    area
+ 18 Float radius2;
+SEPARATOR   -            ;
+CONTROL     DECLARE      Float
+OPERAND     IDENTFIER    radius2
+ 19 Int radius;
+SEPARATOR   -            ;
+CONTROL     DECLARE      Int
+OPERAND     IDENTFIER    radius
+ 20 radius = 8;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    radius
+OPERATOR    -            =
+OPERAND     INTEGER      8
+ 21 radius2 = radius ^ 2;  // square the radius
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    radius2
+OPERATOR    -            =
+OPERAND     IDENTFIER    radius
+OPERATOR    -            ^
+OPERAND     INTEGER      2
+ 22 print("\t1. area all float");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . 1. area all float
+                         09                 
+SEPARATOR   -            )
+ 23 area = pi * radius2;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    area
+OPERATOR    -            =
+OPERAND     IDENTFIER    pi
+OPERATOR    -            *
+OPERAND     IDENTFIER    radius2
+ 24 print("\tradius="
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+ 25       ,  radius
+OPERAND     STRING       . radius=
+                         09       
+SEPARATOR   -            ,
+ 26       ,  "radius2="
+OPERAND     IDENTFIER    radius
+SEPARATOR   -            ,
+ 27       ,  radius2
+OPERAND     STRING       radius2=
+                                 
+SEPARATOR   -            ,
+ 28       ,  "area="
+OPERAND     IDENTFIER    radius2
+SEPARATOR   -            ,
+ 29       ,  area);
+OPERAND     STRING       area=
+                              
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    area
+SEPARATOR   -            )
+ 30 Int irad2;
+SEPARATOR   -            ;
+CONTROL     DECLARE      Int
+OPERAND     IDENTFIER    irad2
+ 31 irad2 = radius ^ 2;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    irad2
+OPERATOR    -            =
+OPERAND     IDENTFIER    radius
+OPERATOR    -            ^
+OPERAND     INTEGER      2
+ 32 print("\t2. area using int radius as left operand");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . 2. area using int radius as left operand
+                         09                                        
+SEPARATOR   -            )
+ 33 area = irad2 * pi;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    area
+OPERATOR    -            =
+OPERAND     IDENTFIER    irad2
+OPERATOR    -            *
+OPERAND     IDENTFIER    pi
+ 34 print("\tradius=", radius, "irad2=", irad2, "area=", area);
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . radius=
+                         09       
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    radius
+SEPARATOR   -            ,
+OPERAND     STRING       irad2=
+                               
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    irad2
+SEPARATOR   -            ,
+OPERAND     STRING       area=
+                              
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    area
+SEPARATOR   -            )
+ 35 Float circum;
+SEPARATOR   -            ;
+CONTROL     DECLARE      Float
+OPERAND     IDENTFIER    circum
+ 36 Float twoPi;
+SEPARATOR   -            ;
+CONTROL     DECLARE      Float
+OPERAND     IDENTFIER    twoPi
+ 37 print("\t3. circumference using twoPi as float * int");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . 3. circumference using twoPi as float * int
+                         09                                           
+SEPARATOR   -            )
+ 38 twoPi = pi * 2;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    twoPi
+OPERATOR    -            =
+OPERAND     IDENTFIER    pi
+OPERATOR    -            *
+OPERAND     INTEGER      2
+ 39 circum = twoPi * radius;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    circum
+OPERATOR    -            =
+OPERAND     IDENTFIER    twoPi
+OPERATOR    -            *
+OPERAND     IDENTFIER    radius
+ 40 print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . radius=
+                         09       
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    radius
+SEPARATOR   -            ,
+OPERAND     STRING       twoPi=
+                               
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    twoPi
+SEPARATOR   -            ,
+OPERAND     STRING       circum=
+                                
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    circum
+SEPARATOR   -            )
+ 41 print("\t4. circumference using twoPi as int * float");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . 4. circumference using twoPi as int * float
+                         09                                           
+SEPARATOR   -            )
+ 42 twoPi = 2 * pi;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    twoPi
+OPERATOR    -            =
+OPERAND     INTEGER      2
+OPERATOR    -            *
+OPERAND     IDENTFIER    pi
+ 43 circum = twoPi * radius;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    circum
+OPERATOR    -            =
+OPERAND     IDENTFIER    twoPi
+OPERATOR    -            *
+OPERAND     IDENTFIER    radius
+ 44 print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . radius=
+                         09       
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    radius
+SEPARATOR   -            ,
+OPERAND     STRING       twoPi=
+                               
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    twoPi
+SEPARATOR   -            ,
+OPERAND     STRING       circum=
+                                
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    circum
+SEPARATOR   -            )
+ 45 
+ 46 // Simple if
+ 47 i = 0;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    i
+OPERATOR    -            =
+OPERAND     INTEGER      0
+ 48 print(">>> First If");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       >>> First If
+                                     
+SEPARATOR   -            )
+ 49 if loc == "TX": // check for TX
+SEPARATOR   -            ;
+CONTROL     FLOW         if
+OPERAND     IDENTFIER    loc
+OPERATOR    -            ==
+OPERAND     STRING       TX
+                           
+ 50     // It is TX
+ 51     print("\tloc is", loc);
+SEPARATOR   -            :
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . loc is
+                         09      
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    loc
+SEPARATOR   -            )
+ 52     // it is ok to have this statement on multiple lines.  
+ 53     // That is why we have a semicolon
+ 54     i 
+SEPARATOR   -            ;
+ 55        = 
+OPERAND     IDENTFIER    i
+ 56           i 
+OPERATOR    -            =
+ 57           + 1;
+OPERAND     IDENTFIER    i
+OPERATOR    -            +
+OPERAND     INTEGER      1
+ 58 endif;
+SEPARATOR   -            ;
+CONTROL     END          endif
+ 59 print("\tDone with first if");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . Done with first if
+                         09                  
+SEPARATOR   -            )
+ 60 
+ 61 print(">>> Second If");
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       >>> Second If
+                                      
+SEPARATOR   -            )
+ 62 // if then else
+ 63 if i >= 5:
+SEPARATOR   -            ;
+CONTROL     FLOW         if
+OPERAND     IDENTFIER    i
+OPERATOR    -            >=
+OPERAND     INTEGER      5
+ 64     print("\t2nd if true, i >= 5, i =", i);
+SEPARATOR   -            :
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . 2nd if true, i >= 5, i =
+                         09                        
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    i
+SEPARATOR   -            )
+ 65 else:
+SEPARATOR   -            ;
+CONTROL     END          else
+ 66     print("\t2nd if false, i >= 5, i =", i);
+SEPARATOR   -            :
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . 2nd if false, i >= 5, i =
+                         09                         
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    i
+SEPARATOR   -            )
+ 67 endif;
+SEPARATOR   -            ;
+CONTROL     END          endif
+ 68 // while and if 
+ 69 print(">>> First while i < 5");    
+SEPARATOR   -            ;
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       >>> First while i < 5
+                                              
+SEPARATOR   -            )
+ 70 i = 1;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    i
+OPERATOR    -            =
+OPERAND     INTEGER      1
+ 71 while i < 5:
+SEPARATOR   -            ;
+CONTROL     FLOW         while
+OPERAND     IDENTFIER    i
+OPERATOR    -            <
+OPERAND     INTEGER      5
+ 72     print("\ttop of while, i=", i);
+SEPARATOR   -            :
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . top of while, i=
+                         09                
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    i
+SEPARATOR   -            )
+ 73     if i < 3:
+SEPARATOR   -            ;
+CONTROL     FLOW         if
+OPERAND     IDENTFIER    i
+OPERATOR    -            <
+OPERAND     INTEGER      3
+ 74         print("\twhile first if true i<3, i=", i);
+SEPARATOR   -            :
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . while first if true i<3, i=
+                         09                           
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    i
+SEPARATOR   -            )
+ 75         i = i + 2;
+SEPARATOR   -            ;
+OPERAND     IDENTFIER    i
+OPERATOR    -            =
+OPERAND     IDENTFIER    i
+OPERATOR    -            +
+OPERAND     INTEGER      2
+ 76         if loc != "TX":
+SEPARATOR   -            ;
+CONTROL     FLOW         if
+OPERAND     IDENTFIER    loc
+OPERATOR    -            !=
+OPERAND     STRING       TX
+                           
+ 77              print("\t\twhile inner if true ... wrong!");
+SEPARATOR   -            :
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . . while inner if true ... wrong!
+                         0909                              
+SEPARATOR   -            )
+ 78         else:
+SEPARATOR   -            ;
+CONTROL     END          else
+ 79              print('\t\twhile inner if false, loc!=\'TX\', loc is', loc);
+SEPARATOR   -            :
+FUNCTION    BUILTIN      print
+SEPARATOR   -            (
+OPERAND     STRING       . . while inner if false, loc!='TX', loc is
+                         0909                                       
+SEPARATOR   -            ,
+OPERAND     IDENTFIER    loc
+SEPARATOR   -            )
+ 80         endif;
+SEPARATOR   -            ;
+CONTROL     END          endif
