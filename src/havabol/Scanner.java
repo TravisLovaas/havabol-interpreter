@@ -32,6 +32,7 @@ public class Scanner {
 	public int commentFoundOn = 0;
 	// Done scanning this file
 	public boolean done = false;
+	private boolean printedLast = false;
 	public boolean printBuffer = false;
 	
 	private final static String DELIMITERS = " \t;:()\'\"=!<>+-*/[]#^,\n"; // terminate a token
@@ -158,8 +159,13 @@ public class Scanner {
 		
 		// If the done flag was set, there are no more tokens
 		if (done) {
-			nextToken.primClassif = Token.EOF;
-			return "";
+			if (printedLast) {
+				currentToken.primClassif = Token.EOF;
+				return "";
+			} else {
+				printedLast = true;
+				return currentToken.tokenStr;
+			}
 		}
 		
 		
@@ -244,7 +250,6 @@ public class Scanner {
 		return tokenStr.toString();
 		
 	}
-	
 
 	public void setPosition(int iSourceLineNr, int iColPos) 
 	{
@@ -343,8 +348,6 @@ public class Scanner {
 					token.subClassif = Token.STRING;
 				} else {
 					token.subClassif = Token.IDENTIFIER;
-					//STIdentifier entry = new STIdentifier(tokenStr, Token.OPERATOR);
-					//symbolTable.putSymbol(tokenStr, entry);
 				}
 			}
 		}
