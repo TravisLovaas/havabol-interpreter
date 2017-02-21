@@ -277,7 +277,6 @@ public class Scanner {
 				token.subClassif = Token.DECLARE;
 				return;
 			case "if":
-			case "else":
 			case "while":
 			case "for":
 			case "select":
@@ -285,6 +284,7 @@ public class Scanner {
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.FLOW;
 				return;
+			case "else":
 			case "endif":
 			case "endwhile":
 			case "endfor":
