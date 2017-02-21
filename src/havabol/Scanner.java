@@ -32,7 +32,7 @@ public class Scanner {
 	public int commentFoundOn = 0;
 	// Done scanning this file
 	public boolean done = false;
-	public boolean printBufferOnNext = false;
+	public boolean printBuffer = false;
 	
 	private final static String DELIMITERS = " \t;:()\'\"=!<>+-*/[]#^,\n"; // terminate a token
 	private final static String WHITESPACE = " \t\n";
@@ -196,7 +196,6 @@ public class Scanner {
 						isStringLiteral = true;
 						break;
 					}
-						
 
 					if (currentChar == '\\' && !escapeNext) {
 						escapeNext = true;
@@ -344,6 +343,8 @@ public class Scanner {
 					token.subClassif = Token.STRING;
 				} else {
 					token.subClassif = Token.IDENTIFIER;
+					//STIdentifier entry = new STIdentifier(tokenStr, Token.OPERATOR);
+					//symbolTable.putSymbol(tokenStr, entry);
 				}
 			}
 		}
@@ -367,6 +368,7 @@ public class Scanner {
 			if (iSourceLineNr < sourceLineM.size()) {
 				textCharM = sourceLineM.get(iSourceLineNr).toCharArray();
 				bufferLine(iSourceLineNr);
+				printBuffer = true;
 			} else {
 				done = true;
 			}

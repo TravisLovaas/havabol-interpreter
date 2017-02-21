@@ -4,15 +4,15 @@ import java.util.*;
 
 public class SymbolTable
 {
-	public HashMap<String, Object> ST = new HashMap<String, Object>();
+	public HashMap<String, STEntry> ST = new HashMap<>();
 	
 	public SymbolTable()
 	{
 		initGlobal();
 		
-		Set set = ST.entrySet();
+		//Set<STEntry> set = ST.entrySet();
 		// Get an iterator
-		Iterator i = set.iterator();
+		//Iterator i = set.iterator();
 	    // Display elements
 		//while(i.hasNext()) {
 		//	Map.Entry me = (Map.Entry)i.next();
@@ -22,8 +22,8 @@ public class SymbolTable
 	
 	private void initGlobal()
 	{
-		ST.put("def", 10);
-		ST.put("enddef", 10);
+		ST.put("def", new STControl("def", Token.CONTROL, Token.FLOW));
+		ST.put("enddef", new STControl("def", Token.CONTROL, Token.END));
 		ST.put("if", new STControl("if",Token.CONTROL,Token.FLOW));
 		ST.put("endif", new STControl("endif",Token.CONTROL,Token.END));
 		ST.put("else", 10);
@@ -50,52 +50,6 @@ public class SymbolTable
 		 
 	}
 	
-	
-	class STEntry
-	{
-		public STEntry(String string, int operator){
-			
-		}
-		HashMap STEntry = new HashMap();
-		char symbol;
-		String primClassif;
-		
-	}
-	class STIdentifier extends STEntry
-	{
-		public STIdentifier(String string, int operator) {
-			super(string, operator);
-			// TODO Auto-generated constructor stub
-		}
-		HashMap STIdentifier = new HashMap();
-		String dclType;
-		String structure;
-		String parm;
-		int nonLocal;
-	}
-	class STFunction extends STEntry
-	{
-		public STFunction(String string, int operator, int void1) {
-			super(string, operator);
-			// TODO Auto-generated constructor stub
-		}
-		HashMap STFunction = new HashMap();
-		String returnType;
-		String definedBy;
-		int numArgs;
-		ArrayList parmList;
-		SymbolTable symbolTable;
-	}
-	class STControl extends STEntry
-	{
-		public STControl(String string, int operator, int declare) {
-			super(string, operator);
-			// TODO Auto-generated constructor stub
-		}
-		HashMap STControl = new HashMap();
-		String subClassif;
-	}
-	
 	//returns the symbol and its corresponding entry in the symbol table.
 	STEntry getSymbol(String symbol)
 	{
@@ -106,4 +60,58 @@ public class SymbolTable
 	{
 		ST.put(symbol, entry);
 	}
+}
+
+abstract class STEntry
+{
+	
+	public STEntry(String tokenStr, int primClassif) {
+		this.symbol = tokenStr;
+		this.primClassif = primClassif;
+	}
+	
+	HashMap STEntry = new HashMap();
+	String symbol;
+	int primClassif;	
+}
+
+class STIdentifier extends STEntry
+{
+	
+	public STIdentifier(String tokenStr, int primClassif, String dclType, String structure, String parm, int nonLocal) {
+		super(tokenStr, primClassif);
+		this.dclType = dclType;
+		this.structure = structure;
+		this.parm = parm;
+		this.nonLocal = nonLocal;
+	}
+	
+	String dclType;
+	String structure;
+	String parm;
+	int nonLocal;
+}
+
+class STFunction extends STEntry
+{
+	public STFunction(String string, int operator, int void1) {
+		super(string, operator);
+		// TODO Auto-generated constructor stub
+	}
+	HashMap STFunction = new HashMap();
+	String returnType;
+	String definedBy;
+	int numArgs;
+	ArrayList parmList;
+	SymbolTable symbolTable;
+}
+
+class STControl extends STEntry
+{
+	public STControl(String string, int operator, int declare) {
+		super(string, operator);
+		// TODO Auto-generated constructor stub
+	}
+	HashMap STControl = new HashMap();
+	String subClassif;
 }
