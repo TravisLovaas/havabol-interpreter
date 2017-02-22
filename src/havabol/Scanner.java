@@ -80,56 +80,79 @@ public class Scanner {
 		} else {
 			done = true;
 		}
-		
-		getNext();
+
 	}
 	
 	/**
-	 * Retrieves and sets all information for the current token scanned.
+	 * Reads and classifies the next token in the source file.
 	 * Returns the next token as a string, functionally.
 	 * @return String representation of the next token
 	 */
 	public String getNext() throws SyntaxError {
 		
-		/* 
-		 * Algorithmic sketch:
+//		while (!lineBuffer.isEmpty()) {
+//			System.out.println(lineBuffer.remove(0));
+//		}
+		
+		currentToken = getNextToken(false);
+		
+		if (currentToken.primClassif == Token.EOF) {
+			return "";
+		}
+		
+		nextToken = getNextToken(true);
+		
+		return currentToken.tokenStr;
+		
+	}
+	
+	/**
+	 * Returns the next available token from the scanner's current internal
+	 * cursor position.
+	 * @param lookahead If true, save and restore scanner's internal cursor position
+	 * @return The next available token
+	 */
+	public Token getNextToken(boolean lookahead) {
+		
+		/*
+		 * token refers to the next available token we will read
+		 * delimiter refers to any character in above DELIMITERS list.
 		 * 
-		 * Advance iColPos and iSourceLineNr until we find a non-whitespace character
-		 * If char is a delimiter:
-		 * 		If char is quote:
-		 * 			Until we find a non-escaped matching quote:
-		 * 				Append chars
-		 * 			Return a string literal token
+		 * Preconditions:
+		 * 		- Internal cursor is ON or BEFORE the beginning of our token.
+		 * 
+		 * Algorithm:
+		 * 		If backtrack is true:
+		 * 			Save internal cursor state
+		 * 		Skip any and all whitespace and comments
+		 * 		If our cursor is ON a delimiter:
+		 * 			If delimiter is a quote:
+		 * 				Read a string literal as our token
+		 * 			Otherwise:
+		 * 				Read one character into tokenStr
 		 * 		Otherwise:
-		 * 			Append char
-		 * 			Return token
-		 * Otherwise:
-		 * 		Until we find a delimiter:
-		 * 			Append chars
-		 * 		Return token
+		 * 			Read characters into tokenStr until cursor is ON a delimiter.
+		 * 		If backtrack is true:
+		 * 			Restore internal cursor state
 		 * 
-		 * 
-		 * Comment parsing
-		 * ---------------------------
-		 * If we find a "//":
-		 * 		set commentFound = true
-		 * 		set commentFoundOn = iSourceLineNr
-		 * 		while iSourceLineNr == commentFoundOn:
-		 * 			advanceCursor()
-		 * 
-		 * Handling escaped chars
-		 * ---------------------------
-		 * if find a "/" followed by a printable char,
-		 * 		continue
-		 * if the string contains non printable char,
-		 * 		then call the hex printing method
+		 * Postconditions:
+		 * 		- If backtrack is false: internal cursor is STRICTLY AFTER the end of our token.
+		 * 		- If backtrack is true: internal cursor is unchanged from its state before the call to this function.
 		 */
-		currentToken = nextToken.clone();
-		nextToken = new Token();
+		
+		int beforeSourceLineNr = -1;
+		int beforeColPos = -1;
+		
+		//System.out.println("Lookahead: " + lookahead);
+		//System.out.println("Before: " + iSourceLineNr + " "+ iColPos);
+		if (lookahead) {
+			beforeSourceLineNr = iSourceLineNr;
+			beforeColPos = iColPos;
+		}
 
+		Token token = new Token();
 		StringBuilder tokenStr = new StringBuilder();
 		boolean isStringLiteral = false;
-		boolean doubleOperator = false;
 		commentFound = false;
 		
 		// Skip until we find something other than whitespace, comments, or we finish
@@ -138,46 +161,35 @@ public class Scanner {
 		{
 			//System.out.println("SKIP");
 			if ((iColPos >= textCharM.length || WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
-				advanceCursor();
+				advanceCursor(!lookahead);
 			else if (textCharM[iColPos] == '/')
 			{
 				if(iColPos < (textCharM.length - 1) && textCharM[iColPos + 1] == '/'){
 					commentFound = true; 
 					commentFoundOn = iSourceLineNr;
 					while (iSourceLineNr == commentFoundOn)
-						advanceCursor();
+						advanceCursor(!lookahead);
 				} else {
 					throw new SyntaxError("Invalid char \' " + textCharM[iColPos] + " \' found", iSourceLineNr + 1, iColPos);
 				}
 			}
 		}
 		
-		// Print any source lines we've read before we scan the next token
-		while (!lineBuffer.isEmpty()) {
-			System.out.println(lineBuffer.remove(0));
-		}
-		
 		// If the done flag was set, there are no more tokens
 		if (done) {
-			if (printedLast) {
-				currentToken.primClassif = Token.EOF;
-				return "";
-			} else {
-				printedLast = true;
-				return currentToken.tokenStr;
-			}
+			token.primClassif = Token.EOF;
+			return token;
 		}
-		
 		
 		//System.out.println("Found non-whitespace: " + textCharM[iColPos]);
 		// Save the start position of this token in case of error
-		nextToken.iColPos = iColPos;
-		nextToken.iSourceLineNr = iSourceLineNr;
+		token.iColPos = iColPos;
+		token.iSourceLineNr = iSourceLineNr;
 		debugColPos = iColPos;
 		char currentChar = textCharM[iColPos];
 		char [] retCharM = new char[textCharM.length];
 		int iRet = 0;
-		int i = 0;
+
 		if (DELIMITERS.contains(Character.toString(currentChar))) {
 			if (QUOTES.contains(Character.toString(currentChar))) {
 				//System.out.println("Quote found.");
@@ -186,7 +198,7 @@ public class Scanner {
 				int openQuoteLineNr = iSourceLineNr;
 				for (;;) {
 					
-					advanceCursor();	
+					advanceCursor(!lookahead);	
 					
 					//if(currentToken.nonPrintable){
 						//currentToken.nonPrintable = false;
@@ -208,7 +220,7 @@ public class Scanner {
 						if(ESCAPEPRINT.contains(Character.toString(textCharM[iColPos + 1])))
 							continue;
 						else{
-							nextToken.nonPrintable = true;
+							token.nonPrintable = true;
 							if (escapeMap.containsKey(textCharM[iColPos + 1])){
 								retCharM[iRet++] = escapeMap.get(textCharM[iColPos + 1]);
 								continue;
@@ -222,7 +234,7 @@ public class Scanner {
 			
 				tokenStr =  tokenStr.insert(0, retCharM, 0, iRet);
 				tokenStr.delete(iRet, tokenStr.length() + 1);
-				advanceCursor();
+				advanceCursor(!lookahead);
 
 			} else {
 				if(OPERATORS.contains(Character.toString(textCharM[iColPos])) && 
@@ -230,27 +242,39 @@ public class Scanner {
 				{
 					tokenStr.append(textCharM[iColPos]);
 					tokenStr.append(textCharM[iColPos + 1]);
-					advanceCursor();
+					advanceCursor(!lookahead);
 				}else
 					tokenStr.append(currentChar);
-				advanceCursor();
+				advanceCursor(!lookahead);
 			}
 		} else {
 			//System.out.println("Non-delimiter token found.");
 			while (!DELIMITERS.contains(Character.toString(currentChar))) {
 				tokenStr.append(currentChar);
 				//System.out.println("Appended: " + currentChar);
-				advanceCursor();
+				advanceCursor(!lookahead);
 				currentChar = textCharM[iColPos];
 			}
 		}
 		
-		classifyToken(nextToken, tokenStr.toString(), isStringLiteral);
+		token.tokenStr = tokenStr.toString();
+		classifyToken(token, isStringLiteral);
 		
-		return tokenStr.toString();
+		if (lookahead) {
+			iSourceLineNr = beforeSourceLineNr;
+			iColPos = beforeColPos;
+			textCharM = sourceLineM.get(beforeSourceLineNr).toCharArray();
+		}
+		
+		return token;
 		
 	}
 
+	/**
+	 * Sets the cursor position of this scanner
+	 * @param iSourceLineNr Zero-based line number to set cursor at
+	 * @param iColPos Zero-based column to set cursor at
+	 */
 	public void setPosition(int iSourceLineNr, int iColPos) 
 	{
 		this.iSourceLineNr = iSourceLineNr;
@@ -260,15 +284,12 @@ public class Scanner {
 	/**
 	 * Classifies a token and sets necessary token fields.
 	 * @param token Token to populate
-	 * @param tokenStr Token string
 	 * @param isStringLiteral Identifies this token as a string literal
 	 */
-	public void classifyToken(Token token, String tokenStr, boolean isStringLiteral) throws SyntaxError {
-		
-		token.tokenStr = tokenStr;
+	public void classifyToken(Token token, boolean isStringLiteral) throws SyntaxError {
 		
 		// Check if tokenStr is a data type
-		switch (tokenStr) {
+		switch (token.tokenStr) {
 			case "Int":
 			case "Float":
 			case "String":
@@ -324,21 +345,21 @@ public class Scanner {
 				return;
 		}
 		
-		if (OPERATORS.contains(tokenStr)) {
+		if (OPERATORS.contains(token.tokenStr)) {
 			token.primClassif = Token.OPERATOR;
-		} else if (SEPARATORS.contains(tokenStr)) {
+		} else if (SEPARATORS.contains(token.tokenStr)) {
 			token.primClassif = Token.SEPARATOR;
 		} else {
 			token.primClassif = Token.OPERAND;
-			if (Character.isDigit(tokenStr.charAt(0))) {
+			if (Character.isDigit(token.tokenStr.charAt(0))) {
 				// Numeric literal
-				if (tokenStr.contains(".")) {
-					if (!tokenStr.matches("(\\d+\\.\\d*|\\d*\\.\\d+)")) {
+				if (token.tokenStr.contains(".")) {
+					if (!token.tokenStr.matches("(\\d+\\.\\d*|\\d*\\.\\d+)")) {
 						throw new SyntaxError("Invalid floating point literal", iSourceLineNr + 1, debugColPos + 1);
 					}
 					token.subClassif = Token.FLOAT;
 				} else {
-					if (!tokenStr.matches("\\d+")) {
+					if (!token.tokenStr.matches("\\d+")) {
 						throw new SyntaxError("Invalid integer literal", iSourceLineNr + 1, debugColPos + 1);
 					}
 					token.subClassif = Token.INTEGER;
@@ -354,6 +375,10 @@ public class Scanner {
 		
 	}
 	
+	/**
+	 * Adds the given source code line to the line print buffer
+	 * @param lineNumber The 0-based line number of the line to add to the buffer
+	 */
 	public void bufferLine(int lineNumber) {
 		lineBuffer.add("  " + (lineNumber + 1) + " " + sourceLineM.get(lineNumber));
 	}
@@ -362,20 +387,20 @@ public class Scanner {
 	 * Advances the scanner's cursor location by one, reading in new lines
 	 * as necessary.
 	 */
-	public void advanceCursor() {
+	public void advanceCursor(boolean print) {
 		iColPos += 1;
-		//System.out.println("Line: " + (iSourceLineNr + 1) + " Col: " + iColPos);
+		//System.out.println("Line: " + (iSourceLineNr) + " Col: " + (iColPos - 1) + " Char: " + textCharM[iColPos - 1]);
 		if (iColPos >= textCharM.length) {
 			iColPos = 0;
 			iSourceLineNr++;
 			if (iSourceLineNr < sourceLineM.size()) {
 				textCharM = sourceLineM.get(iSourceLineNr).toCharArray();
-				bufferLine(iSourceLineNr);
-				printBuffer = true;
+				if (print) {
+					bufferLine(iSourceLineNr);
+				}
 			} else {
 				done = true;
 			}
-			//lineAdvanced = true;
 		}
 	}
 
