@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import havabol.SymbolTable;
 import havabol.SyntaxError;
 
 public class Scanner {

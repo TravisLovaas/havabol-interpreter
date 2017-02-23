@@ -1,4 +1,4 @@
-package havabol;
+package havabol.lexer;
 
 public class Symbols {
 

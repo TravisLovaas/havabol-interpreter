@@ -1,8 +1,6 @@
-package havabol;
+package havabol.lexer;
 
 import java.util.*;
-
-import lexer.Token;
 
 public class SymbolTable
 {
