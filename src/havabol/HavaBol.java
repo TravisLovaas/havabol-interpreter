@@ -17,6 +17,8 @@
  */
 package havabol;
 
+import havabol.lexer.Scanner;
+
 public class HavaBol 
 {
     public static void main(String[] args) 

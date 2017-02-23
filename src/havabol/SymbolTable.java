@@ -2,6 +2,8 @@ package havabol;
 
 import java.util.*;
 
+import lexer.Token;
+
 public class SymbolTable
 {
 	public HashMap<String, STEntry> ST = new HashMap<>();
