@@ -37,6 +37,7 @@ public class TestHavaBol
     		}
     	});
     	
+    	// Ensure at least one source file exists
     	assert inputFiles.length > 0;
     	
     	boolean testSuccessful = false;
@@ -47,6 +48,7 @@ public class TestHavaBol
     		System.out.println("===========================================");
     		
     		testSuccessful = testSourceFile(f.getAbsolutePath());
+    		// Ensure source file test was successful
     		assert testSuccessful;
     	}
         
@@ -68,6 +70,8 @@ public class TestHavaBol
             while (! scan.getNext().isEmpty())
             {
                 scan.currentToken.printToken();
+                // Ensure token was classified
+                assert scan.currentToken.primClassif != 0;
             }
         }
         catch (Exception e)
