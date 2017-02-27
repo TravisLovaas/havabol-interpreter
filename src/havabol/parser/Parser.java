@@ -8,10 +8,11 @@ import havabol.storage.*;
 public class Parser {
 	
 	Scanner scanner;
+	SymbolTable symbolTable;
 
 	public Parser(String sourceFilename) {
 		
-		SymbolTable symbolTable = new SymbolTable();
+		symbolTable = new SymbolTable();
 		
 		try {
 			scanner = new Scanner(sourceFilename, symbolTable);
@@ -37,13 +38,20 @@ public class Parser {
 	
 	public void parseDeclaration() {
 		DataType declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
+		Structure structure = Structure.PRIMITIVE;
 		String identifier;
 		
 		if (!scanner.getNext().isEmpty()) {
 			if (scanner.currentToken.primClassif == Token.OPERAND && scanner.currentToken.subClassif == Token.IDENTIFIER) {
 				identifier = scanner.currentToken.tokenStr;
 				
-				// TODO: Check and create symbol table entry
+				// TODO: check scope of symbol table entries
+				if (symbolTable.ST.containsKey(identifier)) {
+					// TODO: redeclared already existing identifier
+				} else {
+					// TODO: handle scope of entries
+					symbolTable.ST.put(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
+				}
 				
 				// Check for declaration initialization
 				if (scanner.nextToken.primClassif == Token.OPERATOR && scanner.nextToken.tokenStr.equals("=")) {

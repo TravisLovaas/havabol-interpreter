@@ -80,32 +80,11 @@ class STEntry
 		this.symbol = tokenStr;
 		this.primClassif = primClassif;
 	}
-	
-	HashMap STEntry = new HashMap();
+
 	String symbol;
 	int primClassif;	
 }
-/*
- * STIdentifier class for the Identifier symbol table entries.
- */
-class STIdentifier extends STEntry
-{
-	/*
-	 * Constructor for STIdentifier subclass
-	 */
-	public STIdentifier(String tokenStr, int primClassif, String dclType, String structure, String parm, int nonLocal) {
-		super(tokenStr, primClassif);
-		this.dclType = dclType;
-		this.structure = structure;
-		this.parm = parm;
-		this.nonLocal = nonLocal;
-	}
-	
-	String dclType;
-	String structure;
-	String parm;
-	int nonLocal;
-}
+
 /*
  * STFunction class for the Function symbol table entries.
  */
