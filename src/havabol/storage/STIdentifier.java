@@ -1,4 +1,4 @@
-package havabol.lexer;
+package havabol.storage;
 
 import havabol.storage.*;
 
@@ -22,4 +22,9 @@ public class STIdentifier extends STEntry
 	Structure structure;
 	String parm;
 	int nonLocal;
+	
+	public String toString() {
+		return String.format("IDENTIFIER: %s: %s %s %s %d", symbol, declaredType, structure, parm, nonLocal);
+	}
+	
 }

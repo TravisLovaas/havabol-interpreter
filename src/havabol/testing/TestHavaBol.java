@@ -21,8 +21,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import havabol.lexer.Scanner;
-import havabol.lexer.SymbolTable;
 import havabol.parser.Parser;
+import havabol.storage.SymbolTable;
 
 public class TestHavaBol 
 {

@@ -18,7 +18,7 @@
 package havabol;
 
 import havabol.lexer.Scanner;
-import havabol.lexer.SymbolTable;
+import havabol.storage.SymbolTable;
 
 public class HavaBol 
 {

@@ -1,12 +1,14 @@
-package havabol.lexer;
+package havabol.storage;
 
 import java.util.*;
+
+import havabol.lexer.Token;
 
 public class SymbolTable
 {
 	public HashMap<String, STEntry> ST = new HashMap<>();
 	int VAR_ARGS;
-	
+
 	/**
 	 * main function for Symbol Table class which calls initGlobal
 	 */
@@ -69,62 +71,18 @@ public class SymbolTable
 	
 	public void printSymbolTable() {
 		System.out.println("******************** SymbolTable ********************");
-		for (String i : ST.keySet()) {
-			System.out.printf("%15s: ", i);
-			System.out.println(ST.get(i));
+		for (STEntry e : ST.values()) {
+			if (e instanceof STIdentifier) {
+				System.out.println(((STIdentifier) e).toString());
+			} else if (e instanceof STFunction) {
+				System.out.println(((STFunction) e).toString());
+			} else if (e instanceof STControl) {
+				System.out.println(((STControl) e).toString());
+			} else {
+				System.out.println(e);
+			}
 		}
 		
 		System.out.println("*****************************************************");
 	}
-}
-
-/*
- *  STEntry class for handling Symbol Table entries.
- */
-class STEntry
-{
-	/*
-	 * Constructor for the STEntry class
-	 */
-	public STEntry(String tokenStr, int primClassif) {
-		this.symbol = tokenStr;
-		this.primClassif = primClassif;
-	}
-
-	String symbol;
-	int primClassif;	
-}
-
-/*
- * STFunction class for the Function symbol table entries.
- */
-class STFunction extends STEntry
-{
-	/*
-	 * Constructor for STFunction subclass
-	 */
-	public STFunction(String tokenStr, int primClassif, int returnType, int builtin, int numArgs) {
-		super(tokenStr, primClassif);
-		this.returnType = returnType;
-		this.definedBy = builtin;
-		this.numArgs = numArgs;
-	}
-	int returnType;
-	int definedBy;
-	int numArgs;
-	SymbolTable symbolTable;
-}
-/*
- * STControl class for the Control symbol table entries.
- */
-class STControl extends STEntry
-{
-	/*
-	 * Constructor for the STControl subclass
-	 */
-	public STControl(String tokenStr, int primClassif, int subClassif) {
-		super(tokenStr, primClassif);
-		this.subClassif = subClassif;
-	}
-	int subClassif;
 }
