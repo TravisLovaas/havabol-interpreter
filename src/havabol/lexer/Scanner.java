@@ -113,7 +113,7 @@ public class Scanner {
 	 * @param lookahead If true, save and restore scanner's internal cursor position
 	 * @return The next available token
 	 */
-	public Token getNextToken(boolean lookahead) {
+	private Token getNextToken(boolean lookahead) {
 		
 		/*
 		 * token refers to the next available token we will read

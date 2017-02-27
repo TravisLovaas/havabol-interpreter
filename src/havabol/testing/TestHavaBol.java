@@ -22,6 +22,7 @@ import java.io.FilenameFilter;
 
 import havabol.lexer.Scanner;
 import havabol.lexer.SymbolTable;
+import havabol.parser.Parser;
 
 public class TestHavaBol 
 {
@@ -47,14 +48,14 @@ public class TestHavaBol
     		System.out.println(f.getAbsolutePath());
     		System.out.println("===========================================");
     		
-    		testSuccessful = testSourceFile(f.getAbsolutePath());
+    		testSuccessful = testSourceFileParsing(f.getAbsolutePath());
     		// Ensure source file test was successful
     		assert testSuccessful;
     	}
         
     }
     
-    public static boolean testSourceFile(String sourceFile) {
+    public static boolean testSourceFileScanning(String sourceFile) {
     	
     	
     	SymbolTable symbolTable = new SymbolTable();
@@ -79,6 +80,27 @@ public class TestHavaBol
             e.printStackTrace();
             return false;
         }
+    	
+    	return true;
+    	
+    }
+    
+    public static boolean testSourceFileParsing(String sourceFile) {
+    	
+    	try
+        {
+            Parser parser = new Parser(sourceFile);
+            parser.beginParsing();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    	
+    	System.out.println("===========================================");
+		System.out.println("Test complete. Resetting environment...");
+		System.out.println("===========================================");
     	
     	return true;
     	
