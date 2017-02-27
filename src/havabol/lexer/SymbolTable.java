@@ -53,7 +53,7 @@ public class SymbolTable
 	 * returns the symbol and its corresponding entry in the symbol table.
 	 * @param symbol the symbol to get to the Symbol Table
 	 */
-	STEntry getSymbol(String symbol)
+	public STEntry getSymbol(String symbol)
 	{
 		return (STEntry) ST.get(symbol);
 	}
@@ -62,9 +62,19 @@ public class SymbolTable
 	 * @param symbol the symbol to add to the Symbol Table
 	 * @param entry the entry in the symbol table that corresponds to the symbol name
 	 */
-	void putSymbol(String symbol, STEntry entry)
+	public void putSymbol(String symbol, STEntry entry)
 	{
 		ST.put(symbol, entry);
+	}
+	
+	public void printSymbolTable() {
+		System.out.println("******************** SymbolTable ********************");
+		for (String i : ST.keySet()) {
+			System.out.printf("%15s: ", i);
+			System.out.println(ST.get(i));
+		}
+		
+		System.out.println("*****************************************************");
 	}
 }
 

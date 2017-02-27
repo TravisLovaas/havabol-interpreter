@@ -10,9 +10,9 @@ public class Parser {
 	Scanner scanner;
 	SymbolTable symbolTable;
 
-	public Parser(String sourceFilename) {
+	public Parser(String sourceFilename, SymbolTable symbolTable) {
 		
-		symbolTable = new SymbolTable();
+		this.symbolTable = symbolTable;
 		
 		try {
 			scanner = new Scanner(sourceFilename, symbolTable);
@@ -50,7 +50,7 @@ public class Parser {
 					// TODO: redeclared already existing identifier
 				} else {
 					// TODO: handle scope of entries
-					symbolTable.ST.put(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
+					symbolTable.putSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
 				}
 				
 				// Check for declaration initialization

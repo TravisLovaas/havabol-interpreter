@@ -89,8 +89,10 @@ public class TestHavaBol
     	
     	try
         {
-            Parser parser = new Parser(sourceFile);
+    		SymbolTable st = new SymbolTable();
+            Parser parser = new Parser(sourceFile, st);
             parser.beginParsing();
+            st.printSymbolTable();
         }
         catch (Exception e)
         {
