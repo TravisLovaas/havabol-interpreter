@@ -36,12 +36,14 @@ public class Parser {
 	}
 	
 	public void parseDeclaration() {
-		String declaredType = scanner.currentToken.tokenStr;
+		DataType declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
 		String identifier;
 		
 		if (!scanner.getNext().isEmpty()) {
 			if (scanner.currentToken.primClassif == Token.OPERAND && scanner.currentToken.subClassif == Token.IDENTIFIER) {
 				identifier = scanner.currentToken.tokenStr;
+				
+				// TODO: Check and create symbol table entry
 				
 				// Check for declaration initialization
 				if (scanner.nextToken.primClassif == Token.OPERATOR && scanner.nextToken.tokenStr.equals("=")) {
@@ -49,22 +51,27 @@ public class Parser {
 					scanner.getNext();
 					if (!scanner.getNext().isEmpty()) {
 						// Parse expr into result value
-						
+						ResultValue initValue = parseExpression();
+						if (initValue.dataType != declaredType) {
+							// TODO: type mismatch
+						}
+						// TODO: Store value in StorageManager
 					} else {
-						// expected initialization expr, found nothing
+						// TODO: expected initialization expr, found nothing
 					}
 				}
 				
 			} else {
-				// expected identifier, found something else
+				// TODO: expected identifier, found something else
 			}
 		} else {
-			// expected identifier, found nothing
+			// TODO: expected identifier, found nothing
 		}
 		
 	}
 	
 	public ResultValue parseExpression() {
+		// TODO: recursively parse an expression
 		return null;
 	}
 
