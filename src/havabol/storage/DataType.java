@@ -5,7 +5,8 @@ public enum DataType {
 	INTEGER,
 	FLOAT,
 	STRING,
-	BOOLEAN;
+	BOOLEAN,
+	VOID;
 	
 	public static DataType stringToType(String type) {
 		switch (type) {
