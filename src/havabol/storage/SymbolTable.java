@@ -69,6 +69,10 @@ public class SymbolTable
 		ST.put(symbol, entry);
 	}
 	
+	public void deleteSymbol(String symbol){
+		ST.remove(symbol);
+	}
+	
 	public void printSymbolTable() {
 		System.out.println("******************** SymbolTable ********************");
 		for (STEntry e : ST.values()) {
