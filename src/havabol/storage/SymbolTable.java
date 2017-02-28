@@ -3,9 +3,11 @@ package havabol.storage;
 import java.util.*;
 
 import havabol.lexer.Token;
+import havabol.parser.*;
 
 public class SymbolTable {
 	public HashMap<String, STEntry> ST = new HashMap<>();
+	Parser parser;
 	int VAR_ARGS;
 
 	/**
@@ -76,8 +78,12 @@ public class SymbolTable {
 	 * @param symbol the symbol to add to the Symbol Table
 	 * @param entry the entry in the symbol table that corresponds to the symbol name
 	 */
-	public void createSymbol(String symbol, STEntry entry){
-		ST.put(symbol, entry);
+	public void createSymbol(Parser parser, String symbol, STEntry entry){
+		if(this.containsSymbol(symbol)){
+			// TODO: error: already in Symbol Table
+		}else{
+			ST.put(symbol, entry);
+		}
 	}
 	
 	/**

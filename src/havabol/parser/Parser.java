@@ -34,7 +34,7 @@ public class Parser {
 				parseDeclaration();
 			}
 		}else if(scanner.currentToken.primClassif == Token.OPERATOR){
-			//parseOperator();
+			
 		}
 	}
 	
@@ -47,13 +47,8 @@ public class Parser {
 			if (scanner.currentToken.primClassif == Token.OPERAND && scanner.currentToken.subClassif == Token.IDENTIFIER) {
 				identifier = scanner.currentToken.tokenStr;
 				
-				// TODO: check scope of symbol table entries
-				if (symbolTable.containsSymbol(identifier)) {
-					// TODO: redeclared already existing identifier
-				} else {
-					// TODO: handle scope of entries
-					symbolTable.createSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
-				}
+				// Create symbol and checks for errors
+				symbolTable.createSymbol(this, identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
 				
 				// Check for declaration initialization
 				if (scanner.nextToken.primClassif == Token.OPERATOR && scanner.nextToken.tokenStr.equals("=")) {
@@ -88,6 +83,11 @@ public class Parser {
 	
 	public ResultValue parseExpression() {
 		// TODO: recursively parse an expression
+		return null;
+	}
+	
+	public ResultValue parseFunction() {
+		// TODO: recursively parse a function
 		return null;
 	}
 
