@@ -9,6 +9,7 @@ public class Parser {
 	
 	Scanner scanner;
 	SymbolTable symbolTable;
+	StorageManager storageManager;
 
 	public Parser(String sourceFilename, SymbolTable symbolTable) {
 		
@@ -64,6 +65,7 @@ public class Parser {
 							// TODO: type mismatch
 						}
 						// TODO: Store value in StorageManager
+						storageManager.update(identifier,scanner.nextToken.tokenStr);
 					} else {
 						// TODO: expected initialization expr, found nothing
 					}
