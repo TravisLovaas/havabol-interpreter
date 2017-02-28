@@ -1,27 +1,30 @@
 package havabol.storage;
 
+import havabol.lexer.Token;
 
 /*
  * STFunction class for the Function symbol table entries.
  */
-class STFunction extends STEntry
+public class STFunction extends STEntry
 {
+	
+	public DataType returnType;
+	public int subClassif;
+	public int numArgs;
+	public SymbolTable symbolTable;
+	
 	/*
 	 * Constructor for STFunction subclass
 	 */
-	public STFunction(String tokenStr, int primClassif, int returnType, int builtin, int numArgs) {
+	public STFunction(String tokenStr, int primClassif, DataType returnType, int subClassif, int numArgs) {
 		super(tokenStr, primClassif);
 		this.returnType = returnType;
-		this.definedBy = builtin;
+		this.subClassif = subClassif;
 		this.numArgs = numArgs;
 	}
-	int returnType;
-	int definedBy;
-	int numArgs;
-	SymbolTable symbolTable;
-	
+
 	public String toString() {
-		return String.format("FUNCTION: %s: %s %s %d", symbol, returnType, definedBy, numArgs);
+		return String.format("FUNCTION: %s: returns: %s classification: %s num args: %d", symbol, returnType, subClassif, numArgs);
 	}
 	
 }

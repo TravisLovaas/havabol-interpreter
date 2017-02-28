@@ -1,6 +1,4 @@
-package havabol;
-
-import havabol.lexer.Token;
+package havabol.lexer;
 
 public class SyntaxError extends Error {
 
