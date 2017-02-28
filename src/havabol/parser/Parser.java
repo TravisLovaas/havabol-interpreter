@@ -55,7 +55,6 @@ public class Parser {
 				}
 				
 				// Check for declaration initialization
-				System.out.print("  identifier = '"+identifier+"' nextToken.tokenStr = '"+scanner.nextToken.tokenStr+"'\n");
 				if (scanner.nextToken.primClassif == Token.OPERATOR && scanner.nextToken.tokenStr.equals("=")) {
 					// Initialization assignment found
 					scanner.getNext();
