@@ -48,9 +48,15 @@ public class TestHavaBol
     		System.out.println(f.getAbsolutePath());
     		System.out.println("===========================================");
     		
-    		testSuccessful = testSourceFileParsing(f.getAbsolutePath());
-    		// Ensure source file test was successful
+    		testSuccessful = testSourceFileScanning(f.getAbsolutePath());
     		assert testSuccessful;
+    		
+    		testSuccessful = testSourceFileParsing(f.getAbsolutePath());
+    		assert testSuccessful;
+    		
+    	   	System.out.println("===========================================");
+    		System.out.println("Test complete. Resetting environment...");
+    		System.out.println("===========================================");
     	}
         
     }
@@ -99,10 +105,6 @@ public class TestHavaBol
             e.printStackTrace();
             return false;
         }
-    	
-    	System.out.println("===========================================");
-		System.out.println("Test complete. Resetting environment...");
-		System.out.println("===========================================");
     	
     	return true;
     	
