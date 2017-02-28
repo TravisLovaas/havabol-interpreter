@@ -12,8 +12,7 @@ public class SymbolTable
 	/**
 	 * main function for Symbol Table class which calls initGlobal
 	 */
-	public SymbolTable()
-	{
+	public SymbolTable(){
 		initGlobal();  
 	}
 	
@@ -21,8 +20,7 @@ public class SymbolTable
 	 * initGlobal function for initializing the Global Symbol Table
 	 * with put functions.
 	 */
-	private void initGlobal()
-	{
+	private void initGlobal(){
 		ST.put("def", new STControl("def", Token.CONTROL, Token.FLOW));
 		ST.put("enddef", new STControl("def", Token.CONTROL, Token.END));
 		ST.put("if", new STControl("if",Token.CONTROL,Token.FLOW));
@@ -48,29 +46,38 @@ public class SymbolTable
 		ST.put("not", new STEntry("not", Token.OPERATOR));
 		ST.put("in", new STEntry("in", Token.OPERATOR));
 		ST.put("notin", new STEntry("notin", Token.OPERATOR));
-		 
 	}
 	
 	/**
 	 * returns the symbol and its corresponding entry in the symbol table.
 	 * @param symbol the symbol to get to the Symbol Table
 	 */
-	public STEntry getSymbol(String symbol)
-	{
-		return (STEntry) ST.get(symbol);
+	public STEntry getSymbol(String symbol){
+		if(ST.containsKey(symbol)){
+			return (STEntry) ST.get(symbol);
+		}else{
+			// TODO: error: symbol not found 
+			return null;
+		}
 	}
 	/**
-	 * stores the symbol and its corresponding entry in the symbol table
+	 * creates and/or stores the symbol and its corresponding entry in the symbol table
 	 * @param symbol the symbol to add to the Symbol Table
 	 * @param entry the entry in the symbol table that corresponds to the symbol name
 	 */
-	public void putSymbol(String symbol, STEntry entry)
-	{
+	public void createUpdateSymbol(String symbol, STEntry entry){
 		ST.put(symbol, entry);
 	}
-	
+	/**
+	 * removes the symbol and its corresponding entry in the symbol table
+	 * @param symbol the symbol to delete from the Symbol Table
+	 */
 	public void deleteSymbol(String symbol){
-		ST.remove(symbol);
+		if(ST.containsKey(symbol)){
+			ST.remove(symbol);
+		}else{
+			// TODO: error: symbol not in table
+		}
 	}
 	
 	public void printSymbolTable() {

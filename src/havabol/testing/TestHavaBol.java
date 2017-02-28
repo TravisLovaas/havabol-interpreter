@@ -26,6 +26,7 @@ import havabol.storage.SymbolTable;
 
 public class TestHavaBol 
 {
+	SymbolTable symbolTable;
     public static void main(String[] args) 
     {
         

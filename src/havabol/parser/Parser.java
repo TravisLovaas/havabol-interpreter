@@ -9,7 +9,6 @@ public class Parser {
 	
 	Scanner scanner;
 	SymbolTable symbolTable;
-	StorageManager storageManager;
 
 	public Parser(String sourceFilename, SymbolTable symbolTable) {
 		
@@ -34,6 +33,8 @@ public class Parser {
 			if (scanner.currentToken.subClassif == Token.DECLARE) {
 				parseDeclaration();
 			}
+		}else if(scanner.currentToken.primClassif == Token.OPERATOR){
+			//parseOperator();
 		}
 	}
 	
@@ -51,9 +52,8 @@ public class Parser {
 					// TODO: redeclared already existing identifier
 				} else {
 					// TODO: handle scope of entries
-					symbolTable.putSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
+					symbolTable.createUpdateSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
 				}
-				
 				// Check for declaration initialization
 				if (scanner.nextToken.primClassif == Token.OPERATOR && scanner.nextToken.tokenStr.equals("=")) {
 					// Initialization assignment found
@@ -64,13 +64,11 @@ public class Parser {
 						if (initValue.dataType != declaredType) {
 							// TODO: type mismatch
 						}
-						// TODO: Store value in StorageManager
-						storageManager.update(identifier,scanner.nextToken.tokenStr);
+						symbolTable.createUpdateSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
 					} else {
 						// TODO: expected initialization expr, found nothing
 					}
 				}
-				
 			} else {
 				// TODO: expected identifier, found something else
 			}
