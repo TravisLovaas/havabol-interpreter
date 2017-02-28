@@ -15,8 +15,18 @@ public class STEntry
 
 	String symbol;
 	int primClassif;
+	Value value;
 	
 	public String toString() {
 		return String.format("GENERIC ENTRY: %s: %d", symbol, primClassif);
 	}
+	
+	public void setValue(Value value) {
+		this.value = value;
+	}
+	
+	public Value getValue() {
+		return this.value;
+	}
+	
 }

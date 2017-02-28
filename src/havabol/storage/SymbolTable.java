@@ -66,15 +66,20 @@ public class SymbolTable {
 		}
 
 	}
+	
+	public boolean containsSymbol(String symbol) {
+		return ST.containsKey(symbol);
+	}
 
 	/**
 	 * creates and/or stores the symbol and its corresponding entry in the symbol table
 	 * @param symbol the symbol to add to the Symbol Table
 	 * @param entry the entry in the symbol table that corresponds to the symbol name
 	 */
-	public void createUpdateSymbol(String symbol, STEntry entry){
+	public void createSymbol(String symbol, STEntry entry){
 		ST.put(symbol, entry);
 	}
+	
 	/**
 	 * removes the symbol and its corresponding entry in the symbol table
 	 * @param symbol the symbol to delete from the Symbol Table

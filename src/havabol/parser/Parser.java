@@ -48,27 +48,35 @@ public class Parser {
 				identifier = scanner.currentToken.tokenStr;
 				
 				// TODO: check scope of symbol table entries
-				if (symbolTable.ST.containsKey(identifier)) {
+				if (symbolTable.containsSymbol(identifier)) {
 					// TODO: redeclared already existing identifier
 				} else {
 					// TODO: handle scope of entries
-					symbolTable.createUpdateSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
+					symbolTable.createSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
 				}
+				
 				// Check for declaration initialization
 				if (scanner.nextToken.primClassif == Token.OPERATOR && scanner.nextToken.tokenStr.equals("=")) {
+					
 					// Initialization assignment found
 					scanner.getNext();
 					if (!scanner.getNext().isEmpty()) {
+						
 						// Parse expr into result value
 						ResultValue initValue = parseExpression();
 						if (initValue.dataType != declaredType) {
 							// TODO: type mismatch
 						}
-						symbolTable.createUpdateSymbol(identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
+						
+						symbolTable.getSymbol(identifier).setValue(initValue.value);
 					} else {
 						// TODO: expected initialization expr, found nothing
 					}
+				} else {
+					// No init, declaration only
+					// TODO: set default value of a non-initialized variable (somewhere, not necessarily here?)
 				}
+				
 			} else {
 				// TODO: expected identifier, found something else
 			}

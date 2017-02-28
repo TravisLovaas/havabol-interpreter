@@ -3,7 +3,6 @@ package havabol.storage;
 public class Value {
 	
 	DataType dataType;
-	
 	String strValue;
 	int intValue;
 	double floatValue;
