@@ -109,21 +109,19 @@ public class Parser {
 					
 					switch (scanner.currentToken.tokenStr) {
 					case "+":
-						Execute.add(dataType, op1, op2);
-						break;
+						return Execute.add(dataType, op1, op2);
 					case "-":
-						break;
+						return null;
 					case "*":
-						break;
+						return null;
 					case "/":
-						break;
+						return null;
 					case "#":
-						break;
+						return null;
 					case "^":
-						break;
+						return null;
 					default:
 						// TODO: found an unsupported operator
-						break;
 					}
 					
 				} else {
