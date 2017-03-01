@@ -99,7 +99,13 @@ public class Parser {
 				// 1. An operator follows this operand
 				// 2. This is the final operand
 				
-				ResultValue op1 = ResultValue.tokenStrToResult(this, dataType, scanner.currentToken.tokenStr);
+				ResultValue op1;
+				
+				if (scanner.currentToken.primClassif == Token.OPERAND) {
+					op1 = ResultValue.tokenStrToResult(this, dataType, scanner.currentToken.tokenStr);
+				} else {
+					op1 = parseFunctionCall();
+				}
 				
 				if (scanner.nextToken.primClassif == Token.OPERATOR) {
 					// Option 1: we found an operator
