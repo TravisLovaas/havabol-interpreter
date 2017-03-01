@@ -1,12 +1,14 @@
-package havabol.storage;
+package havabol.runtime;
+
+import havabol.storage.DataType;
 
 public class Value {
 	
-	DataType dataType;
-	String strValue;
-	int intValue;
-	double floatValue;
-	boolean booleanValue;
+	public DataType dataType;
+	public String strValue;
+	public int intValue;
+	public double floatValue;
+	public boolean booleanValue;
 	
 	public Value(DataType dataType, String value) {
 		this.dataType = dataType;

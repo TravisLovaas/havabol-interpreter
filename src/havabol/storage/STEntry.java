@@ -1,5 +1,7 @@
 package havabol.storage;
 
+import havabol.runtime.Value;
+
 /*
  *  STEntry class for handling Symbol Table entries.
  */
