@@ -1,10 +1,16 @@
 package havabol.runtime;
 
-import havabol.storage.DataType;
+import java.util.ArrayList;
 
-public class Value {
+import havabol.storage.*;
+
+public class Value<T> {
 	
 	public DataType dataType;
+	public T value;
+	public ArrayList<T> arrayValue;
+	public Structure structure;
+	
 	public String strValue;
 	public int intValue;
 	public double floatValue;
@@ -30,19 +36,8 @@ public class Value {
 		this.booleanValue = value;
 	}
 	
-	public Object getValue() {
-		switch (this.dataType) {
-		case STRING:
-			return strValue;
-		case INTEGER:
-			return intValue;
-		case FLOAT:
-			return floatValue;
-		case BOOLEAN:
-			return booleanValue;
-		default:
-			return null;
-		}
+	public T getValue() {
+		return value;
 	}
 
 }
