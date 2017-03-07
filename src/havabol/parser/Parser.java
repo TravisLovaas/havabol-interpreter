@@ -22,16 +22,26 @@ public class Parser {
 		
 	}
 	
+	/**
+	 * 
+	 */
 	public void beginParsing() {
 		while (!scanner.getNext().isEmpty()) {
 			parseToken();
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void parseToken() {
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
 			if (scanner.currentToken.subClassif == Token.DECLARE) {
 				parseDeclaration();
+			}
+			if (scanner.currentToken.subClassif == Token.FLOW) {
+				//parseIf();
+				//parseWhile();
 			}
 		}else if(scanner.currentToken.primClassif == Token.OPERATOR){
 			//parseOperator();
@@ -86,9 +96,20 @@ public class Parser {
 		
 	}
 	
+	public void parseIf(){
+		
+	}
+	
+	public void parseWhile(){
+		
+	}
 	public ResultValue parseExpression() {
 		// TODO: recursively parse an expression
 		return null;
 	}
+	
+	//unary minus
+	//parse expr
+	//if statements
 
 }
