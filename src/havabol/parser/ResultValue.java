@@ -7,7 +7,10 @@ import havabol.runtime.Value;
 public class ResultValue {
 	
 	public DataType dataType;
-	public Value value;
+	public String strValue;
+	public int intValue;
+	public double floatValue;
+	public boolean booleanValue;
 	public Structure structure;
 	public String terminatingStr;
 	
