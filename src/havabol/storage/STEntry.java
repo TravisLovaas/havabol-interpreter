@@ -17,17 +17,18 @@ public class STEntry
 
 	String symbol;
 	int primClassif;
-	Value value;
+	Value<?> value;
 	
 	public String toString() {
 		return String.format("GENERIC ENTRY: %s: %d", symbol, primClassif);
 	}
 	
-	public void setValue(Value value) {
+	public void setValue(Value<?> value) {
 		this.value = value;
+		System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
 	}
 	
-	public Value getValue() {
+	public Value<?> getValue() {
 		return this.value;
 	}
 	
