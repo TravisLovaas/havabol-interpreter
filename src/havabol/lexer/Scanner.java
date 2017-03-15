@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import havabol.error.SyntaxError;
 import havabol.storage.SymbolTable;
@@ -35,6 +37,7 @@ public class Scanner {
 	public int commentFoundOn = 0;
 	// Done scanning this file
 	public boolean done = false;
+	public boolean unary = false;
 	public boolean printBuffer = false;
 	
 	private final static String DELIMITERS = " \t;:()\'\"=!<>+-*/[]#^,\n"; // terminate a token
@@ -54,7 +57,9 @@ public class Scanner {
 	private final static String[] WORD_OPERATORS = {"and", "or", "not", "in", "notin"};
 	private final static String[] FLOW_OPERATORS = {"if", "endif", "else", "while", "endwhile", "for", "endfor"};
 	private final static String[] DATA_TYPES = {"Int", "Float", "String", "Bool"};
-	
+	private final static List<String> UNARY = Arrays.asList("=", "+=", "-=", "+", "-", "*", "/", "^", "<", ">",
+															"<=", ">=", "!=", "#", "and", "or", "u-", "(", ",",
+															"!", "if", "select", "while", "when");
 	/**
 	 * Reads a Havabol source file and initializes environment for scanning.
 	 * @param sourceFileNm Havabol source file path
@@ -92,10 +97,6 @@ public class Scanner {
 	 */
 	public String getNext() throws SyntaxError {
 		
-//		while (!lineBuffer.isEmpty()) {
-//			System.out.println(lineBuffer.remove(0));
-//		}
-		
 		currentToken = getNextToken(false);
 		
 		if (currentToken.primClassif == Token.EOF) {
@@ -111,12 +112,8 @@ public class Scanner {
 	/**
 	 * Returns the next available token from the scanner's current internal
 	 * cursor position.
-	 * @param lookahead If true, save and restore scanner's internal cursor position
-	 * @return The next available token
-	 */
-	private Token getNextToken(boolean lookahead) {
-		
-		/*
+	 * Pseudo:
+	 	 * 	
 		 * token refers to the next available token we will read
 		 * delimiter refers to any character in above DELIMITERS list.
 		 * 
@@ -140,13 +137,15 @@ public class Scanner {
 		 * Postconditions:
 		 * 		- If backtrack is false: internal cursor is STRICTLY AFTER the end of our token.
 		 * 		- If backtrack is true: internal cursor is unchanged from its state before the call to this function.
-		 */
+		 *
+	 * @param lookahead If true, save and restore scanner's internal cursor position
+	 * @return The next available token
+	 */
+	private Token getNextToken(boolean lookahead) {
 		
 		int beforeSourceLineNr = -1;
 		int beforeColPos = -1;
 		
-		//System.out.println("Lookahead: " + lookahead);
-		//System.out.println("Before: " + iSourceLineNr + " "+ iColPos);
 		if (lookahead) {
 			beforeSourceLineNr = iSourceLineNr;
 			beforeColPos = iColPos;
@@ -192,6 +191,23 @@ public class Scanner {
 		char [] retCharM = new char[textCharM.length];
 		int iRet = 0;
 
+		//Unary minus is taken care of
+		
+		if (!lookahead){
+			//System.out.println("------------------------>Current: '" + currentToken.tokenStr + "' next: '" + nextToken.tokenStr + "' <-----------------------");
+			if(currentToken.subClassif != Token.STRING && nextToken.subClassif != Token.STRING)
+				if(UNARY.contains(currentToken.tokenStr) && nextToken.tokenStr.startsWith("-")){
+					unary = true;
+					//System.out.println("------------------------>We found a unary minus<---------------------------- c = '"
+							// currentToken.tokenStr + "' n = '" + nextToken.tokenStr + "'");
+					tokenStr.append("u-");
+				}
+				else 
+					unary = false;
+		}
+		//System.out.println("------------------------>We found a unary minus<---------------------------- c = '"
+				//+ currentToken.tokenStr + "' n = '" + nextToken.tokenStr + "'");
+			
 		if (DELIMITERS.contains(Character.toString(currentChar))) {
 			if (QUOTES.contains(Character.toString(currentChar))) {
 				//System.out.println("Quote found.");
@@ -237,29 +253,39 @@ public class Scanner {
 				tokenStr =  tokenStr.insert(0, retCharM, 0, iRet);
 				tokenStr.delete(iRet, tokenStr.length() + 1);
 				advanceCursor(!lookahead);
-
 			} else {
 				if(OPERATORS.contains(Character.toString(textCharM[iColPos])) && 
 						OPERATORS.contains(Character.toString(textCharM[iColPos + 1])))
 				{
-					tokenStr.append(textCharM[iColPos]);
-					tokenStr.append(textCharM[iColPos + 1]);
-					advanceCursor(!lookahead);
-				}else
+					
+					if(tokenStr.toString().equals("u-")){
+						int i = iColPos + 1;
+						while (textCharM[i] == '-'){
+							tokenStr.append("u-");
+							advanceCursor(!lookahead);
+							i++;
+						}
+					}
+					else{
+						tokenStr.append(textCharM[iColPos]);
+						tokenStr.append(textCharM[iColPos + 1]);
+						advanceCursor(!lookahead);
+
+					}
+				}else if(unary == false)
 					tokenStr.append(currentChar);
 				advanceCursor(!lookahead);
 			}
 		} else {
-			//System.out.println("Non-delimiter token found.");
 			while (!DELIMITERS.contains(Character.toString(currentChar))) {
 				tokenStr.append(currentChar);
-				//System.out.println("Appended: " + currentChar);
 				advanceCursor(!lookahead);
 				currentChar = textCharM[iColPos];
 			}
 		}
 		
 		token.tokenStr = tokenStr.toString();
+		
 		classifyToken(token, isStringLiteral);
 		
 		if (lookahead) {
@@ -343,6 +369,7 @@ public class Scanner {
 			case "<=":
 			case "==":
 			case "!=":
+			case "u-":
 				token.primClassif = Token.OPERATOR;
 				return;
 		}

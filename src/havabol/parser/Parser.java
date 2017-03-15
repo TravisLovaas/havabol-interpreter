@@ -140,7 +140,22 @@ public class Parser {
 			token = scanner.currentToken.tokenStr;
 			//if function or operand place in out
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
-				out.add(token);
+				switch(scanner.currentToken.subClassif){
+					case Token.IDENTIFIER:
+						//not sure we have a function to return actual values yet
+						//ResultValue res = STIdentifier.getVariableValue(this, token);
+						//out.add(res);
+					/*case Token.INTEGER:
+					case Token.FLOAT:
+					case Token.DATE:
+					case Token.STRING:
+					case Token.BOOLEAN:*/
+					// if it is not identifier, no need to convert
+					//add the constant or function to postfix out
+					default:
+						out.add(token);
+							
+				}
 			}
 			
 			//if operator, check precedence
@@ -203,7 +218,7 @@ public class Parser {
 		//still haven't checked for validity of expression
 		//the stack is empty.
 		
-		for(int i = 0; i < out.size(); i++){
+		for(Object entry : out){
 			//go through each entry in postfix
 			
 			//If you find an operand
@@ -213,7 +228,9 @@ public class Parser {
 			
 			// else you find an operator,
 			// if stack is not empty
-			// pop the first operand from the stack
+			// if u-
+			// push -1 * pop first operand
+			// else pop the first operand from the stack
 			// else error invalid expression found 
 			// if the stack is not empty
 			// pop the second operand from the stack
