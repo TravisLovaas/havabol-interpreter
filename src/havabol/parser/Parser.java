@@ -114,9 +114,38 @@ public class Parser {
 		
 	}
 	
-	
+	/**
+	 * parseAssignment is called for all lines of assignment
+	 * within parseExpression
+	 * @return the evaluated value of the assignment
+	 */
 	private ResultValue parseAssignment() {
 		// assignment := identifier '=' expr
+		
+		String token;
+		String dataType;
+		String variable;
+		while (scanner.getNext() != ";") {
+			// token string
+			token = scanner.currentToken.tokenStr;
+			// if data type is found
+			if (scanner.currentToken.primClassif == Token.DECLARE) {
+				// takes in the data type
+				dataType = scanner.currentToken.toString();
+				// next token is variable
+				scanner.getNext();
+				variable = scanner.currentToken.toString();
+				continue;
+			} else if (token == "=") {
+				continue;
+			} else {
+				// call parseExpression here in the event the assignment
+				// is an expression
+				
+				// throw the value result from parseExpression into symbol table
+				// with variable as name
+			}
+		}
 		return null;
 	}
 	

@@ -1,5 +1,6 @@
 package havabol.storage;
 
+import havabol.parser.Parser;
 import havabol.parser.ResultValue;
 import havabol.storage.*;
 
