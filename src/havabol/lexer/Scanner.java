@@ -54,6 +54,7 @@ public class Scanner {
 		put('n', '\n');
 		put('a', (char) 0x07);    
 		}};
+		
 	private final static String[] WORD_OPERATORS = {"and", "or", "not", "in", "notin"};
 	private final static String[] FLOW_OPERATORS = {"if", "endif", "else", "while", "endwhile", "for", "endfor"};
 	private final static String[] DATA_TYPES = {"Int", "Float", "String", "Bool"};
@@ -103,8 +104,9 @@ public class Scanner {
 			return "";
 		}
 		
-		nextToken = getNextToken(true);
 		
+		nextToken = getNextToken(true);
+
 		return currentToken.tokenStr;
 		
 	}
@@ -192,14 +194,15 @@ public class Scanner {
 		int iRet = 0;
 
 		//Unary minus is taken care of
+				
 		
+				
 		if (!lookahead){
 			//System.out.println("------------------------>Current: '" + currentToken.tokenStr + "' next: '" + nextToken.tokenStr + "' <-----------------------");
 			if(currentToken.subClassif != Token.STRING && nextToken.subClassif != Token.STRING)
+				
 				if(UNARY.contains(currentToken.tokenStr) && nextToken.tokenStr.startsWith("-")){
 					unary = true;
-					//System.out.println("------------------------>We found a unary minus<---------------------------- c = '"
-							// currentToken.tokenStr + "' n = '" + nextToken.tokenStr + "'");
 					tokenStr.append("u-");
 				}
 				else 
@@ -252,29 +255,20 @@ public class Scanner {
 			
 				tokenStr =  tokenStr.insert(0, retCharM, 0, iRet);
 				tokenStr.delete(iRet, tokenStr.length() + 1);
+				//System.out.println("------------------------>1Current: '" + token.tokenStr + "' <-----------------------");
 				advanceCursor(!lookahead);
 			} else {
 				if(OPERATORS.contains(Character.toString(textCharM[iColPos])) && 
-						OPERATORS.contains(Character.toString(textCharM[iColPos + 1])))
+						textCharM[iColPos + 1] == '=')
 				{
-					
-					if(tokenStr.toString().equals("u-")){
-						int i = iColPos + 1;
-						while (textCharM[i] == '-'){
-							tokenStr.append("u-");
-							advanceCursor(!lookahead);
-							i++;
-						}
-					}
-					else{
-						tokenStr.append(textCharM[iColPos]);
-						tokenStr.append(textCharM[iColPos + 1]);
-						advanceCursor(!lookahead);
+					tokenStr.append(textCharM[iColPos]);
+					tokenStr.append(textCharM[iColPos + 1]);
+					advanceCursor(!lookahead);
 
-					}
 				}else if(unary == false)
 					tokenStr.append(currentChar);
 				advanceCursor(!lookahead);
+				//System.out.println("------------------------>2Current: '" + token.tokenStr + "' <-----------------------");
 			}
 		} else {
 			while (!DELIMITERS.contains(Character.toString(currentChar))) {
@@ -282,12 +276,14 @@ public class Scanner {
 				advanceCursor(!lookahead);
 				currentChar = textCharM[iColPos];
 			}
+			//System.out.println("------------------------>Current: '" + tokenStr + "' <-----------------------");
 		}
 		
+		
+
 		token.tokenStr = tokenStr.toString();
-		
+		//System.out.println("------------------------>3Current: '" + token.tokenStr + "' <-----------------------");
 		classifyToken(token, isStringLiteral);
-		
 		if (lookahead) {
 			iSourceLineNr = beforeSourceLineNr;
 			iColPos = beforeColPos;

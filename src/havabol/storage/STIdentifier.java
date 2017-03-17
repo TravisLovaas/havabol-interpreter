@@ -27,12 +27,5 @@ public class STIdentifier extends STEntry
 	public String toString() {
 		return String.format("IDENTIFIER: %s: %s %s %s %d", symbol, declaredType, structure, parm, nonLocal);
 	}
-
-	//we should probably have this
-	public static ResultValue getVariableValue(Parser parser, String token)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 }

@@ -6,6 +6,13 @@ import havabol.storage.*;
 
 public class Execute {
 	
+	/***
+	 * Adds to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return
+	 */
 	public static ResultValue add(Parser parser, ResultValue op1, ResultValue op2) {
 		
 		ResultValue res = new ResultValue();
@@ -40,6 +47,13 @@ public class Execute {
 		return res;
 	}
 	
+	/***
+	 * Subtracts to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return
+	 */
 	public static ResultValue subtract(Parser parser, ResultValue op1, ResultValue op2) {
 		
 		ResultValue res = new ResultValue();
@@ -74,6 +88,13 @@ public class Execute {
 		return res;
 	}
 	
+	/***
+	 * Multiplies to evaluate operands
+	 @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return
+	 */
 	public static ResultValue multiply(Parser parser, ResultValue op1, ResultValue op2) {
 		
 		ResultValue res = new ResultValue();
@@ -108,6 +129,7 @@ public class Execute {
 		return res;
 	}
 	
+	//divide function
 	public static ResultValue divide(Parser parser, ResultValue op1, ResultValue op2) {
 		
 		ResultValue res = new ResultValue();

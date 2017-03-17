@@ -1,5 +1,7 @@
 package havabol.storage;
 
+import havabol.parser.Parser;
+import havabol.parser.ResultValue;
 import havabol.runtime.Value;
 
 /*
@@ -30,6 +32,12 @@ public class STEntry
 	
 	public Value<?> getValue() {
 		return this.value;
+	}
+
+	public static ResultValue getValue(Parser parser, String token)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

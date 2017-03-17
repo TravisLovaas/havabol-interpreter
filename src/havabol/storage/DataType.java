@@ -6,7 +6,7 @@ public enum DataType {
 	FLOAT,
 	STRING,
 	BOOLEAN,
-	VOID;
+	VOID, DATE;
 	
 	public static DataType stringToType(String type) {
 		switch (type) {
