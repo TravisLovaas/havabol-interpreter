@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.Stack;
 
 import havabol.error.SyntaxError;
-import havabol.error.UnsupportedOperationError;
 import havabol.lexer.*;
 import havabol.runtime.Execute;
-import havabol.runtime.Value;
 import havabol.storage.*;
 
 public class Parser {
@@ -116,20 +114,53 @@ public class Parser {
 		
 	}
 	
+	/**
+	 * parseAssignment is called for all lines of assignment
+	 * within parseExpression
+	 * @return the evaluated value of the assignment
+	 */
+	private ResultValue parseAssignment() {
+		// assignment := identifier '=' expr
+		
+		String token;
+		String dataType;
+		String variable;
+		while (scanner.getNext() != ";") {
+			// token string
+			token = scanner.currentToken.tokenStr;
+			// if data type is found
+			if (scanner.currentToken.primClassif == Token.DECLARE) {
+				// takes in the data type
+				dataType = scanner.currentToken.toString();
+				// next token is variable
+				scanner.getNext();
+				variable = scanner.currentToken.toString();
+				continue;
+			} else if (token == "=") {
+				continue;
+			} else {
+				// call parseExpression here in the event the assignment
+				// is an expression
+				
+				// throw the value result from parseExpression into symbol table
+				// with variable as name
+			}
+		}
+		return null;
+	}
+	
 	
 	/***
 	 * Assumption: parseExpression is called before potential
-	 * I am not dealing with conditionals at the moment
 	 * infix expression
 	 * Creates a postFix expression from stack
 	 * @return the evaluated value of an expression
 	 */
-	@SuppressWarnings("rawtypes")
 	private ResultValue parseExpression() throws SyntaxError{
 		ArrayList <Object> out = new ArrayList<Object>();
 		Stack <Object> stack = new Stack <Object>();
 		String token;
-		Object popped;
+		String popped;
 		boolean lParen = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
 		
@@ -140,33 +171,19 @@ public class Parser {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				switch(scanner.currentToken.subClassif){
 					case Token.IDENTIFIER:
-						//function to return actual values isn't complete yet
-						ResultValue value = STEntry.getValue(this, token);
-						out.add(value);
-						break;
-					case Token.INTEGER:
-						Value value1 = new Value(DataType.INTEGER, token);
-						out.add(value1.getValue());
-						break;
+						//not sure we have a function to return actual values yet
+						//ResultValue res = STIdentifier.getVariableValue(this, token);
+						//out.add(res);
+					/*case Token.INTEGER:
 					case Token.FLOAT:
-						Value value2 = new Value(DataType.FLOAT, token);
-						out.add(value2.getValue());
-						break;
 					case Token.DATE:
-						Value value3 = new Value(DataType.DATE, token);
-						out.add(value3.getValue());
-						break;
 					case Token.STRING:
-						Value value4 = new Value(DataType.STRING, token);
-						out.add(value4.getValue());
-						break;
-					case Token.BOOLEAN:
-						Value value5 = new Value(DataType.BOOLEAN, token);
-						out.add(value5.getValue());
-						break;
-					//this is a function for sure.
+					case Token.BOOLEAN:*/
+					// if it is not identifier, no need to convert
+					//add the constant or function to postfix out
 					default:
 						out.add(token);
+							
 				}
 			}
 			
@@ -189,7 +206,7 @@ public class Parser {
 					stack.push(token);
 				else if(token == ")"){
 					while(!stack.isEmpty()){
-						popped = stack.pop();
+						popped = (String) stack.pop();
 						if(popped == "("){
 							lParen = true;
 							break;
@@ -224,80 +241,33 @@ public class Parser {
 			out.add(popped);
 		}
 		
-		//System.out.println("*************************I'M IN PARSE EXPRESSION, ARE YOU HERE? *************************");
+		System.out.println("*************************I'M IN PARSE EXPRESSION, ARE YOU HERE? *************************");
 		
 		//at this point, our postfix expression is already populated
-		//should contain only operands, operators, and functions
 		//still haven't checked for validity of expression
 		//the stack is empty.
 		
 		for(Object entry : out){
 			//go through each entry in postfix
 			
-			//If you find a number
-			//push to stack
-			if(entry instanceof Number){
-				stack.push((Number) entry);
-			}
-			//we have an operator
-			else if(precedence.containsKey(entry)){
-				/* if stack is not empty
-				   if u-
-				   push -1 * pop first operand
-				   else pop the first operand from the stack
-				   else error invalid expression found 
-				   if the stack is not empty
-				   pop the second operand from the stack
-				   else error invalid expression found*/
-				
-				if (!stack.isEmpty()){
-					if(entry == "u-"){
-						popped = stack.pop();
-						if(popped instanceof Integer)
-							stack.push(-1 * (Integer) popped);
-						else
-							stack.push(-1 * (Double) popped);
-					}
-					
-					/*else{
-						if(!stack.isEmpty())
-							ResultValue resOp1 = stack.pop();
-						else
-							throw new SyntaxError("Parser could not parse invalid Expression: " + out,
-									scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
-						if(!stack.isEmpty())
-							ResultValue resOp2 = stack.pop();
-						else
-							throw new SyntaxError("Parser could not parse invalid Expression: " + out,
-									scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);		
-					}*/
-				}
-				
-				// depending on operator, call the appropriate evaluate function
-				// then push result to the stack
-				switch (entry.toString()){
-					case "+":
-					case "-":
-					case "/":
-					case "*":
-					case "^":
-					case "#":
-					case "<":
-					case ">":
-					case "<=":
-					case ">=":
-					case "==":
-					case "!=":
-					case "not":
-					case "and":
-					case "or":
-					default:
-						throw new UnsupportedOperationError("The operator is an invalid token for operation", (Token) entry);
-				}
-			}
-									
-			// switch (operator)
+			//If you find an operand
+			//check if it is an actual value
+			//convert to an actual value and push to stack
 			
+			
+			// else you find an operator,
+			// if stack is not empty
+			// if u-
+			// push -1 * pop first operand
+			// else pop the first operand from the stack
+			// else error invalid expression found 
+			// if the stack is not empty
+			// pop the second operand from the stack
+			// else error invalid expression found
+			
+			// switch (operator)
+			// depending on operator, call the appropriate evaluate function
+			// then push result to the stack
 			//default invalid operator found
 			//if(out.get(i))
 		}
