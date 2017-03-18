@@ -193,9 +193,7 @@ public class Scanner {
 		char [] retCharM = new char[textCharM.length];
 		int iRet = 0;
 
-		//Unary minus is taken care of
-				
-		
+		//Unary minus has error for multiple unary minuses.
 				
 		if (!lookahead){
 			//System.out.println("------------------------>Current: '" + currentToken.tokenStr + "' next: '" + nextToken.tokenStr + "' <-----------------------");
@@ -220,11 +218,6 @@ public class Scanner {
 				for (;;) {
 					
 					advanceCursor(!lookahead);	
-					
-					//if(currentToken.nonPrintable){
-						//currentToken.nonPrintable = false;
-						//continue;
-					//}
 					if (iSourceLineNr != openQuoteLineNr) {
 						// Quote literal must end on opening line
 						throw new SyntaxError("String literal must begin and end on same line", openQuoteLineNr + 1);
@@ -255,7 +248,6 @@ public class Scanner {
 			
 				tokenStr =  tokenStr.insert(0, retCharM, 0, iRet);
 				tokenStr.delete(iRet, tokenStr.length() + 1);
-				//System.out.println("------------------------>1Current: '" + token.tokenStr + "' <-----------------------");
 				advanceCursor(!lookahead);
 			} else {
 				if(OPERATORS.contains(Character.toString(textCharM[iColPos])) && 
@@ -268,7 +260,6 @@ public class Scanner {
 				}else if(unary == false)
 					tokenStr.append(currentChar);
 				advanceCursor(!lookahead);
-				//System.out.println("------------------------>2Current: '" + token.tokenStr + "' <-----------------------");
 			}
 		} else {
 			while (!DELIMITERS.contains(Character.toString(currentChar))) {
@@ -276,13 +267,9 @@ public class Scanner {
 				advanceCursor(!lookahead);
 				currentChar = textCharM[iColPos];
 			}
-			//System.out.println("------------------------>Current: '" + tokenStr + "' <-----------------------");
 		}
-		
-		
 
 		token.tokenStr = tokenStr.toString();
-		//System.out.println("------------------------>3Current: '" + token.tokenStr + "' <-----------------------");
 		classifyToken(token, isStringLiteral);
 		if (lookahead) {
 			iSourceLineNr = beforeSourceLineNr;

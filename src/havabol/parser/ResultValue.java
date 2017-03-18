@@ -16,8 +16,6 @@ public class ResultValue {
 	
 	public static ResultValue tokenStrToResult(Parser parser, DataType dataType, String tokenStr) {
 		ResultValue res = new ResultValue();
-		
-		
 		return res;
 	}
 

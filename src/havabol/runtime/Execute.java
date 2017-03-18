@@ -1,6 +1,7 @@
 package havabol.runtime;
 
 import havabol.error.*;
+import havabol.lexer.Token;
 import havabol.parser.*;
 import havabol.storage.*;
 
@@ -162,6 +163,72 @@ public class Execute {
 		}
 		
 		return res;
+	}
+
+	public static ResultValue unaryMinus(Parser parser, ResultValue op1)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue unaryNot(Parser parser, ResultValue op1)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue less(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue greater(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue lessEqual(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue greaterEqual(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue doubleEqual(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue notEqual(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue logicalAnd(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue logicalOr(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ResultValue concatenate(Parser parser, ResultValue op1, ResultValue op2)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

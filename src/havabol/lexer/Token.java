@@ -2,6 +2,8 @@ package havabol.lexer;
 
 import java.util.*;
 
+import havabol.parser.ResultValue;
+
 public class Token
 {
 	public String tokenStr = "";
@@ -216,6 +218,12 @@ public class Token
 	enum SubClassif
 	{
 		FLOW, END, IDENTIFIER, INTEGER, FLOAT, STRING, BOOLEAN, DATE, VOID, BUILTIN, DECLARE, USER
+	}
+
+	public ResultValue toResult()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
