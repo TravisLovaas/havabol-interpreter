@@ -242,8 +242,7 @@ public class Parser {
 		for(Token entry : out){			
 			
 			//if you find an operand
-			ResultValue res, res2 =
-			null;
+			ResultValue res, res2 = null;
 			token = entry.tokenStr;
 			if(entry.primClassif == Token.OPERAND){
 				//check if it is an actual value
@@ -251,7 +250,7 @@ public class Parser {
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
 						//getValue should be get variable value, for now this will do
-						res = symbolTable.getSymbol(token).getResult();
+						res = symbolTable.getSymbol(token).getValue();
 						stackResult.push(res);
 						break;
 					case Token.INTEGER:

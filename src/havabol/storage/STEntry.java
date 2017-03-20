@@ -19,25 +19,19 @@ public class STEntry
 
 	String symbol;
 	int primClassif;
-	Value<?> value;
+	ResultValue value;
 	
 	public String toString() {
 		return String.format("GENERIC ENTRY: %s: %d", symbol, primClassif);
 	}
 	
-	public void setValue(Value<?> value) {
+	public void setValue(ResultValue value) {
 		this.value = value;
 		System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
 	}
 	
-	public Value<?> getValue() {
+	public ResultValue getValue() {
 		return this.value;
-	}
-
-	public static ResultValue getValue(Parser parser, String token)
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }
