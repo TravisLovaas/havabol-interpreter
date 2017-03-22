@@ -3,6 +3,8 @@ package havabol.lexer;
 import java.util.*;
 
 import havabol.parser.ResultValue;
+import havabol.storage.DataType;
+import havabol.storage.Structure;
 
 public class Token
 {
@@ -222,8 +224,31 @@ public class Token
 
 	public ResultValue toResult()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ResultValue res = new ResultValue();
+		if (tokenStr.charAt(0) == '"') {
+			res.dataType = DataType.STRING;
+			res.structure = Structure.PRIMITIVE;
+			res.strValue = tokenStr.substring(1, tokenStr.length() - 1);
+		} else if (tokenStr.equals("T")) {
+			res.dataType = DataType.BOOLEAN;
+			res.structure = Structure.PRIMITIVE;
+			res.booleanValue = true;
+		} else if (tokenStr.equals("F")) {
+			res.dataType = DataType.BOOLEAN;
+			res.structure = Structure.PRIMITIVE;
+			res.booleanValue = false;
+		} else {
+			if (this.subClassif == Token.FLOAT) {
+				res.dataType = DataType.FLOAT;
+				res.structure = Structure.PRIMITIVE;
+				res.floatValue = Double.parseDouble(tokenStr);
+			} else {
+				res.dataType = DataType.INTEGER;
+				res.structure = Structure.PRIMITIVE;
+				res.intValue = Integer.parseInt(tokenStr);
+			}
+		}
+		return res;
 	}
 
 }
