@@ -56,6 +56,15 @@ public class Parser {
 		}
 	}
 	
+	private void parseIf() {
+		// while ":" is not found
+		while (scanner.getNext() != ":") {
+			// find 
+			if (scanner.currentToken.primClassif == Token.OPERAND){
+				
+			}
+		}
+	}
 	
 	private void parseToken() {
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
@@ -120,35 +129,90 @@ public class Parser {
 	 * within parseExpression
 	 * @return the evaluated value of the assignment
 	 */
+	
+	
 	private ResultValue parseAssignment() {
 		// assignment := identifier '=' expr
 		
-		String token;
-		String dataType;
-		String variable;
+		DataType declaredType = null;
+		Structure structure = Structure.PRIMITIVE;
+		ResultValue res = null;
+		String identifier;
+		String variable = null;
+		SymbolTable st = this.symbolTable;
 		while (scanner.getNext() != ";") {
 			// token string
-			token = scanner.currentToken.tokenStr;
+			identifier = scanner.currentToken.tokenStr;
 			// if data type is found
 			if (scanner.currentToken.primClassif == Token.DECLARE) {
 				// takes in the data type
-				dataType = scanner.currentToken.toString();
+				declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
 				// next token is variable
 				scanner.getNext();
 				variable = scanner.currentToken.toString();
 				continue;
-			} else if (token == "=") {
+			} else if (identifier == "=" || identifier == "-=" || identifier == "+=") {
 				continue;
 			} else {
-				// call parseExpression here in the event the assignment
-				// is an expression
-				
-				// throw the value result from parseExpression into symbol table
-				// with variable as name
+				// check if token is in symbol table
+				if(symbolTable.containsSymbol(variable)){
+					// get value of res
+					res = parseExpression();
+					// create symbol
+					st.createSymbol(this, variable, new STIdentifier(variable, Token.OPERAND, declaredType, structure, "", 0));
+				}
 			}
 		}
-		return null;
+		return res;
 	}
+	
+	/*
+	private ResultValue parseAssignment() {
+	    ResultValue res = null;
+	    SymbolTable st = this.symbolTable;
+	    if(scanner.currentToken.subClassif != Token.IDENTIFIER){
+	    	//error("expected a variable for the target of an assignment");
+	    }
+	    String variableStr = scanner.currentToken.tokenStr;
+
+	    // get the assignment operator and check it
+	    scanner.getNext();
+	    if(scanner.currentToken.primClassif != Token.OPERATOR){
+	    	//error("expected assignment operator");
+	    }
+
+	    String operatorStr = scanner.currentToken.tokenStr;
+	    ResultValue resO2;
+	    ResultValue resO1;
+	    Numeric nOp2;  // numeric value of second operand
+	    Numeric nOp1;  // numeric value of first operand
+	    switch(operatorStr){
+		    case "=":
+		    	resO2 = parseExpression();   
+//		    	res = assign(variableStr, resO2);  // assign to target
+		    	
+		    	st.createSymbol(this, variableStr, new STIdentifier(variableStr, Token.OPERAND, ));
+		    case "-=":
+		    	resO2 = parseExpression();   
+		    	// expression must be numeric, raise exception if not
+//		    	nOp2 = new Numeric(this, resO2, “-=”, “2nd operand”);
+		    	// Since it is numeric, we need value of target variable 
+//		    	resO1 = getVariableValue(variableStr);
+		    	// target variable must be numeric
+//		    	nOp1 = new Numeric(this, resO1, “-=”, “1st operand”);
+	
+		    	// subtract 2nd operand from first and assign it
+//		    	res = assign(variableStr, Utility.subtract(this, nop1, nop2));
+		    case "+=":
+		    	// fill it in yourself
+		    default:
+		    	//error("expected assignment operator");
+	    }    
+
+	    return res;
+	}
+	*/
+
 	
 	private ResultValue parseFunctionCall() {
 		// TODO: recursively parse a function
