@@ -171,14 +171,20 @@ public class Parser {
 		boolean lParen = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
 		
-		while (scanner.getNext() != ";" || scanner.getNext() != ":") {
+		while (scanner.getNext() != ";" || scanner.getNext() != ":" || scanner.getNext() != ",") {
 			//get token string
 			token = scanner.currentToken.tokenStr;
 			//if function or operand place in out
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//add the identifier or function to postfix out
-				out.add(scanner.currentToken);
+				if (scanner.currentToken.primClassif == Token.OPERAND)
+					out.add(scanner.currentToken);
+				if (scanner.currentToken.primClassif == Token.FUNCTION){
+					parseFunctionCall();
+				}
+
 			}
+			
 			
 			//if operator, check precedence
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
@@ -266,9 +272,10 @@ public class Parser {
 				}
 			}
 			
-			else if(entry.primClassif == Token.FUNCTION){
+			//else if(entry.primClassif == Token.FUNCTION){
 				//not positive
-			}
+			//	parseFunction()
+			//}
 			
 			// else you find an operator,
 			else if(entry.primClassif == Token.OPERATOR){

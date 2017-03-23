@@ -55,7 +55,7 @@ print(">> Minus test, A=", A, "B=", B, "D=", D);
 print("D-A=", D-A);
 print("-A=", -A);
 print("-D=", -D);
-A = --B;
+A = - -B;
 print("A=-B =", A);
 
 // Simple if

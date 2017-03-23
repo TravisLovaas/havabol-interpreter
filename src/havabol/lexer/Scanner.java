@@ -98,15 +98,21 @@ public class Scanner {
 	 */
 	public String getNext() throws SyntaxError {
 		
-		currentToken = getNextToken(false);
+		String previous = currentToken.tokenStr;
 		
+		currentToken = getNextToken(false);
+	
 		if (currentToken.primClassif == Token.EOF) {
 			return "";
 		}
-		
-		
 		nextToken = getNextToken(true);
-
+		
+		if(currentToken.subClassif != Token.STRING && nextToken.subClassif != Token.STRING)
+			if(UNARY.contains(previous) && currentToken.tokenStr.equals("-")){
+				currentToken.tokenStr = "u-";
+			}else
+				unary = false;
+			
 		return currentToken.tokenStr;
 		
 	}
@@ -192,23 +198,8 @@ public class Scanner {
 		char currentChar = textCharM[iColPos];
 		char [] retCharM = new char[textCharM.length];
 		int iRet = 0;
-
-		//Unary minus has error for multiple unary minuses.
-				
-		if (!lookahead){
-			//System.out.println("------------------------>Current: '" + currentToken.tokenStr + "' next: '" + nextToken.tokenStr + "' <-----------------------");
-			if(currentToken.subClassif != Token.STRING && nextToken.subClassif != Token.STRING)
-				
-				if(UNARY.contains(currentToken.tokenStr) && nextToken.tokenStr.startsWith("-")){
-					unary = true;
-					tokenStr.append("u-");
-				}
-				else 
-					unary = false;
-		}
-		//System.out.println("------------------------>We found a unary minus<---------------------------- c = '"
-				//+ currentToken.tokenStr + "' n = '" + nextToken.tokenStr + "'");
-			
+		
+	
 		if (DELIMITERS.contains(Character.toString(currentChar))) {
 			if (QUOTES.contains(Character.toString(currentChar))) {
 				//System.out.println("Quote found.");
@@ -256,8 +247,7 @@ public class Scanner {
 					tokenStr.append(textCharM[iColPos]);
 					tokenStr.append(textCharM[iColPos + 1]);
 					advanceCursor(!lookahead);
-
-				}else if(unary == false)
+				}else
 					tokenStr.append(currentChar);
 				advanceCursor(!lookahead);
 			}
@@ -401,6 +391,7 @@ public class Scanner {
 	 */
 	public void advanceCursor(boolean print) {
 		iColPos += 1;
+		//if(iColPos < textCharM.length)
 		//System.out.println("Line: " + (iSourceLineNr) + " Col: " + (iColPos - 1) + " Char: " + textCharM[iColPos - 1]);
 		if (iColPos >= textCharM.length) {
 			iColPos = 0;
