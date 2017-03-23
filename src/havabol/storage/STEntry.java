@@ -17,9 +17,9 @@ public class STEntry
 		this.primClassif = primClassif;
 	}
 
-	String symbol;
-	int primClassif;
-	ResultValue value;
+	public String symbol;
+	public int primClassif;
+	private ResultValue value;
 	
 	public String toString() {
 		return String.format("GENERIC ENTRY: %s: %d", symbol, primClassif);

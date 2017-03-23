@@ -123,5 +123,20 @@ public class ResultValue {
 		return res;
 		
 	}
+	
+	public ResultValue asType(Parser parser, DataType dataType) {
+		switch (dataType) {
+		case INTEGER:
+			return this.asInteger(parser);
+		case FLOAT:
+			return this.asFloat(parser);
+		case STRING:
+			return this.asString(parser);
+		case BOOLEAN:
+			return this.asBoolean(parser);
+		default:
+			throw new TypeError("Invalid type cast specified");
+		}
+	}
 
 }
