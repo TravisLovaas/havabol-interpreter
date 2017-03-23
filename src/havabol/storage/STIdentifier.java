@@ -20,10 +20,10 @@ public class STIdentifier extends STEntry
 		this.nonLocal = nonLocal;
 	}
 	
-	DataType declaredType;
-	Structure structure;
-	String parm;
-	int nonLocal;
+	public DataType declaredType;
+	public Structure structure;
+	public String parm;
+	public int nonLocal;
 	
 	public String toString() {
 		return String.format("IDENTIFIER: %s: %s %s %s %d", symbol, declaredType, structure, parm, nonLocal);

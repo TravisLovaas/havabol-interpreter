@@ -3,10 +3,10 @@ package havabol.parser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
-import havabol.error.SyntaxError;
-import havabol.error.UnsupportedOperationError;
+import havabol.error.*;
 import havabol.lexer.*;
 import havabol.runtime.Execute;
 import havabol.storage.*;
@@ -52,7 +52,7 @@ public class Parser {
 	
 	public void beginParsing() {
 		while (!scanner.getNext().isEmpty()) {
-			parseToken();
+			parseStatement();
 		}
 	}
 	
@@ -129,60 +129,80 @@ public class Parser {
 		
 	}
 	
-	private void parseToken() {
+	private void parseWhile() {
+		
+	}
+	
+	private void parseFor() {
+		
+	}
+	
+	private void parseStatement() {
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
 			if (scanner.currentToken.subClassif == Token.DECLARE) {
 				parseDeclaration();
+			} else if (scanner.currentToken.subClassif == Token.FLOW) {
+				switch (scanner.currentToken.tokenStr) {
+				case "if":
+					parseIf();
+					break;
+				case "while":
+					parseWhile();
+					break;
+				case "for":
+					parseFor();
+					break;
+				default:
+					throw new UnsupportedOperationError("Unsupported FLOW token found.");
+				}
+			} else {
+				throw new UnsupportedOperationError("Unknown CONTROL token found.");
 			}
-			if (scanner.currentToken.subClassif == Token.FLOW) {
-				//parseIf();
-				//parseWhile();
+		} else if (scanner.currentToken.primClassif == Token.FUNCTION) {
+			parseFunctionCall();
+		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
+			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+				parseAssignment();
+			} else {
+				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
-		}else if(scanner.currentToken.primClassif == Token.OPERATOR){
-			
+		} else {
+			throw new UnsupportedOperationError("Unknown token found while parsing statements.");
 		}
 	}
 	
+	/**
+	 * Parses a declaration statement.
+	 * Preconditions:
+	 *    - currentToken is a data type declaration
+	 */
 	private void parseDeclaration() {
+		
+		// Parse declared type
 		DataType declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
 		Structure structure = Structure.PRIMITIVE;
 		String identifier;
 		
-		if (!scanner.getNext().isEmpty()) {
-			if (scanner.currentToken.primClassif == Token.OPERAND && scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				identifier = scanner.currentToken.tokenStr;
-				
-				// Create symbol and checks for errors
-				symbolTable.createSymbol(this, identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
-				
-				// Check for declaration initialization
-				if (scanner.nextToken.primClassif == Token.OPERATOR && scanner.nextToken.tokenStr.equals("=")) {
-					
-					// Initialization assignment found
-					scanner.getNext();
-					if (!scanner.getNext().isEmpty()) {
-						
-						// Parse expr into result value
-						ResultValue initValue = parseExpression();
-						if (initValue.dataType != declaredType) {
-							// TODO: type mismatch
-						}
-						
-						//i took out this line because there is no "value" at this point
-						//symbolTable.getSymbol(identifier).setValue(initValue.value);
-					} else {
-						// TODO: expected initialization expr, found nothing
-					}
-				} else {
-					// No init, declaration only
-					// TODO: set default value of a non-initialized variable (somewhere, not necessarily here?)
-				}
-				
-			} else {
-				// TODO: expected identifier, found something else
-			}
+		// Next token is name of variable
+		if (scanner.nextToken.subClassif == Token.IDENTIFIER) {
+			identifier = scanner.nextToken.tokenStr;
 		} else {
-			// TODO: expected identifier, found eof
+			throw new DeclarationError("Expected an identifier", scanner.nextToken);
+		}
+		
+		// Create symbol table entry
+		symbolTable.createSymbol(this, identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
+		
+		// currentToken should be our identifier after this call
+		scanner.getNext();
+		
+		// Check for an assignment
+		if (scanner.nextToken.tokenStr.equals("=")) {
+			parseAssignment();
+		} else if (scanner.nextToken.tokenStr.equals(";")) {
+			scanner.getNext();
+		} else {
+			throw new SyntaxError("Expected semi-colon", scanner.currentToken);
 		}
 		
 	}
@@ -190,43 +210,81 @@ public class Parser {
 	/**
 	 * parseAssignment is called for all lines of assignment
 	 * within parseExpression
+	 * Preconditions:
+	 *    - currentToken is an identifier
+	 *    
 	 * @return the evaluated value of the assignment
 	 */
-	
-	
 	private ResultValue parseAssignment() {
 		// assignment := identifier '=' expr
 		
-		DataType declaredType = null;
-		Structure structure = Structure.PRIMITIVE;
-		ResultValue res = null;
-		String identifier;
-		String variable = null;
-		SymbolTable st = this.symbolTable;
-		while (scanner.getNext() != ";") {
-			// token string
-			identifier = scanner.currentToken.tokenStr;
-			// if data type is found
-			if (scanner.currentToken.primClassif == Token.DECLARE) {
-				// takes in the data type
-				declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
-				// next token is variable
-				scanner.getNext();
-				variable = scanner.currentToken.toString();
-				continue;
-			} else if (identifier == "=" || identifier == "-=" || identifier == "+=") {
-				continue;
-			} else {
-				// check if token is in symbol table
-				if(symbolTable.containsSymbol(variable)){
-					// get value of res
-					res = parseExpression();
-					// create symbol
-					st.createSymbol(this, variable, new STIdentifier(variable, Token.OPERAND, declaredType, structure, "", 0));
-				}
-			}
+		if (scanner.currentToken.subClassif != Token.IDENTIFIER) {
+			throw new SyntaxError("Expected an identifier to begin assignment", scanner.currentToken);
 		}
-		return res;
+		
+		String identifier = scanner.currentToken.tokenStr;
+		
+		// Ensure identifier has been declared
+		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
+		
+		if (variable == null) {
+			throw new DeclarationError("Reference to undeclared identifier found", scanner.currentToken);
+		}
+		
+		// Next token should be an assignment operator
+		switch (scanner.getNext()) {
+		case "=":
+		case "+=":
+		case "-=":
+		case "*=":
+		case "/=":
+			break;
+		default:
+			throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
+		}
+		
+		// Next token should be an expression
+		scanner.getNext();
+		
+		ResultValue rhsExpr = parseExpression(); // Parse expression on right-hand side of assignment
+		
+		// Ensure type of rhsExpr matches declared type, or can be cast to such.
+		rhsExpr = rhsExpr.asType(this, variable.declaredType);
+		
+		variable.setValue(rhsExpr);
+		
+		return rhsExpr;
+		
+//		DataType declaredType = null;
+//		Structure structure = Structure.PRIMITIVE;
+//		ResultValue res = null;
+//		String identifier;
+//		String variable = null;
+//		SymbolTable st = this.symbolTable;
+//		while (scanner.getNext() != ";") {
+//			// token string
+//			identifier = scanner.currentToken.tokenStr;
+//			// if data type is found
+//			if (scanner.currentToken.primClassif == Token.DECLARE) {
+//				// takes in the data type
+//				declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
+//				// next token is variable
+//				scanner.getNext();
+//				variable = scanner.currentToken.toString();
+//				continue;
+//			} else if (identifier == "=" || identifier == "-=" || identifier == "+=") {
+//				continue;
+//			} else {
+//				// check if token is in symbol table
+//				if(symbolTable.containsSymbol(variable)){
+//					// get value of res
+//					res = parseExpression();
+//					// create symbol
+//					st.createSymbol(this, variable, new STIdentifier(variable, Token.OPERAND, declaredType, structure, "", 0));
+//				}
+//			}
+//		}
+//		return res;
 	}
 	
 	/*
@@ -276,10 +334,58 @@ public class Parser {
 	}
 	*/
 
-	
+	/**
+	 * Parses a function call
+	 * Preconditions:
+	 *    - currentToken is the name of a function in a function call
+	 *      i.e. print("hello", "world");
+	 *      	 ^^^^^
+	 * @return
+	 */
 	private ResultValue parseFunctionCall() {
-		// TODO: recursively parse a function
-		return null;
+		
+		if (scanner.currentToken.primClassif != Token.FUNCTION) {
+			throw new SyntaxError("Expected name of a function", scanner.currentToken);
+		}
+		
+		String calledFunction = scanner.currentToken.tokenStr;
+		
+		scanner.getNext(); // currentToken should be open paren "("
+		
+		if (!scanner.currentToken.tokenStr.equals("(")) {
+			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
+		}
+		
+		List<ResultValue> args = new ArrayList<>();
+		
+		// Parse all function arguments
+		for (;;) {
+			
+			args.add(parseExpression());
+			
+			if (scanner.currentToken.tokenStr.equals(",")) {
+				continue;
+			} else if (scanner.currentToken.tokenStr.equals(")")) {
+				break;
+			} else {
+				throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
+			}
+			
+		}
+		
+		switch (calledFunction) {
+		case "print":
+			//Execute.print(parser, args);
+			break;
+		default:
+			break;
+		}
+		
+		// TODO: function call returns proper result
+		ResultValue retVal = new ResultValue();
+		retVal.dataType = DataType.VOID;
+		
+		return retVal;
 	}
 	
 	/***
