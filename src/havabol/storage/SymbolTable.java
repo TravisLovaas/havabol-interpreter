@@ -63,8 +63,7 @@ public class SymbolTable {
 		if(ST.containsKey(symbol)){
 			return (STEntry) ST.get(symbol);
 		}else{
-			// TODO: error: symbol not found 
-			return null;
+			throw new DeclarationError("Attempted to access value of undeclared idendtifier");
 		}
 
 	}
