@@ -64,29 +64,53 @@ public class Parser {
 	 */
 	
 	private void parseIf() {
+		// currentToken is "if"
 		scanner.getNext();
+		
+		// currentToken should be beginning of conditional expression
 		ResultValue resCond = parseExpression();
 		if (!scanner.currentToken.tokenStr.equals(":")){
 			throw new SyntaxError("Expected ':' after conditional expression in if", scanner.currentToken);
 		}
-		scanner.getNext();
+		
+		scanner.getNext(); // advance past :
+		
 		if (resCond.asBoolean(this).booleanValue){
-			// parse the true statements
-			while (!scanner.currentToken.tokenStr.equals("else") || !scanner.currentToken.tokenStr.equals("endif")) {
+			// Parse statements if conditional expression is true
+			for (;;) {
 				parseStatement();
+				if (scanner.currentToken.tokenStr.equals("else")) {
+					break;
+				} else if (scanner.currentToken.tokenStr.equals("endif")) {
+					scanner.getNext();
+					return; // currentToken should be ;, handled by parseStatement
+				}
+			}
+		
+			// skip everything inside else
+			while (!scanner.currentToken.tokenStr.equals("endif")) {
+				scanner.getNext();
 			}
 			scanner.getNext();
-			while (!scanner.currentToken.tokenStr.equals("endif")) {
+			// done, semi-colon handled by parseStatement
+		} else {
+			// Skip everything until else or endif
+			for (;;) {
 				scanner.getNext();
+				if (scanner.currentToken.tokenStr.equals("else")) {
+					break;
+				} else if (scanner.currentToken.tokenStr.equals("endif")) {
+					scanner.getNext();
+					return; // currentToken should be ;, handled by parseStatement
+				}
 			}
-		}
-		else if(resCond.asBoolean(this).booleanValue == false){
-			while (!scanner.currentToken.tokenStr.equals("else") || !scanner.currentToken.tokenStr.equals("endif")) {
-				scanner.getNext();
-			}
+		
+			// skip everything inside else
 			while (!scanner.currentToken.tokenStr.equals("endif")) {
 				parseStatement();
 			}
+			System.out.println("last: " + scanner.currentToken.tokenStr);
+			scanner.getNext();
 		}
 	}
 	
@@ -220,10 +244,12 @@ public class Parser {
 				scanner.getNext();
 				//System.out.println("check = " + check);
 				res02 = parseExpression();
+				//System.out.println(res02);
 				//System.out.println("res02 = " + res02.toString());
 				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
 				//System.out.println("token = " + token);
 				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
+				//System.out.println(rhsExpr);
 				//System.out.println(rhsExpr.toString());
 				variable.setValue(rhsExpr);
 				break;
@@ -263,6 +289,8 @@ public class Parser {
 			default:
 				throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
 		}
+		
+		//System.out.println("Assigned " + rhsExpr + " to " + identifier);
 		
 		// Next token should be an expression
 		//scanner.getNext();
