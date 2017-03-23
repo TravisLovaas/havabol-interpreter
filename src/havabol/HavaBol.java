@@ -18,6 +18,7 @@
 package havabol;
 
 import havabol.lexer.Scanner;
+import havabol.parser.Parser;
 import havabol.storage.SymbolTable;
 
 public class HavaBol 
@@ -36,16 +37,14 @@ public class HavaBol
         try
         {
             // Print a column heading 
-            System.out.printf("%-11s %-12s %s\n"
-                    , "primClassif"
-                    , "subClassif"
-                    , "tokenStr");
+//            System.out.printf("%-11s %-12s %s\n"
+//                    , "primClassif"
+//                    , "subClassif"
+//                    , "tokenStr");
             
-            Scanner scan = new Scanner(args[0], symbolTable);
-            while (! scan.getNext().isEmpty())
-            {
-                scan.currentToken.printToken();
-            }
+            Parser parser = new Parser(args[0], symbolTable);
+            
+            parser.beginParsing();
         }
         catch (Exception e)
         {

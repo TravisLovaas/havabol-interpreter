@@ -312,7 +312,7 @@ public class Parser {
 		
 		switch (calledFunction) {
 		case "print":
-			//Execute.print(parser, args);
+			Execute.print(this, args);
 			break;
 		default:
 			break;
