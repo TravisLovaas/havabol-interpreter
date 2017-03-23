@@ -448,10 +448,4 @@ public class Execute {
 		System.out.println();
 	}
 
-	public static ResultValue exponentiate(Parser parser, ResultValue op1, ResultValue op2)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
