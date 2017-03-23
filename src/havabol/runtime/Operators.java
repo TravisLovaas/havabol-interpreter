@@ -6,7 +6,7 @@ import havabol.lexer.Token;
 import havabol.parser.*;
 import havabol.storage.*;
 
-public class Execute {
+public class Operators {
 	
 	/***
 	 * Adds to evaluate operands
@@ -431,21 +431,6 @@ public class Execute {
 		res.strValue = op1.strValue.concat(op2.strValue);
 		
 		return res;
-	}
-	
-	public static void print(Parser parser, List<ResultValue> args) {
-		if (args.size() == 0) {
-			return;
-		}
-
-		System.out.print(args.get(0).asString(parser).strValue);
-		
-		for (int i = 1; i < args.size(); i++) {
-			System.out.print(" ");
-			System.out.print(args.get(i).asString(parser).strValue);
-		}
-		
-		System.out.println();
 	}
 
 }

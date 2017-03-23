@@ -8,6 +8,10 @@ import java.util.Stack;
 
 import havabol.error.*;
 import havabol.lexer.*;
+<<<<<<< HEAD
+=======
+import havabol.runtime.Functions;
+>>>>>>> refs/remotes/origin/master
 import havabol.runtime.Operators;
 import havabol.storage.*;
 
@@ -273,6 +277,7 @@ public class Parser {
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
+
 				rhsExpr = Operators.multiply(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
