@@ -1,5 +1,6 @@
 package havabol.runtime;
 
+import java.util.List;
 import havabol.error.*;
 import havabol.lexer.Token;
 import havabol.parser.*;
@@ -406,6 +407,21 @@ public class Execute {
 		res.strValue = op1.strValue.concat(op2.strValue);
 		
 		return res;
+	}
+	
+	public static void print(Parser parser, List<ResultValue> args) {
+		if (args.size() == 0) {
+			return;
+		}
+
+		System.out.print(args.get(0));
+		
+		for (int i = 1; i < args.size(); i++) {
+			System.out.print(" ");
+			System.out.print(args.get(i));
+		}
+		
+		System.out.println();
 	}
 
 }

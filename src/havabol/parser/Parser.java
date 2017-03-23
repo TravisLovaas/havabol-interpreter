@@ -117,7 +117,7 @@ public class Parser {
 			if(scanner.currentToken.tokenStr == "endif")
 				return "endif";
 		}
-		parseToken();
+		parseStatement();
 		return null;
 	}
 	
@@ -144,7 +144,7 @@ public class Parser {
 			} else if (scanner.currentToken.subClassif == Token.FLOW) {
 				switch (scanner.currentToken.tokenStr) {
 				case "if":
-					parseIf();
+					parseIf(true);
 					break;
 				case "while":
 					parseWhile();
@@ -381,7 +381,7 @@ public class Parser {
 		
 		switch (calledFunction) {
 		case "print":
-			//Execute.print(parser, args);
+			Execute.print(this, args);
 			break;
 		default:
 			break;
