@@ -8,7 +8,7 @@ import java.util.Stack;
 
 import havabol.error.*;
 import havabol.lexer.*;
-import havabol.runtime.Execute;
+import havabol.runtime.Operators;
 import havabol.storage.*;
 
 public class Parser {
@@ -57,13 +57,13 @@ public class Parser {
 	}
 	
 	/**
-	 * parseIf will call parseExpression and execute or skip the statements
+	 * parseIf will call parseExpression and Operators or skip the statements
 	 * in the if-then-else statement using statements function
 	 * @param bExec
 	 */
 	
 	private void parseIf(boolean bExec) {
-		// if statement is true, we execute
+		// if statement is true, we Operators
 		String resTrueStmts = null;
 		String resFalseStmts = null;
 		if (bExec){
@@ -72,7 +72,7 @@ public class Parser {
 			if (resCond.strValue == "T")
 				// keep parsing until else 
 				statements(true);
-			// else, execute false part
+			// else, Operators false part
 			else {
 				// keep parsing until endif
 				statements(false);
@@ -103,7 +103,7 @@ public class Parser {
 	}
 	
 	/**
-	 * statements will execute all statements within if, else, while, 
+	 * statements will Operators all statements within if, else, while, 
 	 * for, when, and default.
 	 * @param bRes
 	 * @return String: "else" or "endif"
@@ -256,32 +256,32 @@ public class Parser {
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.subtract(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+				rhsExpr = Operators.subtract(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			case "-=":
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.add(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+				rhsExpr = Operators.add(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			case "*=":
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.multiply(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+				rhsExpr = Operators.multiply(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			case "/=":
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.divide(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+				rhsExpr = Operators.divide(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			default:
@@ -434,7 +434,7 @@ public class Parser {
 		
 		switch (calledFunction) {
 		case "print":
-			Execute.print(this, args);
+			Functions.print(this, args);
 			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
@@ -499,9 +499,9 @@ public class Parser {
 			//if separator, check special cases for parentheses
 			//to determine correctness
 			else if (scanner.currentToken.primClassif == Token.SEPARATOR){
-				if(token == "(")
+				if(token.equals("("))
 					stackToken.push(scanner.currentToken);
-				else if(token == ")"){
+				else if(token.equals(")")){
 					while(!stackToken.isEmpty()){
 						popped = stackToken.pop();
 						if(popped.tokenStr == "("){
@@ -516,10 +516,12 @@ public class Parser {
 						throw new SyntaxError("No matching left parenthesis for '" + token + "' found in expression",
 								scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 					}
+				}else if (token.equals(",")){
+					next = scanner.getNext();
+					continue;
 				}
 				else {
 					//invalid separator found, at this point ',' would be invalid
-					if(token != ",")
 						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
 							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 				}
@@ -591,12 +593,12 @@ public class Parser {
 					switch(token){
 						case "u-":
 							// push -1 * pop first operand
-							unary = Execute.unaryMinus(this, stackResult.pop());
+							unary = Operators.unaryMinus(this, stackResult.pop());
 							stackResult.push(unary);
 							break;
 						case "not":
 						case "!":
-							unary = Execute.unaryNot(this, stackResult.pop());
+							unary = Operators.unaryNot(this, stackResult.pop());
 							stackResult.push(unary);
 							break;
 						case "+":
@@ -605,7 +607,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.add(this, res2, res));
+							stackResult.push(Operators.add(this, res2, res));
 							break;
 						case "-":
 							res = stackResult.pop();
@@ -613,7 +615,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.subtract(this, res2, res));
+							stackResult.push(Operators.subtract(this, res2, res));
 							break;
 						case "*":
 							res = stackResult.pop();
@@ -621,7 +623,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.multiply(this, res2, res));
+							stackResult.push(Operators.multiply(this, res2, res));
 							break;
 						case "/":
 							res = stackResult.pop();
@@ -629,7 +631,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.divide(this, res2, res));
+							stackResult.push(Operators.divide(this, res2, res));
 							break;
 						case "#":
 							res = stackResult.pop();
@@ -637,7 +639,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.concatenate(this, res2, res));
+							stackResult.push(Operators.concatenate(this, res2, res));
 							break;
 						case "<":
 							res = stackResult.pop();
@@ -645,7 +647,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.less(this, res2, res));
+							stackResult.push(Operators.less(this, res2, res));
 							break;
 						case "^":
 							res = stackResult.pop();
@@ -653,7 +655,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.exponentiate(this, res2, res));
+							stackResult.push(Operators.exponentiate(this, res2, res));
 							break;
 						case "<=":
 							res = stackResult.pop();
@@ -661,7 +663,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.lessEqual(this, res2, res));
+							stackResult.push(Operators.lessEqual(this, res2, res));
 							break;
 						case ">":
 							res = stackResult.pop();
@@ -669,7 +671,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.greater(this, res2, res));
+							stackResult.push(Operators.greater(this, res2, res));
 							break;
 						case ">=":
 							res = stackResult.pop();
@@ -677,7 +679,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.greaterEqual(this, res2, res));
+							stackResult.push(Operators.greaterEqual(this, res2, res));
 							break;
 						case "==":
 							res = stackResult.pop();
@@ -685,7 +687,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.doubleEqual(this, res2, res));
+							stackResult.push(Operators.doubleEqual(this, res2, res));
 							break;
 						case "!=":
 							res = stackResult.pop();
@@ -693,7 +695,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.notEqual(this, res2, res));
+							stackResult.push(Operators.notEqual(this, res2, res));
 							break;
 						case "and":
 							res = stackResult.pop();
@@ -701,7 +703,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.logicalAnd(this, res2, res));
+							stackResult.push(Operators.logicalAnd(this, res2, res));
 							break;
 						case "or":
 							res = stackResult.pop();
@@ -709,7 +711,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.logicalOr(this, res2, res));
+							stackResult.push(Operators.logicalOr(this, res2, res));
 							break;
 						default:
 							throw new UnsupportedOperationError("The expression cannot be evaluated because of an invalid operator.", entry);
