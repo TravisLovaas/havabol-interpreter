@@ -8,11 +8,7 @@ import java.util.Stack;
 
 import havabol.error.*;
 import havabol.lexer.*;
-<<<<<<< HEAD
-=======
-import havabol.runtime.Functions;
->>>>>>> refs/remotes/origin/master
-import havabol.runtime.Operators;
+import havabol.runtime.*;
 import havabol.storage.*;
 
 public class Parser {
