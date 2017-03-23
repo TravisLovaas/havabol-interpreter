@@ -232,22 +232,51 @@ public class Parser {
 		}
 		
 		ResultValue res01;
-		ResultValue res02;
+		ResultValue res02, rhsExpr = null;
+		
+		String token = scanner.getNext();
 
 		// Next token should be an assignment operator
-		switch (scanner.getNext()) {
-		case "=":
-			//next Token should be an expression
-			res02 = parseExpression();
-			res02 = res02.asType(this, variable.declaredType);
-			variable.setValue(res02);
-		case "+=":
-		case "-=":
-		case "*=":
-		case "/=":
-			break;
-		default:
-			throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
+		switch (token) {
+			case "=":
+				//next token should be an expression
+				res02 = parseExpression();
+				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
+				System.out.println("token = " + token);
+				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
+				//System.out.println(rhsExpr.toString());
+				variable.setValue(rhsExpr);
+				break;
+			case "+=":
+				res02 = parseExpression();
+				res01 = symbolTable.getSymbol(identifier).getValue();
+				//run the subtract, execute should figure out if it is valid
+				rhsExpr = Execute.subtract(this, res01, res02);
+				variable.setValue(rhsExpr);
+				break;
+			case "-=":
+				res02 = parseExpression();
+				res01 = symbolTable.getSymbol(identifier).getValue();
+				//run the subtract, execute should figure out if it is valid
+				rhsExpr = Execute.add(this, res01, res02);
+				variable.setValue(rhsExpr);
+				break;
+			case "*=":
+				res02 = parseExpression();
+				res01 = symbolTable.getSymbol(identifier).getValue();
+				//run the subtract, execute should figure out if it is valid
+				rhsExpr = Execute.multiply(this, res01, res02);
+				variable.setValue(rhsExpr);
+				break;
+			case "/=":
+				res02 = parseExpression();
+				res01 = symbolTable.getSymbol(identifier).getValue();
+				//run the subtract, execute should figure out if it is valid
+				rhsExpr = Execute.divide(this, res01, res02);
+				variable.setValue(rhsExpr);
+				break;
+			default:
+				throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
 		}
 		
 		// Next token should be an expression
@@ -410,9 +439,10 @@ public class Parser {
 		boolean lParen = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
 		
-		while (scanner.getNext() != ";" || scanner.getNext() != ":" || scanner.getNext() != ",") {
+		while (scanner.getNext().equals(";") || scanner.getNext().equals(":") || scanner.getNext().equals(",")) {
 			//get token string
 			token = scanner.currentToken.tokenStr;
+			System.out.println("token = "+ token);
 			//if function or operand place in out
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//add the identifier or function to postfix out
