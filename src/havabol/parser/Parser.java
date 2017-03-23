@@ -231,9 +231,16 @@ public class Parser {
 			throw new DeclarationError("Reference to undeclared identifier found", scanner.currentToken);
 		}
 		
+		ResultValue res01;
+		ResultValue res02;
+
 		// Next token should be an assignment operator
 		switch (scanner.getNext()) {
 		case "=":
+			//next Token should be an expression
+			res02 = parseExpression();
+			res02 = res02.asType(this, variable.declaredType);
+			variable.setValue(res02);
 		case "+=":
 		case "-=":
 		case "*=":
@@ -244,14 +251,13 @@ public class Parser {
 		}
 		
 		// Next token should be an expression
-		scanner.getNext();
+		//scanner.getNext();
 		
-		ResultValue rhsExpr = parseExpression(); // Parse expression on right-hand side of assignment
+		//ResultValue rhsExpr = parseExpression(); // Parse expression on right-hand side of assignment
 		
 		// Ensure type of rhsExpr matches declared type, or can be cast to such.
-		rhsExpr = rhsExpr.asType(this, variable.declaredType);
 		
-		variable.setValue(rhsExpr);
+		//variable.setValue(rhsExpr);
 		
 		return rhsExpr;
 		
