@@ -166,8 +166,10 @@ public class Parser {
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
+		} else if (scanner.currentToken.tokenStr.equals(";")) {
+			return;
 		} else {
-			throw new UnsupportedOperationError("Unknown token found while parsing statements.");
+			throw new UnsupportedOperationError("Unexpected token '" + scanner.currentToken.tokenStr + "' found while parsing statements.");
 		}
 	}
 	
@@ -391,11 +393,11 @@ public class Parser {
 		}
 		
 		String calledFunction = scanner.currentToken.tokenStr;
-		System.out.println("called func: " + calledFunction);
+		//System.out.println("called func: " + calledFunction);
 		
 		//scanner.getNext(); // currentToken should be open paren "("
 		String check = scanner.getNext();
-		System.out.println("check = " + check);
+		//System.out.println("check = " + check);
 		
 		if (!scanner.currentToken.tokenStr.equals("(")) {
 			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
@@ -403,7 +405,7 @@ public class Parser {
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
 		
-		System.out.println("begin arg parsing token: " + scanner.currentToken.tokenStr);
+		//System.out.println("begin arg parsing token: " + scanner.currentToken.tokenStr);
 		
 		List<ResultValue> args = new ArrayList<>();
 		
@@ -414,9 +416,9 @@ public class Parser {
 			// Parse all function arguments
 			for (;;) {
 				
-				System.out.println("calling parseExpr");
+				//System.out.println("calling parseExpr");
 				ResultValue arg = parseExpression();
-				System.out.println("arg found: " + arg);
+				//System.out.println("arg found: " + arg);
 				args.add(arg);
 				
 				if (scanner.currentToken.tokenStr.equals(",")) {
@@ -435,7 +437,7 @@ public class Parser {
 			Execute.print(this, args);
 			break;
 		default:
-			break;
+			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
 		// TODO: function call returns proper result
@@ -549,7 +551,7 @@ public class Parser {
 			//if you find an operand
 			ResultValue res, res2 = null;
 			token = entry.tokenStr;
-			System.out.println("The entry is = " + entry.tokenStr);
+			//System.out.println("The entry is = " + entry.tokenStr);
 			if(entry.primClassif == Token.OPERAND){
 				//check if it is an actual value
 				//if not, convert to an actual value and push to stack

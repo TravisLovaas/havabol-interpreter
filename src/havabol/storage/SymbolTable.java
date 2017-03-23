@@ -2,6 +2,7 @@ package havabol.storage;
 
 import java.util.*;
 
+import havabol.error.DeclarationError;
 import havabol.lexer.Token;
 import havabol.parser.*;
 
