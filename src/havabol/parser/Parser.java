@@ -51,7 +51,8 @@ public class Parser {
 	
 	
 	public void beginParsing() {
-		while (!scanner.getNext().isEmpty()) {
+		scanner.getNext();
+		while (!scanner.currentToken.tokenStr.isEmpty()) {
 			parseStatement();
 		}
 	}
@@ -98,6 +99,7 @@ public class Parser {
 	}
 	
 	private void parseStatement() {
+		//System.out.println("currentToken is " + scanner.currentToken.tokenStr + " at beginning of statement");
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
 			if (scanner.currentToken.subClassif == Token.DECLARE) {
 				parseDeclaration();
@@ -115,7 +117,9 @@ public class Parser {
 				default:
 					throw new UnsupportedOperationError("Unsupported FLOW token found.");
 				}
-			} else {
+			} //else if (scanner.currentToken.tokenStr.equals("endif")) {
+				//scanner.getNext();
+			 else {
 				throw new UnsupportedOperationError("Unknown CONTROL token found.");
 			}
 		} else if (scanner.currentToken.primClassif == Token.FUNCTION) {
@@ -127,9 +131,17 @@ public class Parser {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
 		} else if (scanner.currentToken.tokenStr.equals(";")) {
+			scanner.getNext();
+			//System.out.println(scanner.currentToken.tokenStr);
 			return;
 		} else {
 			throw new UnsupportedOperationError("Unexpected token '" + scanner.currentToken.tokenStr + "' found while parsing statements.");
+		}
+		
+		if (scanner.currentToken.tokenStr.equals(";")) {
+			scanner.getNext();
+		} else {
+			throw new SyntaxError("Expected semi-colon to end statement", scanner.currentToken);
 		}
 	}
 	
@@ -155,14 +167,15 @@ public class Parser {
 		// Create symbol table entry
 		symbolTable.createSymbol(this, identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
 		
-		// currentToken should be our identifier after this call
 		scanner.getNext();
+		// currentToken should now be an identifier
 		
 		// Check for an assignment
 		if (scanner.nextToken.tokenStr.equals("=")) {
 			parseAssignment();
 		} else if (scanner.nextToken.tokenStr.equals(";")) {
 			scanner.getNext();
+			//System.out.println("currentToken at end of declaration: " + scanner.currentToken.tokenStr);
 		} else {
 			throw new SyntaxError("Expected semi-colon", scanner.currentToken);
 		}
@@ -185,6 +198,8 @@ public class Parser {
 		}
 		
 		String identifier = scanner.currentToken.tokenStr;
+		
+		//System.out.println(identifier);
 		
 		// Ensure identifier has been declared
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
