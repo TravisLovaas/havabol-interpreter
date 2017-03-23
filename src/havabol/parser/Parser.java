@@ -241,6 +241,7 @@ public class Parser {
 			case "=":
 				//next token should be an expression
 				scanner.getNext();
+				//System.out.println("check = " + check);
 				res02 = parseExpression();
 				//System.out.println("res02 = " + res02.toString());
 				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
@@ -391,7 +392,9 @@ public class Parser {
 		
 		String calledFunction = scanner.currentToken.tokenStr;
 		
-		scanner.getNext(); // currentToken should be open paren "("
+		//scanner.getNext(); // currentToken should be open paren "("
+		String check = scanner.getNext();
+		System.out.println("check = " + check);
 		
 		if (!scanner.currentToken.tokenStr.equals("(")) {
 			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
@@ -448,6 +451,7 @@ public class Parser {
 		Stack<ResultValue> stackResult = new Stack<>();
 		ResultValue finalValue = null;
 		String token;
+		String next = null;
 		Token popped;
 		boolean lParen = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
@@ -457,7 +461,9 @@ public class Parser {
 		do {
 			//get token string
 			token = scanner.currentToken.tokenStr;
-			System.out.println("token = "+ token);
+			//System.out.println("currenttoken = "+ token);
+
+			//System.out.println("nexttoken = "+ scanner.nextToken.tokenStr);
 			//if function or operand place in out
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//add the identifier or function to postfix out
@@ -514,9 +520,11 @@ public class Parser {
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}
-		}while (!(scanner.getNext().equals(";") || scanner.getNext().equals(":") || scanner.getNext().equals(",") || scanner.getNext().equals(")"))); 
-				
+			next = scanner.getNext();
+		}while (!(next.equals(";") || next.equals(":") || next.equals(",") || next.equals(")"))); 
+				//System.out.println("failed = " + scanner.currentToken.tokenStr);
 		while(!stackToken.isEmpty()){
+			//System.out.println("$$$$$$$$$$$$$$$$");
 			popped = stackToken.pop();
 			if(popped.tokenStr == "(")
 				throw new SyntaxError("Missing right parenthesis for '" + popped + "' found",
@@ -534,6 +542,7 @@ public class Parser {
 			//if you find an operand
 			ResultValue res, res2 = null;
 			token = entry.tokenStr;
+			System.out.println("The entry is = " + entry.tokenStr);
 			if(entry.primClassif == Token.OPERAND){
 				//check if it is an actual value
 				//if not, convert to an actual value and push to stack

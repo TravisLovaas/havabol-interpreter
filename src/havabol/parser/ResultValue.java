@@ -156,6 +156,8 @@ public class ResultValue {
 		case BOOLEAN:
 			valStr = String.valueOf(booleanValue);
 			break;
+		default:
+			break;
 		}
 		
 		return "[" + this.dataType + ": " + valStr + "]";
