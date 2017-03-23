@@ -62,71 +62,31 @@ public class Parser {
 	 * @param bExec
 	 */
 	
-	private void parseIf(boolean bExec) {
-		// if statement is true, we execute
-		String resTrueStmts = null;
-		String resFalseStmts = null;
-		if (bExec){
-			ResultValue resCond = parseExpression();
-			// if true, executing true part
-			if (resCond.strValue == "T")
-				// keep parsing until else 
-				statements(true);
-			// else, execute false part
-			else {
-				// keep parsing until endif
-				statements(false);
+	private void parseIf() {
+		scanner.getNext();
+		ResultValue resCond = parseExpression();
+		if (!scanner.currentToken.tokenStr.equals(":")){
+			throw new SyntaxError("Expected ':' after conditional expression in if", scanner.currentToken);
+		}
+		scanner.getNext();
+		if (resCond.asBoolean(this).booleanValue){
+			// parse the true statements
+			while (!scanner.currentToken.tokenStr.equals("else") || !scanner.currentToken.tokenStr.equals("endif")) {
+				parseStatement();
+			}
+			scanner.getNext();
+			while (!scanner.currentToken.tokenStr.equals("endif")) {
+				scanner.getNext();
 			}
 		}
-		// ignoring execution
-		else {
-			// skip to the colon.
-			skipTo("if",":");
-			statements(false);
-			resTrueStmts = statements(false);
-			if (resTrueStmts == "else"){
-				if (scanner.getNext() != ":") {
-					// TODO: error, expected ';' after 'else'
-				}
-				resFalseStmts = statements(false);
-				if (resFalseStmts != "endif") {
-					// TODO: error, expected 'endif'
-				}
+		else if(resCond.asBoolean(this).booleanValue == false){
+			while (!scanner.currentToken.tokenStr.equals("else") || !scanner.currentToken.tokenStr.equals("endif")) {
+				scanner.getNext();
 			}
-			if (resTrueStmts != "endif") {
-				// TODO: error, expected 'endif'
-			}
-			if (resTrueStmts == "else") {
-				// TODO: error, expected ';' after 'else'
+			while (!scanner.currentToken.tokenStr.equals("endif")) {
+				parseStatement();
 			}
 		}
-	}
-	
-	/**
-	 * statements will execute all statements within if, else, while, 
-	 * for, when, and default.
-	 * @param bRes
-	 * @return String: "else" or "endif"
-	 */
-	private String statements(boolean bRes) {
-		// executing true condition statements
-		if (bRes) {
-			if (scanner.currentToken.tokenStr == "else")
-				return "else";
-		}else{
-			if(scanner.currentToken.tokenStr == "endif")
-				return "endif";
-		}
-		parseStatement();
-		return null;
-	}
-	
-	/**
-	 * skipTo will skip to the given token
-	 * @param from, to
-	 */
-	public void skipTo(String from, String to){
-		
 	}
 	
 	private void parseWhile() {
