@@ -107,6 +107,7 @@ public class Scanner {
 		}
 		nextToken = getNextToken(true);
 		
+		//Take care of unary minus
 		if(currentToken.subClassif != Token.STRING && nextToken.subClassif != Token.STRING)
 			if(UNARY.contains(previous) && currentToken.tokenStr.equals("-")){
 				currentToken.tokenStr = "u-";
