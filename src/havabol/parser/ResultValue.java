@@ -138,5 +138,28 @@ public class ResultValue {
 			throw new TypeError("Invalid type cast specified");
 		}
 	}
+	
+	public String toString() {
+		
+		String valStr = "null";
+		
+		switch (dataType) {
+		case INTEGER:
+			valStr = String.valueOf(this.intValue);
+			break;
+		case FLOAT:
+			valStr = String.valueOf(this.floatValue);
+			break;
+		case STRING:
+			valStr = strValue;
+			break;
+		case BOOLEAN:
+			valStr = String.valueOf(booleanValue);
+			break;
+		}
+		
+		return "[" + this.dataType + ": " + valStr + "]";
+		
+	}
 
 }
