@@ -390,6 +390,7 @@ public class Parser {
 		}
 		
 		String calledFunction = scanner.currentToken.tokenStr;
+		System.out.println("called func: " + calledFunction);
 		
 		scanner.getNext(); // currentToken should be open paren "("
 		
@@ -398,6 +399,8 @@ public class Parser {
 		}
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
+		
+		System.out.println("begin arg parsing token: " + scanner.currentToken.tokenStr);
 		
 		List<ResultValue> args = new ArrayList<>();
 		
@@ -408,7 +411,10 @@ public class Parser {
 			// Parse all function arguments
 			for (;;) {
 				
-				args.add(parseExpression());
+				System.out.println("calling parseExpr");
+				ResultValue arg = parseExpression();
+				System.out.println("arg found: " + arg);
+				args.add(arg);
 				
 				if (scanner.currentToken.tokenStr.equals(",")) {
 					continue;
