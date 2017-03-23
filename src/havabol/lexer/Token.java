@@ -225,30 +225,32 @@ public class Token
 	public ResultValue toResult()
 	{
 		ResultValue res = new ResultValue();
-		if (tokenStr.charAt(0) == '"') {
+		
+		switch (this.subClassif) {
+		case INTEGER:
+			res.dataType = DataType.INTEGER;
+			res.structure = Structure.PRIMITIVE;
+			res.intValue = Integer.parseInt(tokenStr);
+			break;
+		case FLOAT:
+			res.dataType = DataType.FLOAT;
+			res.structure = Structure.PRIMITIVE;
+			res.floatValue = Double.parseDouble(tokenStr);
+			break;
+		case BOOLEAN:
+			res.dataType = DataType.BOOLEAN;
+			res.structure = Structure.PRIMITIVE;
+			res.booleanValue = tokenStr.equals("T");
+			break;
+		case STRING:
 			res.dataType = DataType.STRING;
 			res.structure = Structure.PRIMITIVE;
-			res.strValue = tokenStr.substring(1, tokenStr.length() - 1);
-		} else if (tokenStr.equals("T")) {
-			res.dataType = DataType.BOOLEAN;
-			res.structure = Structure.PRIMITIVE;
-			res.booleanValue = true;
-		} else if (tokenStr.equals("F")) {
-			res.dataType = DataType.BOOLEAN;
-			res.structure = Structure.PRIMITIVE;
-			res.booleanValue = false;
-		} else {
-			if (this.subClassif == Token.FLOAT) {
-				res.dataType = DataType.FLOAT;
-				res.structure = Structure.PRIMITIVE;
-				res.floatValue = Double.parseDouble(tokenStr);
-			} else {
-				res.dataType = DataType.INTEGER;
-				res.structure = Structure.PRIMITIVE;
-				res.intValue = Integer.parseInt(tokenStr);
-			}
+			res.strValue = tokenStr;
+			break;
 		}
+		
 		return res;
+
 	}
 
 }
