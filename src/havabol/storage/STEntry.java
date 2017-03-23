@@ -27,7 +27,7 @@ public class STEntry
 	
 	public void setValue(ResultValue value) {
 		this.value = value;
-		System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
+		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
 	}
 	
 	public ResultValue getValue() {

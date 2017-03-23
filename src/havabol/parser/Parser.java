@@ -393,6 +393,8 @@ public class Parser {
 			}
 		}
 		
+		scanner.getNext();
+		
 		//System.out.print("dumping args: ");
 		//for (ResultValue a : args) {
 		//	System.out.print(a);
