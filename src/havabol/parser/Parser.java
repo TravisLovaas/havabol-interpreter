@@ -397,21 +397,28 @@ public class Parser {
 			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
 		}
 		
+		scanner.getNext(); // currentToken is beginning of first arg expression or )
+		
 		List<ResultValue> args = new ArrayList<>();
 		
-		// Parse all function arguments
-		for (;;) {
+		if (scanner.currentToken.tokenStr.equals(")")) {
 			
-			args.add(parseExpression());
+		} else {
 			
-			if (scanner.currentToken.tokenStr.equals(",")) {
-				continue;
-			} else if (scanner.currentToken.tokenStr.equals(")")) {
-				break;
-			} else {
-				throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
+			// Parse all function arguments
+			for (;;) {
+				
+				args.add(parseExpression());
+				
+				if (scanner.currentToken.tokenStr.equals(",")) {
+					continue;
+				} else if (scanner.currentToken.tokenStr.equals(")")) {
+					break;
+				} else {
+					throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
+				}
+				
 			}
-			
 		}
 		
 		switch (calledFunction) {
