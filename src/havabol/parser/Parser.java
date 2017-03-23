@@ -240,14 +240,17 @@ public class Parser {
 		switch (token) {
 			case "=":
 				//next token should be an expression
+				scanner.getNext();
 				res02 = parseExpression();
+				//System.out.println("res02 = " + res02.toString());
 				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
-				System.out.println("token = " + token);
+				//System.out.println("token = " + token);
 				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
 				//System.out.println(rhsExpr.toString());
 				variable.setValue(rhsExpr);
 				break;
 			case "+=":
+				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, execute should figure out if it is valid
@@ -255,6 +258,7 @@ public class Parser {
 				variable.setValue(rhsExpr);
 				break;
 			case "-=":
+				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, execute should figure out if it is valid
@@ -262,6 +266,7 @@ public class Parser {
 				variable.setValue(rhsExpr);
 				break;
 			case "*=":
+				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, execute should figure out if it is valid
@@ -269,6 +274,7 @@ public class Parser {
 				variable.setValue(rhsExpr);
 				break;
 			case "/=":
+				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, execute should figure out if it is valid
@@ -439,7 +445,9 @@ public class Parser {
 		boolean lParen = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
 		
-		while (scanner.getNext().equals(";") || scanner.getNext().equals(":") || scanner.getNext().equals(",")) {
+		//System.out.println("token = "+ scanner.getNext());
+
+		do {
 			//get token string
 			token = scanner.currentToken.tokenStr;
 			System.out.println("token = "+ token);
@@ -499,7 +507,7 @@ public class Parser {
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}
-		}
+		}while (!(scanner.getNext().equals(";") || scanner.getNext().equals(":") || scanner.getNext().equals(",") || scanner.getNext().equals(")"))); 
 				
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();
@@ -535,6 +543,8 @@ public class Parser {
 					case Token.DATE :
 						//go back and look at toResult method
 						res = entry.toResult();
+						stackResult.push(res);
+						//System.out.per
 						break;
 					default:
 						//operand type does not exist
@@ -682,6 +692,7 @@ public class Parser {
 		//what's left in stack should be the final result
 		if(!stackResult.isEmpty() && !evaluated){
 			finalValue = stackResult.pop();
+			//System.out.println("finalvalue = " + finalValue.toString());
 			evaluated = true;
 		}else if(stackResult.isEmpty() && evaluated){
 			throw new UnsupportedOperationError("Invalid Expression found. There are too few operands for the operators provided"
@@ -691,6 +702,7 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		
+		//System.out.println("finalvalue = " + finalValue.toString());
 		return finalValue;
 	}
 	
