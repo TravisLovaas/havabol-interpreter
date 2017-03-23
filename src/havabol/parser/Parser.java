@@ -517,9 +517,10 @@ public class Parser {
 								scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 					}
 				}
-				else{
+				else {
 					//invalid separator found, at this point ',' would be invalid
-					throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
+					if(token != ",")
+						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
 							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 				}
 			}
@@ -645,6 +646,14 @@ public class Parser {
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
 							stackResult.push(Execute.less(this, res2, res));
+							break;
+						case "^":
+							res = stackResult.pop();
+							if(!stackResult.isEmpty())
+								res2 = stackResult.pop();
+							else
+								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
+							stackResult.push(Execute.exponentiate(this, res2, res));
 							break;
 						case "<=":
 							res = stackResult.pop();
