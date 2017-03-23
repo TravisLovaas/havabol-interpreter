@@ -56,21 +56,77 @@ public class Parser {
 		}
 	}
 	
-	private void parseIf() {
-		String leftCompare;
-		String[] operators = {"==", "<", ">", "<=", ">="};
-		int length = operators.length;
-		int index = 0;
-		// while ":" is not found
-		while (scanner.getNext() != ":") {
-			// find 
-			scanner.getNext();
-			leftCompare = scanner.currentToken.tokenStr;
-			
-			for (index : length) {
-				
+	/**
+	 * parseIf will call parseExpression and execute or skip the statements
+	 * in the if-then-else statement using statements function
+	 * @param bExec
+	 */
+	
+	private void parseIf(boolean bExec) {
+		// if statement is true, we execute
+		String resTrueStmts = null;
+		String resFalseStmts = null;
+		if (bExec){
+			ResultValue resCond = parseExpression();
+			// if true, executing true part
+			if (resCond.strValue == "T")
+				// keep parsing until else 
+				statements(true);
+			// else, execute false part
+			else {
+				// keep parsing until endif
+				statements(false);
 			}
 		}
+		// ignoring execution
+		else {
+			// skip to the colon.
+			skipTo("if",":");
+			statements(false);
+			resTrueStmts = statements(false);
+			if (resTrueStmts == "else"){
+				if (scanner.getNext() != ":") {
+					// TODO: error, expected ';' after 'else'
+				}
+				resFalseStmts = statements(false);
+				if (resFalseStmts != "endif") {
+					// TODO: error, expected 'endif'
+				}
+			}
+			if (resTrueStmts != "endif") {
+				// TODO: error, expected 'endif'
+			}
+			if (resTrueStmts == "else") {
+				// TODO: error, expected ';' after 'else'
+			}
+		}
+	}
+	
+	/**
+	 * statements will execute all statements within if, else, while, 
+	 * for, when, and default.
+	 * @param bRes
+	 * @return String: "else" or "endif"
+	 */
+	private String statements(boolean bRes) {
+		// executing true condition statements
+		if (bRes) {
+			if (scanner.currentToken.tokenStr == "else")
+				return "else";
+		}else{
+			if(scanner.currentToken.tokenStr == "endif")
+				return "endif";
+		}
+		parseToken();
+		return null;
+	}
+	
+	/**
+	 * skipTo will skip to the given token
+	 * @param from, to
+	 */
+	public void skipTo(String from, String to){
+		
 	}
 	
 	private void parseToken() {
