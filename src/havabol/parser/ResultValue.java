@@ -74,14 +74,14 @@ public class ResultValue {
 		res.dataType = DataType.STRING;
 		
 		if (this.dataType == DataType.INTEGER) {
-			this.strValue = String.valueOf(this.intValue);
+			res.strValue = String.valueOf(this.intValue);
 		} else if (this.dataType == DataType.FLOAT) {
-			this.strValue = String.valueOf(this.floatValue);
+			res.strValue = String.valueOf(this.floatValue);
 		} else if (this.dataType == DataType.BOOLEAN) {
 			if (this.booleanValue) {
-				this.strValue = "T";
+				res.strValue = "T";
 			} else {
-				this.strValue = "F";
+				res.strValue = "F";
 			}
 		}
 		
@@ -155,6 +155,8 @@ public class ResultValue {
 			break;
 		case BOOLEAN:
 			valStr = String.valueOf(booleanValue);
+			break;
+		default:
 			break;
 		}
 		

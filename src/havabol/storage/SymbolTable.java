@@ -2,6 +2,7 @@ package havabol.storage;
 
 import java.util.*;
 
+import havabol.error.DeclarationError;
 import havabol.lexer.Token;
 import havabol.parser.*;
 
@@ -63,8 +64,7 @@ public class SymbolTable {
 		if(ST.containsKey(symbol)){
 			return (STEntry) ST.get(symbol);
 		}else{
-			// TODO: error: symbol not found 
-			return null;
+			throw new DeclarationError("Attempted to access value of undeclared idendtifier");
 		}
 
 	}

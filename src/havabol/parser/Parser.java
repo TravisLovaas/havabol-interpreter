@@ -8,7 +8,7 @@ import java.util.Stack;
 
 import havabol.error.*;
 import havabol.lexer.*;
-import havabol.runtime.Execute;
+import havabol.runtime.*;
 import havabol.storage.*;
 
 public class Parser {
@@ -57,7 +57,7 @@ public class Parser {
 	}
 	
 	/**
-	 * parseIf will call parseExpression and execute or skip the statements
+	 * parseIf will call parseExpression and Operators or skip the statements
 	 * in the if-then-else statement using statements function
 	 * @param bExec
 	 */
@@ -104,7 +104,7 @@ public class Parser {
 			} else if (scanner.currentToken.subClassif == Token.FLOW) {
 				switch (scanner.currentToken.tokenStr) {
 				case "if":
-					parseIf(true);
+					parseIf();
 					break;
 				case "while":
 					parseWhile();
@@ -126,8 +126,10 @@ public class Parser {
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
+		} else if (scanner.currentToken.tokenStr.equals(";")) {
+			return;
 		} else {
-			throw new UnsupportedOperationError("Unknown token found while parsing statements.");
+			throw new UnsupportedOperationError("Unexpected token '" + scanner.currentToken.tokenStr + "' found while parsing statements.");
 		}
 	}
 	
@@ -201,6 +203,7 @@ public class Parser {
 			case "=":
 				//next token should be an expression
 				scanner.getNext();
+				//System.out.println("check = " + check);
 				res02 = parseExpression();
 				//System.out.println("res02 = " + res02.toString());
 				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
@@ -213,32 +216,33 @@ public class Parser {
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.subtract(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+				rhsExpr = Operators.subtract(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			case "-=":
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.add(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+				rhsExpr = Operators.add(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			case "*=":
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.multiply(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+
+				rhsExpr = Operators.multiply(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			case "/=":
 				scanner.getNext();
 				res02 = parseExpression();
 				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, execute should figure out if it is valid
-				rhsExpr = Execute.divide(this, res01, res02);
+				//run the subtract, Operators should figure out if it is valid
+				rhsExpr = Operators.divide(this, res01, res02);
 				variable.setValue(rhsExpr);
 				break;
 			default:
@@ -350,9 +354,11 @@ public class Parser {
 		}
 		
 		String calledFunction = scanner.currentToken.tokenStr;
-		System.out.println("called func: " + calledFunction);
+		//System.out.println("called func: " + calledFunction);
 		
-		scanner.getNext(); // currentToken should be open paren "("
+		//scanner.getNext(); // currentToken should be open paren "("
+		String check = scanner.getNext();
+		//System.out.println("check = " + check);
 		
 		if (!scanner.currentToken.tokenStr.equals("(")) {
 			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
@@ -360,7 +366,7 @@ public class Parser {
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
 		
-		System.out.println("begin arg parsing token: " + scanner.currentToken.tokenStr);
+		//System.out.println("begin arg parsing token: " + scanner.currentToken.tokenStr);
 		
 		List<ResultValue> args = new ArrayList<>();
 		
@@ -371,9 +377,9 @@ public class Parser {
 			// Parse all function arguments
 			for (;;) {
 				
-				System.out.println("calling parseExpr");
+				//System.out.println("calling parseExpr");
 				ResultValue arg = parseExpression();
-				System.out.println("arg found: " + arg);
+				//System.out.println("arg found: " + arg);
 				args.add(arg);
 				
 				if (scanner.currentToken.tokenStr.equals(",")) {
@@ -387,12 +393,18 @@ public class Parser {
 			}
 		}
 		
+		//System.out.print("dumping args: ");
+		//for (ResultValue a : args) {
+		//	System.out.print(a);
+		//}
+		//System.out.println();
+		
 		switch (calledFunction) {
 		case "print":
-			Execute.print(this, args);
+			Functions.print(this, args);
 			break;
 		default:
-			break;
+			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
 		// TODO: function call returns proper result
@@ -414,6 +426,7 @@ public class Parser {
 		Stack<ResultValue> stackResult = new Stack<>();
 		ResultValue finalValue = null;
 		String token;
+		String next = null;
 		Token popped;
 		boolean lParen = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
@@ -423,7 +436,9 @@ public class Parser {
 		do {
 			//get token string
 			token = scanner.currentToken.tokenStr;
-			System.out.println("token = "+ token);
+			//System.out.println("currenttoken = "+ token);
+
+			//System.out.println("nexttoken = "+ scanner.nextToken.tokenStr);
 			//if function or operand place in out
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//add the identifier or function to postfix out
@@ -451,9 +466,9 @@ public class Parser {
 			//if separator, check special cases for parentheses
 			//to determine correctness
 			else if (scanner.currentToken.primClassif == Token.SEPARATOR){
-				if(token == "(")
+				if(token.equals("("))
 					stackToken.push(scanner.currentToken);
-				else if(token == ")"){
+				else if(token.equals(")")){
 					while(!stackToken.isEmpty()){
 						popped = stackToken.pop();
 						if(popped.tokenStr == "("){
@@ -468,10 +483,13 @@ public class Parser {
 						throw new SyntaxError("No matching left parenthesis for '" + token + "' found in expression",
 								scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 					}
+				}else if (token.equals(",")){
+					next = scanner.getNext();
+					continue;
 				}
-				else{
+				else {
 					//invalid separator found, at this point ',' would be invalid
-					throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
+						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
 							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 				}
 			}
@@ -480,15 +498,18 @@ public class Parser {
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}
-		}while (!(scanner.getNext().equals(";") || scanner.getNext().equals(":") || scanner.getNext().equals(",") || scanner.getNext().equals(")"))); 
-				
+			next = scanner.getNext();
+		}while (!(next.equals(";") || next.equals(":") || next.equals(",") || next.equals(")"))); 
+				//System.out.println("failed = " + scanner.currentToken.tokenStr);
 		while(!stackToken.isEmpty()){
+			//System.out.println("$$$$$$$$$$$$$$$$");
 			popped = stackToken.pop();
 			if(popped.tokenStr == "(")
 				throw new SyntaxError("Missing right parenthesis for '" + popped + "' found",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			out.add(popped);
 		}
+		//nothing
 		
 		//System.out.println("*************************I'M IN PARSE EXPRESSION, ARE YOU HERE? *************************");
 		
@@ -500,6 +521,7 @@ public class Parser {
 			//if you find an operand
 			ResultValue res, res2 = null;
 			token = entry.tokenStr;
+			//System.out.println("The entry is = " + entry.tokenStr);
 			if(entry.primClassif == Token.OPERAND){
 				//check if it is an actual value
 				//if not, convert to an actual value and push to stack
@@ -538,12 +560,12 @@ public class Parser {
 					switch(token){
 						case "u-":
 							// push -1 * pop first operand
-							unary = Execute.unaryMinus(this, stackResult.pop());
+							unary = Operators.unaryMinus(this, stackResult.pop());
 							stackResult.push(unary);
 							break;
 						case "not":
 						case "!":
-							unary = Execute.unaryNot(this, stackResult.pop());
+							unary = Operators.unaryNot(this, stackResult.pop());
 							stackResult.push(unary);
 							break;
 						case "+":
@@ -552,7 +574,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.add(this, res2, res));
+							stackResult.push(Operators.add(this, res2, res));
 							break;
 						case "-":
 							res = stackResult.pop();
@@ -560,7 +582,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.subtract(this, res2, res));
+							stackResult.push(Operators.subtract(this, res2, res));
 							break;
 						case "*":
 							res = stackResult.pop();
@@ -568,7 +590,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.multiply(this, res2, res));
+							stackResult.push(Operators.multiply(this, res2, res));
 							break;
 						case "/":
 							res = stackResult.pop();
@@ -576,7 +598,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.divide(this, res2, res));
+							stackResult.push(Operators.divide(this, res2, res));
 							break;
 						case "#":
 							res = stackResult.pop();
@@ -584,7 +606,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.concatenate(this, res2, res));
+							stackResult.push(Operators.concatenate(this, res2, res));
 							break;
 						case "<":
 							res = stackResult.pop();
@@ -592,7 +614,15 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.less(this, res2, res));
+							stackResult.push(Operators.less(this, res2, res));
+							break;
+						case "^":
+							res = stackResult.pop();
+							if(!stackResult.isEmpty())
+								res2 = stackResult.pop();
+							else
+								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
+							stackResult.push(Operators.exponentiate(this, res2, res));
 							break;
 						case "<=":
 							res = stackResult.pop();
@@ -600,7 +630,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.lessEqual(this, res2, res));
+							stackResult.push(Operators.lessEqual(this, res2, res));
 							break;
 						case ">":
 							res = stackResult.pop();
@@ -608,7 +638,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.greater(this, res2, res));
+							stackResult.push(Operators.greater(this, res2, res));
 							break;
 						case ">=":
 							res = stackResult.pop();
@@ -616,7 +646,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.greaterEqual(this, res2, res));
+							stackResult.push(Operators.greaterEqual(this, res2, res));
 							break;
 						case "==":
 							res = stackResult.pop();
@@ -624,7 +654,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.doubleEqual(this, res2, res));
+							stackResult.push(Operators.doubleEqual(this, res2, res));
 							break;
 						case "!=":
 							res = stackResult.pop();
@@ -632,7 +662,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.notEqual(this, res2, res));
+							stackResult.push(Operators.notEqual(this, res2, res));
 							break;
 						case "and":
 							res = stackResult.pop();
@@ -640,7 +670,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.logicalAnd(this, res2, res));
+							stackResult.push(Operators.logicalAnd(this, res2, res));
 							break;
 						case "or":
 							res = stackResult.pop();
@@ -648,7 +678,7 @@ public class Parser {
 								res2 = stackResult.pop();
 							else
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
-							stackResult.push(Execute.logicalOr(this, res2, res));
+							stackResult.push(Operators.logicalOr(this, res2, res));
 							break;
 						default:
 							throw new UnsupportedOperationError("The expression cannot be evaluated because of an invalid operator.", entry);

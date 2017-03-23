@@ -6,7 +6,7 @@ import havabol.lexer.Token;
 import havabol.parser.*;
 import havabol.storage.*;
 
-public class Execute {
+public class Operators {
 	
 	/***
 	 * Adds to evaluate operands
@@ -99,6 +99,8 @@ public class Execute {
 	 */
 	public static ResultValue multiply(Parser parser, ResultValue op1, ResultValue op2) {
 		
+		//System.out.println("Multiply called on operands: " + op1 + " " + op2);
+		
 		ResultValue res = new ResultValue();
 		
 		DataType resultType = op1.dataType;
@@ -127,6 +129,8 @@ public class Execute {
 			// TODO: handle str as first operand, etc
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
 		}
+		
+		//System.out.println("Result: " + res);
 		
 		return res;
 	}
@@ -161,6 +165,30 @@ public class Execute {
 		} else {
 			// TODO: handle str as first operand, etc
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
+		}
+		
+		return res;
+	}
+	
+	public static ResultValue exponentiate(Parser parser, ResultValue op1, ResultValue op2) {
+		
+		ResultValue res = new ResultValue();
+		
+		// op1 dataType determines result of 
+		if (op1.dataType == DataType.INTEGER) {
+			op2 = op2.asInteger(parser);
+			
+			res.intValue = (int) Math.pow(op1.intValue, op2.intValue);
+			res.dataType = DataType.FLOAT;
+			res.structure = Structure.PRIMITIVE;
+			
+		} else {
+			op1 = op1.asFloat(parser);
+			op2 = op2.asFloat(parser);
+			
+			res.floatValue = Math.pow(op1.floatValue, op2.floatValue);
+			res.dataType = DataType.FLOAT;
+			res.structure = Structure.PRIMITIVE;
 		}
 		
 		return res;
@@ -407,21 +435,6 @@ public class Execute {
 		res.strValue = op1.strValue.concat(op2.strValue);
 		
 		return res;
-	}
-	
-	public static void print(Parser parser, List<ResultValue> args) {
-		if (args.size() == 0) {
-			return;
-		}
-
-		System.out.print(args.get(0));
-		
-		for (int i = 1; i < args.size(); i++) {
-			System.out.print(" ");
-			System.out.print(args.get(i));
-		}
-		
-		System.out.println();
 	}
 
 }
