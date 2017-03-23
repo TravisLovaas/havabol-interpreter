@@ -99,6 +99,8 @@ public class Operators {
 	 */
 	public static ResultValue multiply(Parser parser, ResultValue op1, ResultValue op2) {
 		
+		//System.out.println("Multiply called on operands: " + op1 + " " + op2);
+		
 		ResultValue res = new ResultValue();
 		
 		DataType resultType = op1.dataType;
@@ -127,6 +129,8 @@ public class Operators {
 			// TODO: handle str as first operand, etc
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
 		}
+		
+		//System.out.println("Result: " + res);
 		
 		return res;
 	}

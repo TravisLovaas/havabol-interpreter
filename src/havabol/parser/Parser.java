@@ -433,6 +433,12 @@ public class Parser {
 			}
 		}
 		
+		//System.out.print("dumping args: ");
+		//for (ResultValue a : args) {
+		//	System.out.print(a);
+		//}
+		//System.out.println();
+		
 		switch (calledFunction) {
 		case "print":
 			Functions.print(this, args);
