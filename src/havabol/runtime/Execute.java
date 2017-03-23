@@ -165,6 +165,30 @@ public class Execute {
 		
 		return res;
 	}
+	
+	public static ResultValue exponentiate(Parser parser, ResultValue op1, ResultValue op2) {
+		
+		ResultValue res = new ResultValue();
+		
+		// op1 dataType determines result of 
+		if (op1.dataType == DataType.INTEGER) {
+			op2 = op2.asInteger(parser);
+			
+			res.intValue = (int) Math.pow(op1.intValue, op2.intValue);
+			res.dataType = DataType.FLOAT;
+			res.structure = Structure.PRIMITIVE;
+			
+		} else {
+			op1 = op1.asFloat(parser);
+			op2 = op2.asFloat(parser);
+			
+			res.floatValue = Math.pow(op1.floatValue, op2.floatValue);
+			res.dataType = DataType.FLOAT;
+			res.structure = Structure.PRIMITIVE;
+		}
+		
+		return res;
+	}
 
 	public static ResultValue unaryMinus(Parser parser, ResultValue op1)
 	{
