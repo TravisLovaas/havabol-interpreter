@@ -57,10 +57,17 @@ public class Parser {
 	}
 	
 	private void parseIf() {
+		String leftCompare;
+		String[] operators = {"==", "<", ">", "<=", ">="};
+		int length = operators.length;
+		int index = 0;
 		// while ":" is not found
 		while (scanner.getNext() != ":") {
 			// find 
-			if (scanner.currentToken.primClassif == Token.OPERAND){
+			scanner.getNext();
+			leftCompare = scanner.currentToken.tokenStr;
+			
+			for (index : length) {
 				
 			}
 		}
