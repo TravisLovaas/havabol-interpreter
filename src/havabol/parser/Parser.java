@@ -3,6 +3,7 @@ package havabol.parser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 import havabol.error.*;
@@ -270,10 +271,58 @@ public class Parser {
 	}
 	*/
 
-	
+	/**
+	 * Parses a function call
+	 * Preconditions:
+	 *    - currentToken is the name of a function in a function call
+	 *      i.e. print("hello", "world");
+	 *      	 ^^^^^
+	 * @return
+	 */
 	private ResultValue parseFunctionCall() {
-		// TODO: recursively parse a function
-		return null;
+		
+		if (scanner.currentToken.primClassif != Token.FUNCTION) {
+			throw new SyntaxError("Expected name of a function", scanner.currentToken);
+		}
+		
+		String calledFunction = scanner.currentToken.tokenStr;
+		
+		scanner.getNext(); // currentToken should be open paren "("
+		
+		if (!scanner.currentToken.tokenStr.equals("(")) {
+			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
+		}
+		
+		List<ResultValue> args = new ArrayList<>();
+		
+		// Parse all function arguments
+		for (;;) {
+			
+			args.add(parseExpression());
+			
+			if (scanner.currentToken.tokenStr.equals(",")) {
+				continue;
+			} else if (scanner.currentToken.tokenStr.equals(")")) {
+				break;
+			} else {
+				throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
+			}
+			
+		}
+		
+		switch (calledFunction) {
+		case "print":
+			//Execute.print(parser, args);
+			break;
+		default:
+			break;
+		}
+		
+		// TODO: function call returns proper result
+		ResultValue retVal = new ResultValue();
+		retVal.dataType = DataType.VOID;
+		
+		return retVal;
 	}
 	
 	/***
