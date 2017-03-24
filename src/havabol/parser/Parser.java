@@ -58,8 +58,9 @@ public class Parser {
 	}
 	
 	/**
-	 * parseIf will call parseExpression and Operators or skip the statements
-	 * in the if-then-else statement using statements function
+	 * parseIf will call parseExpression and to get the conditional path to take
+	 * and in the if-then-else it will call parseStatement until else or endif
+	 * to correctly execute desired statements.
 	 * @param bExec
 	 */
 	
@@ -116,8 +117,34 @@ public class Parser {
 		}
 	}
 	
+	/**
+	 * parseWhile will evaluated the expression given to while statement and 
+	 * parseStatement will evaluate all the statements within the while loop
+	 * until the condition value is no longer true
+	 */
+	
 	private void parseWhile() {
+		scanner.getNext();
 		
+		ResultValue resCond = parseExpression();
+		if (!scanner.currentToken.tokenStr.equals(":")){
+			throw new SyntaxError("Expected ':' after conditional expression in while", scanner.currentToken);
+		}
+		scanner.getNext();
+		for (;;) {
+			parseStatement();
+			if (scanner.currentToken.tokenStr.equals("endwhile")) {
+				// need to reevaluate resCond to see if we need to jump back to top of while
+				if (resCond.asBoolean(this).booleanValue){
+					// jump to top
+					// TODO: setPosition(top);
+				}
+				else {
+					scanner.getNext(); // after endwhile
+					return;
+				}
+			}
+		}
 	}
 	
 	private void parseFor() {
