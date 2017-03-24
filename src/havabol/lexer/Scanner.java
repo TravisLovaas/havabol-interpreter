@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import havabol.error.SyntaxError;
+import havabol.parser.Parser;
 import havabol.storage.SymbolTable;
 
 public class Scanner {
@@ -101,7 +102,16 @@ public class Scanner {
 		String previous = currentToken.tokenStr;
 		
 		currentToken = getNextToken(false);
-	
+		//Parser parser;
+		if(Parser.debugOn){
+			switch(Parser.debugArg.toLowerCase()){
+				case "token":
+					System.out.println("\t\t... Current Token = " + currentToken.tokenStr);
+					break;
+				default:
+					break;
+			}
+		}
 		if (currentToken.primClassif == Token.EOF) {
 			return "";
 		}

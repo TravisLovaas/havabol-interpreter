@@ -7,19 +7,21 @@ String day;
 String name;
 name = "Anita Goodgrade";
 String weird;
-debug assign on;
+debug token on;
 weird = "\tTX\tTexas\n";
 String loc;
+debug assign on;
 loc = "TX";
 
 // numeric stuff
 print(">>> Checking datatype results based on left operand");
 pi = 3.14;
-Float area;
-debug assign off;
+Int area;
+debug token off;
 Float radius2;
 Int radius;
 radius = 8;
+debug assign on;
 radius2 = radius ^ 2;  // square the radius
 print("\t1. area all float");
 area = pi * radius2;

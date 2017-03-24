@@ -15,9 +15,9 @@ public class Parser {
 	
 	private Scanner scanner;
 	private SymbolTable symbolTable;
-	private Boolean debugOn= false;
+	public static Boolean debugOn= false;
 	private String debugOnOff= null;
-	private String debugArg = null;
+	public static String debugArg = null;
 	//private DataType exprDataType = null;
 	//precedence initialization
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
@@ -155,7 +155,31 @@ public class Parser {
 	}
 	
 	private void parseStatement() {
-		//System.out.println("currentToken is " + scanner.currentToken.tokenStr + " at beginning of statement");
+		//debug for expr and assign
+		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+			if(scanner.currentToken.tokenStr.equals("debug")){
+				debugArg = scanner.getNext();
+				switch (debugArg.toLowerCase()){
+				case "assign":
+				case "Assignment":
+				case "expr":
+				case "Expression":
+				case "token":
+					debugOnOff = scanner.getNext();
+					if(debugOnOff.equalsIgnoreCase("on"))
+						debugOn = true;
+					else if (debugOnOff.equalsIgnoreCase("off")){
+						debugOn = false;
+					}
+					scanner.getNext();
+					scanner.getNext();
+					break;
+				default:
+					throw new SyntaxError("Found unsupported debug argument", scanner.currentToken);
+				}
+			}
+		}
+		
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
 			if (scanner.currentToken.subClassif == Token.DECLARE) {
 				parseDeclaration();
@@ -182,36 +206,8 @@ public class Parser {
 			parseFunctionCall();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				if(scanner.currentToken.tokenStr.equals("debug")){
-					//System.out.println("--------->am I in here<---------");
-					debugArg = scanner.getNext();
-					switch (debugArg.toLowerCase()){
-					case "assign":
-					case "Assignment":
-					case "expr":
-					case "Expression":
-						debugOnOff = scanner.getNext();
-						if(debugOnOff.equalsIgnoreCase("on"))
-							debugOn = true;
-						else if (debugOnOff.equalsIgnoreCase("off"))
-							debugOn = false;
-						scanner.getNext();
-						scanner.getNext();
-						System.out.println("---------> token = " + scanner.currentToken.tokenStr + " <---------");
-						break;
-					/*case "token"
-					case "Token":
-						debugOnOff = scanner.getNext();
-						if(debugOnOff.equals("on"))
-							debugOn = true;
-						else if (debugOnOff.equals("off"))
-							debugOn = false;
-						break;*/
-					default:
-						throw new SyntaxError("Found unsupported debug argument", scanner.currentToken);
-					}
-				}
-				parseAssignment();
+				
+					parseAssignment();
 
 				//System.out.println("---------> token = " + scanner.currentToken.tokenStr + " <---------");
 				//if(scanner.nextToken.equals("="))
@@ -549,6 +545,7 @@ public class Parser {
 		String next = null;
 		Token popped;
 		boolean lParen = false;
+		boolean containsOperator = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
 		
 		//System.out.println("token = "+ scanner.getNext());
@@ -573,6 +570,7 @@ public class Parser {
 			
 			//if operator, check precedence
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
+				containsOperator = true;
 				while(!stackToken.isEmpty()){
 					if(precedence.get(token) > stkPrecedence.get(stackToken.peek())){
 						break;
@@ -819,7 +817,7 @@ public class Parser {
 			finalValue = stackResult.pop();
 			//System.out.println("finalvalue = " + finalValue.toString());
 			evaluated = true;
-			if(debugOn){
+			if(debugOn && containsOperator){
 				switch(debugArg.toLowerCase()){
 					case "expr":
 					case "expression":
