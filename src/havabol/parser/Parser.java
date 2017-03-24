@@ -211,14 +211,12 @@ public class Parser {
 				
 					parseAssignment();
 
-				//System.out.println("---------> token = " + scanner.currentToken.tokenStr + " <---------");
 				//if(scanner.nextToken.equals("="))
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
 		} else if (scanner.currentToken.tokenStr.equals(";")) {
 			scanner.getNext();
-			//System.out.println(scanner.currentToken.tokenStr);
 			return;
 		} else {
 			throw new UnsupportedOperationError("Unexpected token '" + scanner.currentToken.tokenStr + "' found while parsing statements.");
@@ -261,7 +259,6 @@ public class Parser {
 			parseAssignment();
 		} else if (scanner.nextToken.tokenStr.equals(";")) {
 			scanner.getNext();
-			//System.out.println("currentToken at end of declaration: " + scanner.currentToken.tokenStr);
 		} else {
 			throw new SyntaxError("Expected semi-colon", scanner.currentToken);
 		}
@@ -284,8 +281,6 @@ public class Parser {
 		}
 		
 		String identifier = scanner.currentToken.tokenStr;
-		
-		//System.out.println(identifier);
 		
 		// Ensure identifier has been declared
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
@@ -379,11 +374,8 @@ public class Parser {
 		}
 		
 		String calledFunction = scanner.currentToken.tokenStr;
-		//System.out.println("called func: " + calledFunction);
-		
-		//scanner.getNext(); // currentToken should be open paren "("
+		// currentToken should be open paren "("
 		String check = scanner.getNext();
-		//System.out.println("check = " + check);
 		
 		if (!scanner.currentToken.tokenStr.equals("(")) {
 			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
