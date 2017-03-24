@@ -55,7 +55,7 @@ public class Parser {
 	
 	public void beginParsing() {
 		scanner.getNext();
-		while (!scanner.currentToken.tokenStr.isEmpty()) {
+		while (scanner.currentToken.primClassif != Token.EOF) {
 			parseStatement();
 		}
 	}
@@ -227,6 +227,7 @@ public class Parser {
 	}
 	
 	private void parseStatement() {
+		
 		//System.out.println("parse statement");
 		//debug for expr and assign
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
@@ -294,6 +295,9 @@ public class Parser {
 		} else {
 			throw new UnsupportedOperationError("Unexpected token '" + scanner.currentToken.tokenStr + "' found while parsing statements.");
 		}
+		
+		if (scanner.currentToken.tokenStr.isEmpty())
+			return;
 		
 		if (scanner.currentToken.tokenStr.equals(";")) {
 			scanner.getNext();
