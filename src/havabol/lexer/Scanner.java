@@ -303,6 +303,12 @@ public class Scanner {
 	 */
 	public void classifyToken(Token token, boolean isStringLiteral) throws SyntaxError {
 		
+		if (isStringLiteral) {
+			token.primClassif = Token.OPERAND;
+			token.subClassif = Token.STRING;
+			return;
+		}
+		
 		// Check if tokenStr is a data type
 		switch (token.tokenStr) {
 			case "Int":

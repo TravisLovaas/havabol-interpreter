@@ -469,9 +469,8 @@ public class Parser {
 			// Parse all function arguments
 			for (;;) {
 				
-				System.out.println("calling parseExpr");
 				ResultValue arg = parseExpression();
-				System.out.println("arg found: " + arg);
+		
 				args.add(arg);
 				
 				if (scanner.currentToken.tokenStr.equals(",")) {
