@@ -98,6 +98,8 @@ public class Parser {
 			for (;;) {
 				scanner.getNext();
 				if (scanner.currentToken.tokenStr.equals("else")) {
+					scanner.getNext(); // pass "else"
+					scanner.getNext(); // pass ":"
 					break;
 				} else if (scanner.currentToken.tokenStr.equals("endif")) {
 					scanner.getNext();
@@ -110,7 +112,7 @@ public class Parser {
 				parseStatement();
 			}
 			System.out.println("last: " + scanner.currentToken.tokenStr);
-			scanner.getNext();
+			scanner.getNext(); // pass "endif"
 		}
 	}
 	
