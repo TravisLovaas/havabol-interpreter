@@ -171,11 +171,13 @@ public class Parser {
 					else if (debugOnOff.equalsIgnoreCase("off")){
 						debugOn = false;
 					}
-					scanner.getNext();
+					String semi = scanner.getNext();
+					if(!semi.equals(";"))
+						throw new SyntaxError("\"debug statement\" expects a semicolon (\";\")", scanner.currentToken);
 					scanner.getNext();
 					break;
 				default:
-					throw new SyntaxError("Found unsupported debug argument", scanner.currentToken);
+					throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
 				}
 			}
 		}
