@@ -16,6 +16,7 @@ print(">>> Checking datatype results based on left operand");
 pi = 3.14;
 
 Float area;
+
 Float radius2;
 Int radius;
 radius = 8;

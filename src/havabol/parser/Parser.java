@@ -244,11 +244,13 @@ public class Parser {
 					else if (debugOnOff.equalsIgnoreCase("off")){
 						debugOn = false;
 					}
-					scanner.getNext();
+					String semi = scanner.getNext();
+					if(!semi.equals(";"))
+						throw new SyntaxError("\"debug statement\" expects a semicolon (\";\")", scanner.currentToken);
 					scanner.getNext();
 					break;
 				default:
-					throw new SyntaxError("Found unsupported debug argument", scanner.currentToken);
+					throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
 				}
 			}
 		}
@@ -282,14 +284,12 @@ public class Parser {
 				
 					parseAssignment();
 
-				//System.out.println("---------> token = " + scanner.currentToken.tokenStr + " <---------");
 				//if(scanner.nextToken.equals("="))
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
 		} else if (scanner.currentToken.tokenStr.equals(";")) {
 			scanner.getNext();
-			//System.out.println(scanner.currentToken.tokenStr);
 			return;
 		} else {
 			throw new UnsupportedOperationError("Unexpected token '" + scanner.currentToken.tokenStr + "' found while parsing statements.");
@@ -332,7 +332,6 @@ public class Parser {
 			parseAssignment();
 		} else if (scanner.nextToken.tokenStr.equals(";")) {
 			scanner.getNext();
-			//System.out.println("currentToken at end of declaration: " + scanner.currentToken.tokenStr);
 		} else {
 			throw new SyntaxError("Expected semi-colon", scanner.currentToken);
 		}
@@ -356,8 +355,6 @@ public class Parser {
 		
 		String identifier = scanner.currentToken.tokenStr;
 		
-		//System.out.println(identifier);
-		
 		// Ensure identifier has been declared
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
 		
@@ -377,13 +374,8 @@ public class Parser {
 				scanner.getNext();
 				//System.out.println("check = " + check);
 				res02 = parseExpression();
-				//System.out.println(res02);
-				//System.out.println("res02 = " + res02.toString());
 				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
-				//System.out.println("token = " + token);
 				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
-				//System.out.println(rhsExpr);
-				//System.out.println(rhsExpr.toString());
 				variable.setValue(rhsExpr);
 				break;
 			case "+=":
@@ -434,97 +426,11 @@ public class Parser {
 					break;
 			}
 		}
-		//System.out.println("Assigned " + rhsExpr + " to " + identifier);
-		
-		// Next token should be an expression
-		//scanner.getNext();
-		
-		//ResultValue rhsExpr = parseExpression(); // Parse expression on right-hand side of assignment
-		
 		// Ensure type of rhsExpr matches declared type, or can be cast to such.
-		
-		//variable.setValue(rhsExpr);
-		
 		return rhsExpr;
-		
-//		DataType declaredType = null;
-//		Structure structure = Structure.PRIMITIVE;
-//		ResultValue res = null;
-//		String identifier;
-//		String variable = null;
-//		SymbolTable st = this.symbolTable;
-//		while (scanner.getNext() != ";") {
-//			// token string
-//			identifier = scanner.currentToken.tokenStr;
-//			// if data type is found
-//			if (scanner.currentToken.primClassif == Token.DECLARE) {
-//				// takes in the data type
-//				declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
-//				// next token is variable
-//				scanner.getNext();
-//				variable = scanner.currentToken.toString();
-//				continue;
-//			} else if (identifier == "=" || identifier == "-=" || identifier == "+=") {
-//				continue;
-//			} else {
-//				// check if token is in symbol table
-//				if(symbolTable.containsSymbol(variable)){
-//					// get value of res
-//					res = parseExpression();
-//					// create symbol
-//					st.createSymbol(this, variable, new STIdentifier(variable, Token.OPERAND, declaredType, structure, "", 0));
-//				}
-//			}
-//		}
-//		return res;
-	}
+	}	
 	
-	/*
-	private ResultValue parseAssignment() {
-	    ResultValue res = null;
-	    SymbolTable st = this.symbolTable;
-	    if(scanner.currentToken.subClassif != Token.IDENTIFIER){
-	    	//error("expected a variable for the target of an assignment");
-	    }
-	    String variableStr = scanner.currentToken.tokenStr;
-
-	    // get the assignment operator and check it
-	    scanner.getNext();
-	    if(scanner.currentToken.primClassif != Token.OPERATOR){
-	    	//error("expected assignment operator");
-	    }
-
-	    String operatorStr = scanner.currentToken.tokenStr;
-	    ResultValue resO2;
-	    ResultValue resO1;
-	    Numeric nOp2;  // numeric value of second operand
-	    Numeric nOp1;  // numeric value of first operand
-	    switch(operatorStr){
-		    case "=":
-		    	resO2 = parseExpression();   
-//		    	res = assign(variableStr, resO2);  // assign to target
-		    	
-		    	st.createSymbol(this, variableStr, new STIdentifier(variableStr, Token.OPERAND, ));
-		    case "-=":
-		    	resO2 = parseExpression();   
-		    	// expression must be numeric, raise exception if not
-//		    	nOp2 = new Numeric(this, resO2, “-=”, “2nd operand”);
-		    	// Since it is numeric, we need value of target variable 
-//		    	resO1 = getVariableValue(variableStr);
-		    	// target variable must be numeric
-//		    	nOp1 = new Numeric(this, resO1, “-=”, “1st operand”);
 	
-		    	// subtract 2nd operand from first and assign it
-//		    	res = assign(variableStr, Utility.subtract(this, nop1, nop2));
-		    case "+=":
-		    	// fill it in yourself
-		    default:
-		    	//error("expected assignment operator");
-	    }    
-
-	    return res;
-	}
-	*/
 
 	/**
 	 * Parses a function call
@@ -541,19 +447,14 @@ public class Parser {
 		}
 		
 		String calledFunction = scanner.currentToken.tokenStr;
-		//System.out.println("called func: " + calledFunction);
-		
-		//scanner.getNext(); // currentToken should be open paren "("
+		// currentToken should be open paren "("
 		String check = scanner.getNext();
-		//System.out.println("check = " + check);
 		
 		if (!scanner.currentToken.tokenStr.equals("(")) {
 			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
 		}
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
-		
-		//System.out.println("begin arg parsing token: " + scanner.currentToken.tokenStr);
 		
 		List<ResultValue> args = new ArrayList<>();
 		
@@ -581,12 +482,6 @@ public class Parser {
 		}
 		
 		scanner.getNext();
-		
-		//System.out.print("dumping args: ");
-		//for (ResultValue a : args) {
-		//	System.out.print(a);
-		//}
-		//System.out.println();
 		
 		switch (calledFunction) {
 		case "print":
@@ -621,14 +516,9 @@ public class Parser {
 		boolean containsOperator = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
 		
-		//System.out.println("token = "+ scanner.getNext());
-
 		do {
 			//get token string
 			token = scanner.currentToken.tokenStr;
-			//System.out.println("currenttoken = "+ token);
-
-			//System.out.println("nexttoken = "+ scanner.nextToken.tokenStr);
 			//if function or operand place in out
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//add the identifier or function to postfix out
@@ -691,17 +581,15 @@ public class Parser {
 			}
 			next = scanner.getNext();
 		}while (!(next.equals(";") || next.equals(":") || next.equals(",") || next.equals(")"))); 
-				//System.out.println("failed = " + scanner.currentToken.tokenStr);
+		
 		while(!stackToken.isEmpty()){
-			//System.out.println("$$$$$$$$$$$$$$$$");
+		
 			popped = stackToken.pop();
 			if(popped.tokenStr == "(")
 				throw new SyntaxError("Missing right parenthesis for '" + popped + "' found",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			out.add(popped);
 		}
-		//nothing
-		
 		//System.out.println("*************************I'M IN PARSE EXPRESSION, ARE YOU HERE? *************************");
 		
 		//at this point, our postfix expression is already populated
@@ -712,7 +600,6 @@ public class Parser {
 			//if you find an operand
 			ResultValue res, res2 = null;
 			token = entry.tokenStr;
-			//System.out.println("The entry is = " + entry.tokenStr);
 			if(entry.primClassif == Token.OPERAND){
 				//check if it is an actual value
 				//if not, convert to an actual value and push to stack
@@ -736,12 +623,7 @@ public class Parser {
 						//operand type does not exist
 				}
 			}
-			
-			//else if(entry.primClassif == Token.FUNCTION){
-				//not positive
-			//	parseFunction()
-			//}
-			
+				
 			// else you find an operator,
 			else if(entry.primClassif == Token.OPERATOR){
 				// if stack is not empty
@@ -888,7 +770,6 @@ public class Parser {
 		//what's left in stack should be the final result
 		if(!stackResult.isEmpty() && !evaluated){
 			finalValue = stackResult.pop();
-			//System.out.println("finalvalue = " + finalValue.toString());
 			evaluated = true;
 			if(debugOn && containsOperator){
 				switch(debugArg.toLowerCase()){
@@ -908,12 +789,6 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		
-		//System.out.println("finalvalue = " + finalValue.toString());
 		return finalValue;
 	}
-	
-	
-	
-	
 }	
-			
