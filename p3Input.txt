@@ -1,3 +1,4 @@
+print("p3Input.txt");
 Int i;
 Float pi;
 String day;
@@ -14,9 +15,7 @@ loc = "TX";
 // numeric stuff
 print(">>> Checking datatype results based on left operand");
 pi = 3.14;
-
 Float area;
-
 Float radius2;
 Int radius;
 radius = 8;
