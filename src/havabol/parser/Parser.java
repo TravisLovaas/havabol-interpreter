@@ -68,6 +68,7 @@ public class Parser {
 	 */
 	
 	private void parseIf() {
+		//System.out.println("parse if");
 		// currentToken is "if"
 		scanner.getNext();
 		
@@ -91,31 +92,53 @@ public class Parser {
 				}
 			}
 		
+			//System.out.println("skipping else tokens");
 			// skip everything inside else
-			while (!scanner.currentToken.tokenStr.equals("endif")) {
+			int ifCnt = 0;
+			
+			while (!scanner.currentToken.tokenStr.equals("endif") || ifCnt > 0) {
+				if (scanner.currentToken.tokenStr.equals("if")) {
+					ifCnt++;
+				}
+				if (scanner.currentToken.tokenStr.equals("endif")) {
+					ifCnt--;
+				}
 				scanner.getNext();
 			}
 			scanner.getNext();
+			//System.out.println("done skipping else");
 			// done, semi-colon handled by parseStatement
 		} else {
 			// Skip everything until else or endif
+			//System.out.println("skipping if section");
+			int ifCnt = 0;
 			for (;;) {
 				scanner.getNext();
+				if (scanner.currentToken.tokenStr.equals("if")) {
+					ifCnt++;
+					//System.out.println("increment ifCnt");
+				}
 				if (scanner.currentToken.tokenStr.equals("else")) {
-					scanner.getNext(); // pass "else"
-					scanner.getNext(); // pass ":"
-					break;
+					if (ifCnt == 0) {
+						scanner.getNext(); // pass "else"
+						scanner.getNext(); // pass ":"
+						break;
+					}
 				} else if (scanner.currentToken.tokenStr.equals("endif")) {
-					scanner.getNext();
-					return; // currentToken should be ;, handled by parseStatement
+					if (ifCnt == 0) {
+						scanner.getNext();
+						return; // currentToken should be ;, handled by parseStatement
+					} else 
+						ifCnt--;
 				}
 			}
+			//System.out.println("executing else");
 		
 			// skip everything inside else
 			while (!scanner.currentToken.tokenStr.equals("endif")) {
 				parseStatement();
 			}
-			System.out.println("last: " + scanner.currentToken.tokenStr);
+			//System.out.println("last: " + scanner.currentToken.tokenStr);
 			scanner.getNext(); // pass "endif"
 		}
 	}
@@ -127,27 +150,76 @@ public class Parser {
 	 */
 	
 	private void parseWhile() {
-		scanner.getNext();
 		
-		ResultValue resCond = parseExpression();
-		if (!scanner.currentToken.tokenStr.equals(":")){
-			throw new SyntaxError("Expected ':' after conditional expression in while", scanner.currentToken);
-		}
-		scanner.getNext();
+		//System.out.println("parsewhile called");
+		
+		int loopSrcLine = scanner.iSourceLineNr;
+		int loopColPos = scanner.iColPos;
+		
+		// ASSUME currentToken is "while" on call
+		scanner.getNext(); // advance past "while"
+		
+		// Save our position to loop back!!
+		
+		ResultValue whileCond;
+		
+		//System.out.println("" + loopSrcLine + " " + loopColPos);
+		
 		for (;;) {
-			parseStatement();
-			if (scanner.currentToken.tokenStr.equals("endwhile")) {
-				// need to reevaluate resCond to see if we need to jump back to top of while
-				if (resCond.asBoolean(this).booleanValue){
-					// jump to top
-					// TODO: setPosition(top);
-				}
-				else {
-					scanner.getNext(); // after endwhile
-					return;
-				}
+			
+			// Evaluate while condition
+			whileCond = parseExpression();
+			
+			// should be on ":"
+			if (scanner.currentToken.tokenStr.equals(":")) {
+				scanner.getNext(); // advance past ":"
+			} else {
+				throw new SyntaxError("Expected : after while conditional expression", scanner.currentToken);
 			}
+			
+			assert !scanner.currentToken.tokenStr.equals(":");
+			
+			if (whileCond.asBoolean(this).booleanValue) {
+				// Evaluated to true, execute loop
+				//System.out.println("loop execing");
+				while (!scanner.currentToken.tokenStr.equals("endwhile")) {
+					//System.out.println("while parse statement call");
+					parseStatement();
+				}
+				
+				//System.out.println("before while reset: " + scanner.currentToken.tokenStr);
+				scanner.getNext(); // pass "endwhile"
+				scanner.getNext(); // pass ";"
+				
+				//System.out.println("after ; " + scanner.currentToken.tokenStr);
+				
+				// Done executing loop body, let's loop back!
+				scanner.setPosition(loopSrcLine, loopColPos);
+				
+				//System.out.println("after loopback: " + scanner.getNext());
+				//System.out.println("" + loopSrcLine + " " + loopColPos);
+				
+			} else {
+				// Evaluated to false, skip loop past endwhile and return
+				//System.out.println("loop cond false");
+				
+				int whileCnt = 0;
+				while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
+					if (scanner.currentToken.tokenStr.equals("while")) {
+						whileCnt++;
+					} else if (scanner.currentToken.tokenStr.equals("endwhile")) {
+						whileCnt--;
+					}
+					scanner.getNext();
+				}
+				//System.out.println("last inwhile:" + scanner.currentToken.tokenStr);
+				
+				scanner.getNext(); // pass "endwhile"
+				return; // return to parseStatement, expects ;
+			}
+			
 		}
+		
 	}
 	
 	private void parseFor() {
@@ -155,6 +227,7 @@ public class Parser {
 	}
 	
 	private void parseStatement() {
+		//System.out.println("parse statement");
 		//debug for expr and assign
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 			if(scanner.currentToken.tokenStr.equals("debug")){
@@ -200,7 +273,7 @@ public class Parser {
 			} //else if (scanner.currentToken.tokenStr.equals("endif")) {
 				//scanner.getNext();
 			 else {
-				throw new UnsupportedOperationError("Unknown CONTROL token found.");
+				throw new SyntaxError("Unexpected control token found: " + scanner.currentToken.tokenStr, scanner.currentToken);
 			}
 		} else if (scanner.currentToken.primClassif == Token.FUNCTION) {
 			parseFunctionCall();

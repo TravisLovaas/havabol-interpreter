@@ -289,8 +289,11 @@ public class Scanner {
 	 */
 	public void setPosition(int iSourceLineNr, int iColPos) 
 	{
+		this.textCharM = sourceLineM.get(iSourceLineNr).toCharArray();
 		this.iSourceLineNr = iSourceLineNr;
 		this.iColPos = iColPos;
+		
+		this.getNext();
 	}
 	
 	/**
