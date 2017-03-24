@@ -15,6 +15,9 @@ public class Parser {
 	
 	private Scanner scanner;
 	private SymbolTable symbolTable;
+	private Boolean debugOn= false;
+	private String debugOnOff= null;
+	private String debugArg = null;
 	//private DataType exprDataType = null;
 	//precedence initialization
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
@@ -152,7 +155,39 @@ public class Parser {
 			parseFunctionCall();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+				if(scanner.currentToken.tokenStr.equals("debug")){
+					//System.out.println("--------->am I in here<---------");
+					debugArg = scanner.getNext();
+					switch (debugArg.toLowerCase()){
+					case "assign":
+					case "Assignment":
+					case "expr":
+					case "Expression":
+						debugOnOff = scanner.getNext();
+						if(debugOnOff.equalsIgnoreCase("on"))
+							debugOn = true;
+						else if (debugOnOff.equalsIgnoreCase("off"))
+							debugOn = false;
+						scanner.getNext();
+						scanner.getNext();
+						System.out.println("---------> token = " + scanner.currentToken.tokenStr + " <---------");
+						break;
+					/*case "token"
+					case "Token":
+						debugOnOff = scanner.getNext();
+						if(debugOnOff.equals("on"))
+							debugOn = true;
+						else if (debugOnOff.equals("off"))
+							debugOn = false;
+						break;*/
+					default:
+						throw new SyntaxError("Found unsupported debug argument", scanner.currentToken);
+					}
+				}
 				parseAssignment();
+
+				//System.out.println("---------> token = " + scanner.currentToken.tokenStr + " <---------");
+				//if(scanner.nextToken.equals("="))
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
@@ -218,7 +253,7 @@ public class Parser {
 	 */
 	private ResultValue parseAssignment() {
 		// assignment := identifier '=' expr
-		
+
 		if (scanner.currentToken.subClassif != Token.IDENTIFIER) {
 			throw new SyntaxError("Expected an identifier to begin assignment", scanner.currentToken);
 		}
@@ -292,6 +327,17 @@ public class Parser {
 				throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
 		}
 		
+		if(debugOn){
+			switch(debugArg.toLowerCase()){
+				case "assign":
+				case "assignment":
+					System.out.println("\t\t... Assignment variable = " + identifier);
+					System.out.println("\t\t... Assignment value = " + rhsExpr);
+					break;
+				default:
+					break;
+			}
+		}
 		//System.out.println("Assigned " + rhsExpr + " to " + identifier);
 		
 		// Next token should be an expression
@@ -736,6 +782,8 @@ public class Parser {
 			}
 			else
 				throw new UnsupportedOperationError("Invalid token entry found in expression.", entry);
+			
+			
 		}
 		
 		//if stack is not empty
@@ -744,6 +792,16 @@ public class Parser {
 			finalValue = stackResult.pop();
 			//System.out.println("finalvalue = " + finalValue.toString());
 			evaluated = true;
+			if(debugOn){
+				switch(debugArg.toLowerCase()){
+					case "expr":
+					case "expression":
+						System.out.println("\t\t... Expression result = " + finalValue);
+						break;
+					default:
+						break;
+				}
+			}
 		}else if(stackResult.isEmpty() && evaluated){
 			throw new UnsupportedOperationError("Invalid Expression found. There are too few operands for the operators provided"
 					, scanner.currentToken.iSourceLineNr);
