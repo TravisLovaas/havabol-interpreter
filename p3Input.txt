@@ -10,13 +10,12 @@ String weird;
 weird = "\tTX\tTexas\n";
 String loc;
 loc = "TX";
-debug assign on
 
 // numeric stuff
 print(">>> Checking datatype results based on left operand");
 pi = 3.14;
-debug assign off
 Float area;
+debug expr on
 Float radius2;
 Int radius;
 radius = 8;
