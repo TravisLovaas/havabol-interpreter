@@ -17,34 +17,40 @@ public class Operators {
 	 */
 	public static ResultValue add(Parser parser, ResultValue op1, ResultValue op2) {
 		
+		//System.out.print("add: " + op1 + " " + op2);
+		
 		ResultValue res = new ResultValue();
 		
-		DataType resultType = op1.dataType;
-		
-		if (resultType == DataType.INTEGER) {
+		switch (op1.dataType) {
+		case INTEGER:
 			
-			if (op2.dataType != DataType.INTEGER) {
-				op2 = op2.asInteger(parser);
-			}
-			
+			// Coerce second operand into an integer
 			res.dataType = DataType.INTEGER;
 			res.structure = Structure.PRIMITIVE;
-			res.intValue = op1.intValue + op2.intValue;
+			res.intValue = op1.intValue + op2.asInteger(parser).intValue;
 			
-		} else if (resultType == DataType.FLOAT) {
+			break;
+		case FLOAT:
 			
-			if (op2.dataType != DataType.FLOAT) {
-				op2 = op2.asFloat(parser);
-			}
-			
+			// Coerce second operand into an float
 			res.dataType = DataType.FLOAT;
 			res.structure = Structure.PRIMITIVE;
-			res.floatValue = op1.floatValue + op2.floatValue;
+			res.floatValue = op1.floatValue + op2.asFloat(parser).floatValue;
 			
-		} else {
-			// TODO: handle str as first operand, etc
-			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
+			break;
+		case STRING:
+			
+			// Coerce both operands into floats
+			res.dataType = DataType.FLOAT;
+			res.structure = Structure.PRIMITIVE;
+			res.floatValue = op1.asFloat(parser).floatValue + op2.asFloat(parser).floatValue;
+			
+			break;
+		default:
+			throw new TypeError("Left hand operand is not castable to numeric type for addition");
 		}
+		
+		//System.out.println(" = " + res);
 		
 		return res;
 	}
@@ -57,6 +63,8 @@ public class Operators {
 	 * @return
 	 */
 	public static ResultValue subtract(Parser parser, ResultValue op1, ResultValue op2) {
+		
+		//System.out.print("subtract: " + op1 + " " + op2);
 		
 		ResultValue res = new ResultValue();
 		
@@ -87,6 +95,8 @@ public class Operators {
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
 		}
 		
+		//System.out.println(" = " + res);
+		
 		return res;
 	}
 	
@@ -99,7 +109,7 @@ public class Operators {
 	 */
 	public static ResultValue multiply(Parser parser, ResultValue op1, ResultValue op2) {
 		
-		//System.out.println("Multiply called on operands: " + op1 + " " + op2);
+		//System.out.print("multiply: " + op1 + " " + op2);
 		
 		ResultValue res = new ResultValue();
 		
@@ -130,13 +140,15 @@ public class Operators {
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
 		}
 		
-		//System.out.println("Result: " + res);
+		//System.out.println(" = " + res);
 		
 		return res;
 	}
 	
 	//divide function
 	public static ResultValue divide(Parser parser, ResultValue op1, ResultValue op2) {
+		
+		//System.out.print("divide: " + op1 + " " + op2);
 		
 		ResultValue res = new ResultValue();
 		
@@ -167,10 +179,14 @@ public class Operators {
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
 		}
 		
+		//System.out.println(" = " + res);
+		
 		return res;
 	}
 	
 	public static ResultValue exponentiate(Parser parser, ResultValue op1, ResultValue op2) {
+		
+		//System.out.print("exponentiate: " + op1 + " " + op2);
 		
 		ResultValue res = new ResultValue();
 		
@@ -179,7 +195,7 @@ public class Operators {
 			op2 = op2.asInteger(parser);
 			
 			res.intValue = (int) Math.pow(op1.intValue, op2.intValue);
-			res.dataType = DataType.FLOAT;
+			res.dataType = DataType.INTEGER;
 			res.structure = Structure.PRIMITIVE;
 			
 		} else {
@@ -190,6 +206,8 @@ public class Operators {
 			res.dataType = DataType.FLOAT;
 			res.structure = Structure.PRIMITIVE;
 		}
+		
+		//System.out.println(" = " + res);
 		
 		return res;
 	}

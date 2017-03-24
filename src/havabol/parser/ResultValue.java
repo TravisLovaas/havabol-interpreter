@@ -47,7 +47,7 @@ public class ResultValue {
 		
 		ResultValue res = new ResultValue();
 		res.structure = Structure.PRIMITIVE;
-		res.dataType = DataType.INTEGER;
+		res.dataType = DataType.FLOAT;
 		
 		if (this.dataType == DataType.INTEGER) {
 			res.floatValue = (double) this.intValue;
