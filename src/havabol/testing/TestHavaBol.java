@@ -35,7 +35,7 @@ public class TestHavaBol
     	// Find all input files
     	File[] inputFiles = sourceDir.listFiles(new FilenameFilter() {
     		public boolean accept(File dir, String name) {
-    			return name.matches("^.*Input\\.txt$");
+    			return name.matches("^p4.*\\.txt$");
     		}
     	});
     	
@@ -49,8 +49,8 @@ public class TestHavaBol
     		System.out.println(f.getAbsolutePath());
     		System.out.println("===========================================");
     		
-    		testSuccessful = testSourceFileScanning(f.getAbsolutePath());
-    		assert testSuccessful;
+    		//testSuccessful = testSourceFileScanning(f.getAbsolutePath());
+    		//assert testSuccessful;
     		
     		testSuccessful = testSourceFileParsing(f.getAbsolutePath());
     		assert testSuccessful;

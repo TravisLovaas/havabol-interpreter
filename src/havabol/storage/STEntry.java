@@ -2,7 +2,6 @@ package havabol.storage;
 
 import havabol.parser.Parser;
 import havabol.parser.ResultValue;
-import havabol.runtime.Value;
 
 /*
  *  STEntry class for handling Symbol Table entries.
