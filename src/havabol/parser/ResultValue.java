@@ -1,6 +1,9 @@
 package havabol.parser;
 
 import havabol.storage.*;
+
+import java.util.List;
+
 import havabol.error.TypeError;
 import havabol.lexer.*;
 
@@ -11,6 +14,7 @@ public class ResultValue {
 	public int intValue;
 	public double floatValue;
 	public boolean booleanValue;
+	public List<ResultValue> arrayValue;
 	public Structure structure;
 	public String terminatingStr;
 	

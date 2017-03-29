@@ -484,13 +484,25 @@ public class Parser {
 		return rhsExpr;
 	}	
 	
-	
+	/**
+	 * Parses a reference to an array value or slice
+	 * Preconditions:
+	 * 	- currentToken is an array type identifier, e.g.
+	 * 		j = tArray[2~4];
+	 *          ^^^^^^		
+	 * @return
+	 */
+	private ResultValue parseArrayRef() {
+		
+		throw new UnsupportedOperationError("array reference not yet implemented");
+		
+	}
 
 	/**
 	 * Parses a function call
 	 * Preconditions:
-	 *    - currentToken is the name of a function in a function call
-	 *      i.e. print("hello", "world");
+	 *    - currentToken is the name of a function in a function call, e.g.
+	 *           print("hello", "world");
 	 *      	 ^^^^^
 	 * @return
 	 */
