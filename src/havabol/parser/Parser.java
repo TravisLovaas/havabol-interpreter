@@ -245,33 +245,64 @@ public class Parser {
 		}
 	}
 	
-	private void parseStatement() {
+	/**
+	 * Preconditions:
+	 *  - currentToken is beginning of debug statement, e.g.
+	 *  	debug token on;
+	 *      ^^^^^
+	 */
+	private void parseDebugStatement() {
 		
-		//System.out.println("parse statement");
-		//debug for expr and assign
+		debugArg = scanner.getNext();
+		switch (debugArg.toLowerCase()){
+		case "assign":
+		case "Assignment":
+		case "expr":
+		case "Expression":
+		case "token":
+			debugOnOff = scanner.getNext();
+			if(debugOnOff.equalsIgnoreCase("on"))
+				debugOn = true;
+			else if (debugOnOff.equalsIgnoreCase("off")){
+				debugOn = false;
+			}
+			String semi = scanner.getNext();
+			if(!semi.equals(";"))
+				throw new SyntaxError("\"debug statement\" expects a semicolon (\";\")", scanner.currentToken);
+			break;
+		default:
+			throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
+		}
+		
+	}
+	
+	/**
+	 * Parses a statement, ending with a semicolon.
+	 * Preconditions: 
+	 *  - currentToken is the first token in a statement, e.g.
+	 *  			if myVar == 0:
+	 *  			^^
+	 * Postconditions:
+	 *  - currentToken is the first token in a statement and directly follows a semicolon, e.g.
+	 *  			i = 0;
+	 *  			myVar = 1;
+	 *              ^^^^^
+	 */
+	private void parseStatement() {
+		/* Possible types of statements:
+		 * 
+		 * 	Int i = 0;       		declaration
+		 *  i = 1;           		assignment
+		 *  if ... endif;    		if
+		 *  while ... endwhile;		while
+		 *  for ... endfor;			for
+		 * 	debug type setting;		debug
+		 * 	print( ... );			function call
+		 * 
+		 */
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-			if(scanner.currentToken.tokenStr.equals("debug")){
-				debugArg = scanner.getNext();
-				switch (debugArg.toLowerCase()){
-				case "assign":
-				case "Assignment":
-				case "expr":
-				case "Expression":
-				case "token":
-					debugOnOff = scanner.getNext();
-					if(debugOnOff.equalsIgnoreCase("on"))
-						debugOn = true;
-					else if (debugOnOff.equalsIgnoreCase("off")){
-						debugOn = false;
-					}
-					String semi = scanner.getNext();
-					if(!semi.equals(";"))
-						throw new SyntaxError("\"debug statement\" expects a semicolon (\";\")", scanner.currentToken);
-					scanner.getNext();
-					break;
-				default:
-					throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
-				}
+			if(scanner.currentToken.tokenStr.equals("debug")) {
+				parseDebugStatement();
 			}
 		}
 		
