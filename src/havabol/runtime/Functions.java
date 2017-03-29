@@ -22,5 +22,49 @@ public class Functions {
 		
 		System.out.println();
 	}
+	/**
+	 * LENGTH gets the length of the string
+	 * @param string
+	 * @return int
+	 */
+	public int LENGTH(String string){
+		return string.length();
+	}
+	/**
+	 * SPACES returns T if there are any spaces in the string,
+	 * and F is there is at least one
+	 * @param string
+	 * @return boolean
+	 */
+	public boolean SPACES(String string){
+		int i;
+		for(i=0; i<string.length(); i++){
+			if(string.substring(i).compareTo(" ") == 0)
+				return true;
+		}
+		return false;
+	}
+	/**
+	 * ELEM returns the max populated element in the array. 
+	 * @param array
+	 * @return String
+	 */
+	public String ELEM(String[] array){
+		int max = 0;
+		int i;
+		for(i=0; i<array.length; i++){
+			if(array[i] != null)
+				max = i;
+		}
+		return array[max+1]; 
+	}
+	/**
+	 * MAXELEM return the length of the array.
+	 * @param array
+	 * @return
+	 */
+	public int MAXELEM(String[] array){
+		return array.length;
+	}
 
 }

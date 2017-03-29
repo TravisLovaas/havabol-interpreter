@@ -222,8 +222,27 @@ public class Parser {
 		
 	}
 	
+	
 	private void parseFor() {
+		// for expr [in/to] expr:
+		// if 3rd token is "in", second expression
+		scanner.getNext(); // get past "for"
 		
+		// 
+		while (!(scanner.currentToken.tokenStr.equals("in") || scanner.currentToken.tokenStr.equals("to"))) {
+			
+		}
+		// 
+		if (scanner.currentToken.tokenStr.equals("in")){
+			
+		}
+		// 
+		else if (scanner.currentToken.tokenStr.equals("to")){
+			
+		}
+		while (!(scanner.currentToken.tokenStr.equals("endfor"))){
+			
+		}
 	}
 	
 	private void parseStatement() {
@@ -584,7 +603,7 @@ public class Parser {
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}
 			next = scanner.getNext();
-		}while (!(next.equals(";") || next.equals(":") || next.equals(",") || next.equals(")"))); 
+		}while (!(next.equals(";") || next.equals(":") || next.equals(",") || next.equals(")") || next.equals("]"))); 
 		
 		while(!stackToken.isEmpty()){
 		

@@ -323,6 +323,8 @@ public class Scanner {
 			case "for":
 			case "select":
 			case "when":
+			case "by":
+			case "to":
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.FLOW;
 				return;
