@@ -494,6 +494,23 @@ public class Parser {
 	 */
 	private ResultValue parseArrayRef() {
 		
+		String arrayName = scanner.currentToken.tokenStr;
+		
+		// assert currentToken is a valid array identifier
+		if (scanner.currentToken.primClassif != Token.IDENTIFIER ||
+			!symbolTable.containsSymbol(arrayName)) {
+			throw new SyntaxError("Expected an identifier for array reference", scanner.currentToken);
+		}
+		
+		ResultValue array = symbolTable.getSymbol(arrayName).getValue();
+		
+		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
+			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
+		}
+		// precondition should be true
+		
+		// TODO
+		
 		throw new UnsupportedOperationError("array reference not yet implemented");
 		
 	}
