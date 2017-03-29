@@ -73,7 +73,7 @@ public class Parser {
 		scanner.getNext();
 		
 		// currentToken should be beginning of conditional expression
-		ResultValue resCond = parseExpression();
+		ResultValue resCond = parseExpression(":");
 		if (!scanner.currentToken.tokenStr.equals(":")){
 			throw new SyntaxError("Expected ':' after conditional expression in if", scanner.currentToken);
 		}
@@ -168,7 +168,7 @@ public class Parser {
 		for (;;) {
 			
 			// Evaluate while condition
-			whileCond = parseExpression();
+			whileCond = parseExpression(":");
 			
 			// should be on ":"
 			if (scanner.currentToken.tokenStr.equals(":")) {
@@ -396,14 +396,14 @@ public class Parser {
 				//next token should be an expression
 				scanner.getNext();
 				//System.out.println("check = " + check);
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
 				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
 				variable.setValue(rhsExpr);
 				break;
 			case "+=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 				rhsExpr = Operators.subtract(this, res01, res02);
@@ -411,7 +411,7 @@ public class Parser {
 				break;
 			case "-=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 				rhsExpr = Operators.add(this, res01, res02);
@@ -419,7 +419,7 @@ public class Parser {
 				break;
 			case "*=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 
@@ -428,7 +428,7 @@ public class Parser {
 				break;
 			case "/=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 				rhsExpr = Operators.divide(this, res01, res02);
@@ -488,7 +488,7 @@ public class Parser {
 			// Parse all function arguments
 			for (;;) {
 				
-				ResultValue arg = parseExpression();
+				ResultValue arg = parseExpression(")");
 		
 				args.add(arg);
 				
@@ -527,7 +527,7 @@ public class Parser {
 	 * Creates a postFix expression from stack
 	 * @return the evaluated value of an expression
 	 */
-	private ResultValue parseExpression() throws SyntaxError{
+	private ResultValue parseExpression(String terminatingStr) throws SyntaxError{
 		ArrayList <Token> out = new ArrayList<Token>();
 		Stack<Token> stackToken = new Stack<>();
 		Stack<ResultValue> stackResult = new Stack<>();
