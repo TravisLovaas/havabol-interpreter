@@ -12,6 +12,7 @@ weird = "\tTX\tTexas\n";
 String loc;
 loc = "TX";
 
+
 // numeric stuff
 print(">>> Checking datatype results based on left operand");
 pi = 3.14;

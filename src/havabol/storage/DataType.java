@@ -9,14 +9,14 @@ public enum DataType {
 	VOID, DATE;
 	
 	public static DataType stringToType(String type) {
-		switch (type) {
-		case "Int":
+		switch (type.toLowerCase()) {
+		case "int":
 			return INTEGER;
-		case "Float":
+		case "float":
 			return FLOAT;
-		case "String":
+		case "string":
 			return STRING;
-		case "Bool":
+		case "bool":
 			return BOOLEAN;
 		default:
 			return null;

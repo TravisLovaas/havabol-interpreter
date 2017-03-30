@@ -33,6 +33,7 @@ public class Scanner {
 	// Current and lookahead tokens
 	public Token currentToken;
 	public Token nextToken;
+	public Token previous;
 	// Comment found
 	public boolean commentFound = false;
 	public int commentFoundOn = 0;
@@ -98,11 +99,9 @@ public class Scanner {
 	 * @return String representation of the next token
 	 */
 	public String getNext() throws SyntaxError {
-		
-		String previous = currentToken.tokenStr;
-		
+		previous = currentToken;		
 		currentToken = getNextToken(false);
-		//Parser parser;
+		//debugger for token
 		if(Parser.debugOn){
 			switch(Parser.debugArg.toLowerCase()){
 				case "token":
@@ -116,16 +115,13 @@ public class Scanner {
 			return "";
 		}
 		nextToken = getNextToken(true);
-		
 		//Take care of unary minus
 		if(currentToken.subClassif != Token.STRING && nextToken.subClassif != Token.STRING)
-			if(UNARY.contains(previous) && currentToken.tokenStr.equals("-")){
+			if(UNARY.contains(previous.tokenStr) && currentToken.tokenStr.equals("-")){
 				currentToken.tokenStr = "u-";
 			}else
 				unary = false;
-			
 		return currentToken.tokenStr;
-		
 	}
 	
 	/**
@@ -179,7 +175,6 @@ public class Scanner {
 		while ((iColPos >= textCharM.length || textCharM[iColPos] == '/'
 				|| WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
 		{
-			//System.out.println("SKIP");
 			if ((iColPos >= textCharM.length || WHITESPACE.contains(Character.toString(textCharM[iColPos]))) && !done)
 				advanceCursor(!lookahead);
 			else if (textCharM[iColPos] == '/')
@@ -201,7 +196,6 @@ public class Scanner {
 			return token;
 		}
 		
-		//System.out.println("Found non-whitespace: " + textCharM[iColPos]);
 		// Save the start position of this token in case of error
 		token.iColPos = iColPos;
 		token.iSourceLineNr = iSourceLineNr;
@@ -213,7 +207,6 @@ public class Scanner {
 	
 		if (DELIMITERS.contains(Character.toString(currentChar))) {
 			if (QUOTES.contains(Character.toString(currentChar))) {
-				//System.out.println("Quote found.");
 				char openStringChar = currentChar;
 				boolean escapeNext = false;
 				int openQuoteLineNr = iSourceLineNr;
@@ -242,10 +235,12 @@ public class Scanner {
 								continue;
 							}
 						}
-					} else 
+					} else {
 						escapeNext = false;
-					if(textCharM[iColPos - 1] != '\\')
+					}
+					if(textCharM[iColPos - 1] != '\\') {
 						retCharM[iRet++] = textCharM[iColPos];
+					}
 				}
 			
 				tokenStr =  tokenStr.insert(0, retCharM, 0, iRet);
@@ -279,7 +274,6 @@ public class Scanner {
 		}
 		
 		return token;
-		
 	}
 
 	/**

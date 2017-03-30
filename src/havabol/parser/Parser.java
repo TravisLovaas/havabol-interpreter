@@ -18,7 +18,6 @@ public class Parser {
 	public static Boolean debugOn= false;
 	private String debugOnOff= null;
 	public static String debugArg = null;
-	//private DataType exprDataType = null;
 	//precedence initialization
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
 		private static final long serialVersionUID = 1L;
@@ -52,7 +51,6 @@ public class Parser {
 		
 	}
 	
-	
 	public void beginParsing() {
 		scanner.getNext();
 		while (scanner.currentToken.primClassif != Token.EOF) {
@@ -68,8 +66,6 @@ public class Parser {
 	 */
 	
 	private void parseIf() {
-		//System.out.println("parse if");
-		// currentToken is "if"
 		scanner.getNext();
 		
 		// currentToken should be beginning of conditional expression
@@ -92,7 +88,6 @@ public class Parser {
 				}
 			}
 		
-			//System.out.println("skipping else tokens");
 			// skip everything inside else
 			int ifCnt = 0;
 			
@@ -106,17 +101,14 @@ public class Parser {
 				scanner.getNext();
 			}
 			scanner.getNext();
-			//System.out.println("done skipping else");
 			// done, semi-colon handled by parseStatement
 		} else {
 			// Skip everything until else or endif
-			//System.out.println("skipping if section");
 			int ifCnt = 0;
 			for (;;) {
 				scanner.getNext();
 				if (scanner.currentToken.tokenStr.equals("if")) {
 					ifCnt++;
-					//System.out.println("increment ifCnt");
 				}
 				if (scanner.currentToken.tokenStr.equals("else")) {
 					if (ifCnt == 0) {
@@ -131,14 +123,11 @@ public class Parser {
 					} else 
 						ifCnt--;
 				}
-			}
-			//System.out.println("executing else");
-		
+			}		
 			// skip everything inside else
 			while (!scanner.currentToken.tokenStr.equals("endif")) {
 				parseStatement();
 			}
-			//System.out.println("last: " + scanner.currentToken.tokenStr);
 			scanner.getNext(); // pass "endif"
 		}
 	}
@@ -151,8 +140,6 @@ public class Parser {
 	
 	private void parseWhile() {
 		
-		//System.out.println("parsewhile called");
-		
 		int loopSrcLine = scanner.iSourceLineNr;
 		int loopColPos = scanner.iColPos;
 		
@@ -161,12 +148,8 @@ public class Parser {
 		
 		// Save our position to loop back!!
 		
-		ResultValue whileCond;
-		
-		//System.out.println("" + loopSrcLine + " " + loopColPos);
-		
+		ResultValue whileCond;		
 		for (;;) {
-			
 			// Evaluate while condition
 			whileCond = parseExpression(":");
 			
@@ -181,28 +164,17 @@ public class Parser {
 			
 			if (whileCond.asBoolean(this).booleanValue) {
 				// Evaluated to true, execute loop
-				//System.out.println("loop execing");
 				while (!scanner.currentToken.tokenStr.equals("endwhile")) {
-					//System.out.println("while parse statement call");
 					parseStatement();
 				}
 				
-				//System.out.println("before while reset: " + scanner.currentToken.tokenStr);
 				scanner.getNext(); // pass "endwhile"
 				scanner.getNext(); // pass ";"
-				
-				//System.out.println("after ; " + scanner.currentToken.tokenStr);
-				
+								
 				// Done executing loop body, let's loop back!
-				scanner.setPosition(loopSrcLine, loopColPos);
-				
-				//System.out.println("after loopback: " + scanner.getNext());
-				//System.out.println("" + loopSrcLine + " " + loopColPos);
-				
+				scanner.setPosition(loopSrcLine, loopColPos);	
 			} else {
-				// Evaluated to false, skip loop past endwhile and return
-				//System.out.println("loop cond false");
-				
+				// Evaluated to false, skip loop past endwhile and return				
 				int whileCnt = 0;
 				while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
 					if (scanner.currentToken.tokenStr.equals("while")) {
@@ -211,15 +183,11 @@ public class Parser {
 						whileCnt--;
 					}
 					scanner.getNext();
-				}
-				//System.out.println("last inwhile:" + scanner.currentToken.tokenStr);
-				
+				}				
 				scanner.getNext(); // pass "endwhile"
 				return; // return to parseStatement, expects ;
-			}
-			
+			}	
 		}
-		
 	}
 	
 	
@@ -256,9 +224,9 @@ public class Parser {
 		debugArg = scanner.getNext();
 		switch (debugArg.toLowerCase()){
 		case "assign":
-		case "Assignment":
+		case "assignment":
 		case "expr":
-		case "Expression":
+		case "expression":
 		case "token":
 			debugOnOff = scanner.getNext();
 			if(debugOnOff.equalsIgnoreCase("on"))
@@ -332,10 +300,7 @@ public class Parser {
 			parseFunctionCall();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				
 					parseAssignment();
-
-				//if(scanner.nextToken.equals("="))
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
@@ -362,7 +327,6 @@ public class Parser {
 	 *    - currentToken is a data type declaration
 	 */
 	private void parseDeclaration() {
-		
 		// Parse declared type
 		DataType declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
 		Structure structure = Structure.PRIMITIVE;
@@ -510,9 +474,7 @@ public class Parser {
 		// precondition should be true
 		
 		// TODO
-		
 		throw new UnsupportedOperationError("array reference not yet implemented");
-		
 	}
 
 	/**
@@ -595,16 +557,11 @@ public class Parser {
 		String token = scanner.currentToken.tokenStr;
 		Token popped;
 		boolean containsOperator = false;
-		boolean evaluated = false; //we have popped evaluated result value of expression
+		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 		
 		while (!(token.equals(";") || token.equals(":") || token.equals(","))) {
-			//get token string
-			//token = scanner.currentToken.tokenStr;
-			//if function or operand place in out
-			
-			//System.out.println("------------> Current token = " + token + "<--------------");
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
-				//add the identifier or function to postfix out
+				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND)
 					out.add(scanner.currentToken);
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
@@ -612,27 +569,23 @@ public class Parser {
 				}
 
 			}
-			
-			
-			//if operator, check precedence
+						
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
 				containsOperator = true;
 				while(!stackToken.isEmpty()){
-					//System.out.println("precedence of token = " + precedence.get(stackToken.peek()));
+					//if operator, check precedence
 					if(precedence.get(token) > stkPrecedence.get(stackToken.peek().tokenStr)){
 						break;
 					}
-					//pop from stackToken if precedence is less than or equal to
 					out.add(stackToken.pop());
 				}
 				stackToken.push(scanner.currentToken); 
 			}
 			
-			//if separator, check special cases for parentheses
-			//to determine correctness
 			else if (scanner.currentToken.primClassif == Token.SEPARATOR){
+				//if separator, check special cases for parentheses
+				//to determine correctness
 				boolean lParen = false;
-				//token = scanner.nextToken.tokenStr;
 				if(token.equals("(")){
 					stackToken.push(scanner.currentToken);
 				}
@@ -640,13 +593,13 @@ public class Parser {
 					while(!stackToken.isEmpty()){
 						popped = stackToken.pop();
 						if(popped.tokenStr.equals("(")){
-							//System.out.println("------> I'm in here popping = " + popped.tokenStr + " <----");
 							lParen = true;
 						}else		
 							out.add(popped);
 					}
-					//did not find matching parenthesis
 					if(!lParen){
+						//no matching parenthesis found
+						//if parenthesis id for function, leave it to parseFunc
 						break;
 					}
 				}
@@ -655,12 +608,10 @@ public class Parser {
 					continue;
 				}
 				else {
-					//invalid separator found, at this point ',' would be invalid
 						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
 							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 				}
 			}
-			
 			else{
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
@@ -669,7 +620,6 @@ public class Parser {
 		}
 		
 		while(!stackToken.isEmpty()){
-		
 			popped = stackToken.pop();
 			if(popped.tokenStr == "(")
 				throw new SyntaxError("Missing right parenthesis for '" + popped + "' found",
@@ -677,15 +627,13 @@ public class Parser {
 			out.add(popped);
 		}
 		
-		//at this point, our postfix expression is already populated
-		//Error checks for validity of expression	
+		//At this point, our postfix expression is already populated
+		//check for possible errors
 		for(Token entry : out){			
-			
-			//if you find an operand
 			ResultValue res, res2 = null;
 			token = entry.tokenStr;
 			if(entry.primClassif == Token.OPERAND){
-				//check if it is an actual value
+				//Found operand; check if it is an actual value
 				//if not, convert to an actual value and push to stack
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
@@ -701,19 +649,15 @@ public class Parser {
 						stackResult.push(res);
 						break;
 					default:
-						//operand type does not exist
+						throw new TypeError("Found non-existent datatype", entry);
 				}
-			}
-				
-			// else you find an operator,
+			}	
 			else if(entry.primClassif == Token.OPERATOR){
-				// if stack is not empty
+				//found operator
 				if(!stackResult.isEmpty()){
-					//handle unary operators u- and !
-					ResultValue unary;
+					ResultValue unary; //to handle special unary operations
 					switch(token){
 						case "u-":
-							// push -1 * pop first operand
 							unary = Operators.unaryMinus(this, stackResult.pop());
 							stackResult.push(unary);
 							break;
@@ -843,8 +787,6 @@ public class Parser {
 			}
 			else
 				throw new UnsupportedOperationError("Invalid token entry found in expression.", entry);
-			
-			
 		}
 		
 		//if stack is not empty
