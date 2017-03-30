@@ -1,6 +1,9 @@
 package havabol.parser;
 
 import havabol.storage.*;
+
+import java.util.List;
+
 import havabol.error.TypeError;
 import havabol.lexer.*;
 
@@ -11,8 +14,44 @@ public class ResultValue {
 	public int intValue;
 	public double floatValue;
 	public boolean booleanValue;
+	public List<ResultValue> arrayValue;
 	public Structure structure;
 	public String terminatingStr;
+	
+	public ResultValue() {
+		this.dataType = DataType.VOID;
+		this.structure = Structure.VOID;
+	}
+	
+	public ResultValue(int intValue) {
+		this.dataType = DataType.INTEGER;
+		this.structure = Structure.PRIMITIVE;
+		this.intValue = intValue;
+	}
+	
+	public ResultValue(double floatValue) {
+		this.dataType = DataType.FLOAT;
+		this.structure = Structure.PRIMITIVE;
+		this.floatValue = floatValue;
+	}
+	
+	public ResultValue(String strValue) {
+		this.dataType = DataType.STRING;
+		this.structure = Structure.PRIMITIVE;
+		this.strValue = strValue;
+	}
+	
+	public ResultValue(boolean booleanValue) {
+		this.dataType = DataType.BOOLEAN;
+		this.structure = Structure.PRIMITIVE;
+		this.booleanValue = booleanValue;
+	}
+	
+	public ResultValue asVoid() {
+		this.dataType = DataType.VOID;
+		this.structure = Structure.VOID;
+		return this;
+	}
 	
 	public ResultValue asInteger(Parser parser) {
 		

@@ -190,7 +190,7 @@ public class Scanner {
 					while (iSourceLineNr == commentFoundOn)
 						advanceCursor(!lookahead);
 				} else {
-					throw new SyntaxError("Invalid char \' " + textCharM[iColPos] + " \' found", iSourceLineNr + 1, iColPos);
+					break;
 				}
 			}
 		}
@@ -323,6 +323,8 @@ public class Scanner {
 			case "for":
 			case "select":
 			case "when":
+			case "by":
+			case "to":
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.FLOW;
 				return;

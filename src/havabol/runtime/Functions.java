@@ -8,9 +8,9 @@ import havabol.storage.*;
 
 public class Functions {
 	
-	public static void print(Parser parser, List<ResultValue> args) {
+	public static ResultValue print(Parser parser, List<ResultValue> args) {
 		if (args.size() == 0) {
-			return;
+			return new ResultValue().asVoid();
 		}
 
 		System.out.print(args.get(0).asString(parser).strValue);
@@ -21,6 +21,64 @@ public class Functions {
 		}
 		
 		System.out.println();
+		
+		return new ResultValue().asVoid();
+	}
+	
+	/**
+	 * Havabol LENGTH implementation. Returns the length of a given
+	 * string value.
+	 * @param string
+	 * @return int
+	 */
+	public ResultValue length(Parser parser, ResultValue value){
+		return new ResultValue(value.asString(parser).strValue.length());
+	}
+	/**
+	 * Havabol SPACES returns true if there are any spaces in the string,
+	 * or false if there are none
+	 * @param string
+	 * @return boolean
+	 */
+	public ResultValue spaces(Parser parser, ResultValue value){
+		char[] check = value.asString(parser).strValue.toCharArray();
+		
+		for (char c : check) {
+			if (c == ' ') {
+				return new ResultValue(true);
+			}
+		}
+		
+		return new ResultValue(false);
+		
+	}
+	/**
+	 * ELEM returns the max populated element in the array. 
+	 * @param array
+	 * @return String
+	 */
+	public ResultValue elem(Parser parser, ResultValue value) {
+		
+		throw new UnsupportedOperationError("elem is not yet implemented");
+		
+//		if (value.structure == Structure.PRIMITIVE) {
+//			throw new TypeError("ELEM may only operate on array-like values.");
+//		}
+		
+	}
+	/**
+	 * maxElem returns the declared length of an array
+	 * @param array
+	 * @return
+	 */
+	public ResultValue maxElem(Parser parser, ResultValue value) {
+		
+		throw new UnsupportedOperationError("maxelem is not yet implemented");
+		
+//		if (value.structure == Structure.PRIMITIVE) {
+//			throw new TypeError("MAXELEM may only operate on array-like values.");
+//		}
+		
 	}
 
 }

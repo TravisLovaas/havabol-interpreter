@@ -4,6 +4,7 @@ public enum Structure {
 	
 	PRIMITIVE,
 	FIXED_ARRAY,
-	UNBOUNDED_ARRAY
+	UNBOUNDED_ARRAY,
+	VOID
 
 }

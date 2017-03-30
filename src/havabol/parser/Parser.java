@@ -73,7 +73,7 @@ public class Parser {
 		scanner.getNext();
 		
 		// currentToken should be beginning of conditional expression
-		ResultValue resCond = parseExpression();
+		ResultValue resCond = parseExpression(":");
 		if (!scanner.currentToken.tokenStr.equals(":")){
 			throw new SyntaxError("Expected ':' after conditional expression in if", scanner.currentToken);
 		}
@@ -168,7 +168,7 @@ public class Parser {
 		for (;;) {
 			
 			// Evaluate while condition
-			whileCond = parseExpression();
+			whileCond = parseExpression(":");
 			
 			// should be on ":"
 			if (scanner.currentToken.tokenStr.equals(":")) {
@@ -222,37 +222,87 @@ public class Parser {
 		
 	}
 	
+	
 	private void parseFor() {
+		// for expr [in/to] expr:
+		// if 3rd token is "in", second expression
+		scanner.getNext(); // get past "for"
+		
+		// 
+		while (!(scanner.currentToken.tokenStr.equals("in") || scanner.currentToken.tokenStr.equals("to"))) {
+			
+		}
+		// 
+		if (scanner.currentToken.tokenStr.equals("in")){
+			
+		}
+		// 
+		else if (scanner.currentToken.tokenStr.equals("to")){
+			
+		}
+		while (!(scanner.currentToken.tokenStr.equals("endfor"))){
+			
+		}
+	}
+	
+	/**
+	 * Preconditions:
+	 *  - currentToken is beginning of debug statement, e.g.
+	 *  	debug token on;
+	 *      ^^^^^
+	 */
+	private void parseDebugStatement() {
+		
+		debugArg = scanner.getNext();
+		switch (debugArg.toLowerCase()){
+		case "assign":
+		case "Assignment":
+		case "expr":
+		case "Expression":
+		case "token":
+			debugOnOff = scanner.getNext();
+			if(debugOnOff.equalsIgnoreCase("on"))
+				debugOn = true;
+			else if (debugOnOff.equalsIgnoreCase("off")){
+				debugOn = false;
+			}
+			String semi = scanner.getNext();
+			if(!semi.equals(";"))
+				throw new SyntaxError("\"debug statement\" expects a semicolon (\";\")", scanner.currentToken);
+			break;
+		default:
+			throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
+		}
 		
 	}
 	
+	/**
+	 * Parses a statement, ending with a semicolon.
+	 * Preconditions: 
+	 *  - currentToken is the first token in a statement, e.g.
+	 *  			if myVar == 0:
+	 *  			^^
+	 * Postconditions:
+	 *  - currentToken is the first token in a statement and directly follows a semicolon, e.g.
+	 *  			i = 0;
+	 *  			myVar = 1;
+	 *              ^^^^^
+	 */
 	private void parseStatement() {
-		
-		//System.out.println("parse statement");
-		//debug for expr and assign
+		/* Possible types of statements:
+		 * 
+		 * 	Int i = 0;       		declaration
+		 *  i = 1;           		assignment
+		 *  if ... endif;    		if
+		 *  while ... endwhile;		while
+		 *  for ... endfor;			for
+		 * 	debug type setting;		debug
+		 * 	print( ... );			function call
+		 * 
+		 */
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-			if(scanner.currentToken.tokenStr.equals("debug")){
-				debugArg = scanner.getNext();
-				switch (debugArg.toLowerCase()){
-				case "assign":
-				case "Assignment":
-				case "expr":
-				case "Expression":
-				case "token":
-					debugOnOff = scanner.getNext();
-					if(debugOnOff.equalsIgnoreCase("on"))
-						debugOn = true;
-					else if (debugOnOff.equalsIgnoreCase("off")){
-						debugOn = false;
-					}
-					String semi = scanner.getNext();
-					if(!semi.equals(";"))
-						throw new SyntaxError("\"debug statement\" expects a semicolon (\";\")", scanner.currentToken);
-					scanner.getNext();
-					break;
-				default:
-					throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
-				}
+			if(scanner.currentToken.tokenStr.equals("debug")) {
+				parseDebugStatement();
 			}
 		}
 		
@@ -377,14 +427,14 @@ public class Parser {
 				//next token should be an expression
 				scanner.getNext();
 				//System.out.println("check = " + check);
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
 				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
 				variable.setValue(rhsExpr);
 				break;
 			case "+=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 				rhsExpr = Operators.subtract(this, res01, res02);
@@ -392,7 +442,7 @@ public class Parser {
 				break;
 			case "-=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 				rhsExpr = Operators.add(this, res01, res02);
@@ -400,7 +450,7 @@ public class Parser {
 				break;
 			case "*=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 
@@ -409,7 +459,7 @@ public class Parser {
 				break;
 			case "/=":
 				scanner.getNext();
-				res02 = parseExpression();
+				res02 = parseExpression(";");
 				res01 = symbolTable.getSymbol(identifier).getValue();
 				//run the subtract, Operators should figure out if it is valid
 				rhsExpr = Operators.divide(this, res01, res02);
@@ -434,13 +484,42 @@ public class Parser {
 		return rhsExpr;
 	}	
 	
-	
+	/**
+	 * Parses a reference to an array value or slice
+	 * Preconditions:
+	 * 	- currentToken is an array type identifier, e.g.
+	 * 		j = tArray[2~4];
+	 *          ^^^^^^		
+	 * @return
+	 */
+	private ResultValue parseArrayRef() {
+		
+		String arrayName = scanner.currentToken.tokenStr;
+		
+		// assert currentToken is a valid array identifier
+		if (scanner.currentToken.primClassif != Token.IDENTIFIER ||
+			!symbolTable.containsSymbol(arrayName)) {
+			throw new SyntaxError("Expected an identifier for array reference", scanner.currentToken);
+		}
+		
+		ResultValue array = symbolTable.getSymbol(arrayName).getValue();
+		
+		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
+			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
+		}
+		// precondition should be true
+		
+		// TODO
+		
+		throw new UnsupportedOperationError("array reference not yet implemented");
+		
+	}
 
 	/**
 	 * Parses a function call
 	 * Preconditions:
-	 *    - currentToken is the name of a function in a function call
-	 *      i.e. print("hello", "world");
+	 *    - currentToken is the name of a function in a function call, e.g.
+	 *           print("hello", "world");
 	 *      	 ^^^^^
 	 * @return
 	 */
@@ -469,7 +548,7 @@ public class Parser {
 			// Parse all function arguments
 			for (;;) {
 				
-				ResultValue arg = parseExpression();
+				ResultValue arg = parseExpression(")");
 		
 				args.add(arg);
 				
@@ -508,12 +587,11 @@ public class Parser {
 	 * Creates a postFix expression from stack
 	 * @return the evaluated value of an expression
 	 */
-	private ResultValue parseExpression() throws SyntaxError{
+	private ResultValue parseExpression(String terminatingStr) throws SyntaxError{
 		ArrayList <Token> out = new ArrayList<Token>();
 		Stack<Token> stackToken = new Stack<>();
 		Stack<ResultValue> stackResult = new Stack<>();
 		ResultValue finalValue = null;
-		//String token;
 		String token = scanner.currentToken.tokenStr;
 		Token popped;
 		boolean containsOperator = false;
