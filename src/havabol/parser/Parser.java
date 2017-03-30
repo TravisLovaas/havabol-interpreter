@@ -513,17 +513,18 @@ public class Parser {
 		Stack<Token> stackToken = new Stack<>();
 		Stack<ResultValue> stackResult = new Stack<>();
 		ResultValue finalValue = null;
-		String token;
-		String next = null;
+		//String token;
+		String token = scanner.currentToken.tokenStr;
 		Token popped;
-		boolean lParen = false;
 		boolean containsOperator = false;
 		boolean evaluated = false; //we have popped evaluated result value of expression
 		
-		do {
+		while (!(token.equals(";") || token.equals(":") || token.equals(","))) {
 			//get token string
-			token = scanner.currentToken.tokenStr;
+			//token = scanner.currentToken.tokenStr;
 			//if function or operand place in out
+			
+			//System.out.println("------------> Current token = " + token + "<--------------");
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//add the identifier or function to postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND)
@@ -539,7 +540,8 @@ public class Parser {
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
 				containsOperator = true;
 				while(!stackToken.isEmpty()){
-					if(precedence.get(token) > stkPrecedence.get(stackToken.peek())){
+					//System.out.println("precedence of token = " + precedence.get(stackToken.peek()));
+					if(precedence.get(token) > stkPrecedence.get(stackToken.peek().tokenStr)){
 						break;
 					}
 					//pop from stackToken if precedence is less than or equal to
@@ -551,25 +553,27 @@ public class Parser {
 			//if separator, check special cases for parentheses
 			//to determine correctness
 			else if (scanner.currentToken.primClassif == Token.SEPARATOR){
-				if(token.equals("("))
+				boolean lParen = false;
+				//token = scanner.nextToken.tokenStr;
+				if(token.equals("(")){
 					stackToken.push(scanner.currentToken);
+				}
 				else if(token.equals(")")){
 					while(!stackToken.isEmpty()){
 						popped = stackToken.pop();
-						if(popped.tokenStr == "("){
+						if(popped.tokenStr.equals("(")){
+							//System.out.println("------> I'm in here popping = " + popped.tokenStr + " <----");
 							lParen = true;
-							break;
-						}
-						out.add(popped);
+						}else		
+							out.add(popped);
 					}
 					//did not find matching parenthesis
 					if(!lParen){
-						//return no matching left parenthesis here
-						throw new SyntaxError("No matching left parenthesis for '" + token + "' found in expression",
-								scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
+						break;
 					}
-				}else if (token.equals(",")){
-					next = scanner.getNext();
+				}
+				else if (token.equals(",")){
+					token = scanner.getNext();
 					continue;
 				}
 				else {
@@ -583,8 +587,8 @@ public class Parser {
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}
-			next = scanner.getNext();
-		}while (!(next.equals(";") || next.equals(":") || next.equals(",") || next.equals(")"))); 
+			token = scanner.getNext();
+		}
 		
 		while(!stackToken.isEmpty()){
 		
@@ -594,11 +598,9 @@ public class Parser {
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			out.add(popped);
 		}
-		//System.out.println("*************************I'M IN PARSE EXPRESSION, ARE YOU HERE? *************************");
 		
 		//at this point, our postfix expression is already populated
 		//Error checks for validity of expression	
-		
 		for(Token entry : out){			
 			
 			//if you find an operand
@@ -609,7 +611,6 @@ public class Parser {
 				//if not, convert to an actual value and push to stack
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
-						//getValue should be get variable value, for now this will do
 						res = symbolTable.getSymbol(token).getValue();
 						stackResult.push(res);
 						break;
@@ -618,10 +619,8 @@ public class Parser {
 					case Token.BOOLEAN:
 					case Token.STRING:
 					case Token.DATE :
-						//go back and look at toResult method
 						res = entry.toResult();
 						stackResult.push(res);
-						//System.out.per
 						break;
 					default:
 						//operand type does not exist
@@ -792,7 +791,8 @@ public class Parser {
 			throw new UnsupportedOperationError("Invalid Expression found. There are too many operands for the operators provided"
 					, scanner.currentToken.iSourceLineNr);
 		}
-		
+		 
+		//System.out.println("----------> Exit parse expression <---------");
 		return finalValue;
 	}
 }	

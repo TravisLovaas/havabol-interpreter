@@ -9,7 +9,7 @@ four = 4;
 Int five ;
 five = 5;
 print ("variables: 2 * 3 =", two * three);
-print ("constants: 2 * 3 =", 2 * 3);
+print ("constants: 2 * 3 =", (2 * 3));
 
 // numeric comparisons
 Int x;
