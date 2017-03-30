@@ -10,6 +10,7 @@ import havabol.error.*;
 import havabol.lexer.*;
 import havabol.runtime.*;
 import havabol.storage.*;
+import havabol.storage.Structure;
 
 public class Parser {
 	
@@ -630,7 +631,7 @@ public class Parser {
 		//At this point, our postfix expression is already populated
 		//check for possible errors
 		for(Token entry : out){			
-			ResultValue res, res2 = null;
+			ResultValue res = null, res2 = null;
 			token = entry.tokenStr;
 			if(entry.primClassif == Token.OPERAND){
 				//Found operand; check if it is an actual value
@@ -638,6 +639,9 @@ public class Parser {
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
 						res = symbolTable.getSymbol(token).getValue();
+						//Array found?
+						if(res.structure != Structure.PRIMITIVE)
+							res = parseArrayRef();
 						stackResult.push(res);
 						break;
 					case Token.INTEGER:
