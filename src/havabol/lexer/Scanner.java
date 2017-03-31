@@ -42,6 +42,8 @@ public class Scanner {
 	public boolean unary = false;
 	public boolean printBuffer = false;
 	
+	public boolean debugToken = false;
+	
 	private final static String DELIMITERS = " \t;:()\'\"=!<>+-*/[]#^,\n"; // terminate a token
 	private final static String WHITESPACE = " \t\n";
 	private final static String QUOTES = "\"'";
@@ -102,14 +104,8 @@ public class Scanner {
 		previous = currentToken;		
 		currentToken = getNextToken(false);
 		//debugger for token
-		if(Parser.debugOn){
-			switch(Parser.debugArg.toLowerCase()){
-				case "token":
-					System.out.println("\t\t... Current Token = " + currentToken.tokenStr);
-					break;
-				default:
-					break;
-			}
+		if (debugToken) {
+			System.out.println("\t\t... Current Token = " + currentToken.tokenStr);
 		}
 		if (currentToken.primClassif == Token.EOF) {
 			return "";

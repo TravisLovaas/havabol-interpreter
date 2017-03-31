@@ -16,9 +16,10 @@ public class Parser {
 	
 	private Scanner scanner;
 	private SymbolTable symbolTable;
-	public static Boolean debugOn= false;
-	private String debugOnOff= null;
-	public static String debugArg = null;
+	
+	public boolean debugExpr = false;
+	public boolean debugAssignment = false;
+	
 	//precedence initialization
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
 		private static final long serialVersionUID = 1L;
@@ -161,8 +162,6 @@ public class Parser {
 				throw new SyntaxError("Expected : after while conditional expression", scanner.currentToken);
 			}
 			
-			assert !scanner.currentToken.tokenStr.equals(":");
-			
 			if (whileCond.asBoolean(this).booleanValue) {
 				// Evaluated to true, execute loop
 				while (!scanner.currentToken.tokenStr.equals("endwhile")) {
@@ -222,22 +221,37 @@ public class Parser {
 	 */
 	private void parseDebugStatement() {
 		
-		debugArg = scanner.getNext();
+		assert scanner.currentToken.tokenStr.equals("debug");
+		
+		String debugArg = scanner.getNext();
+		String toggleStr = scanner.getNext().toLowerCase(); // on or off
+		boolean desiredState = false;
+		
+		if (toggleStr.equals("on")) {
+			desiredState = true;
+		} else if (toggleStr.equals("off")) {
+			desiredState = false;
+		} else {
+			throw new SyntaxError("Expected `on` or `off` in debug statement", scanner.currentToken);
+		}
+		
 		switch (debugArg.toLowerCase()){
 		case "assign":
 		case "assignment":
+			
+			debugAssignment = desiredState;
+			
+			break;
 		case "expr":
 		case "expression":
+			
+			debugExpr = desiredState;
+			
+			break;
 		case "token":
-			debugOnOff = scanner.getNext();
-			if(debugOnOff.equalsIgnoreCase("on"))
-				debugOn = true;
-			else if (debugOnOff.equalsIgnoreCase("off")){
-				debugOn = false;
-			}
-			String semi = scanner.getNext();
-			if(!semi.equals(";"))
-				throw new SyntaxError("\"debug statement\" expects a semicolon (\";\")", scanner.currentToken);
+			
+			scanner.debugToken = desiredState;
+			
 			break;
 		default:
 			throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
@@ -270,7 +284,7 @@ public class Parser {
 		 * 
 		 */
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-			if(scanner.currentToken.tokenStr.equals("debug")) {
+			if (scanner.currentToken.tokenStr.equals("debug")) {
 				parseDebugStatement();
 			}
 		}
@@ -434,17 +448,11 @@ public class Parser {
 				throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
 		}
 		
-		if(debugOn){
-			switch(debugArg.toLowerCase()){
-				case "assign":
-				case "assignment":
-					System.out.println("\t\t... Assignment variable = " + identifier);
-					System.out.println("\t\t... Assignment value = " + rhsExpr);
-					break;
-				default:
-					break;
-			}
+		if (debugAssignment) {
+			System.out.println("\t\t... Assignment variable = " + identifier);
+			System.out.println("\t\t... Assignment value = " + rhsExpr);
 		}
+
 		// Ensure type of rhsExpr matches declared type, or can be cast to such.
 		return rhsExpr;
 	}	
@@ -795,18 +803,11 @@ public class Parser {
 		
 		//if stack is not empty
 		//what's left in stack should be the final result
-		if(!stackResult.isEmpty() && !evaluated){
+		if (!stackResult.isEmpty() && !evaluated){
 			finalValue = stackResult.pop();
 			evaluated = true;
-			if(debugOn && containsOperator){
-				switch(debugArg.toLowerCase()){
-					case "expr":
-					case "expression":
-						System.out.println("\t\t... Expression result = " + finalValue);
-						break;
-					default:
-						break;
-				}
+			if (debugExpr && containsOperator){
+				System.out.println("\t\t... Expression result = " + finalValue);
 			}
 		}else if(stackResult.isEmpty() && evaluated){
 			throw new UnsupportedOperationError("Invalid Expression found. There are too few operands for the operators provided"
