@@ -9,11 +9,15 @@ import havabol.storage.*;
 public class Operators {
 	
 	/***
-	 * Adds to evaluate operands
+	 * Function: add
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with an addition operator
+	 * Purpose: Adds to evaluate operands
 	 * @param parser - information about  values being parsed
 	 * @param op1 	 - first operand to be evaluated with op2
 	 * @param op2	 - second operand to be evaluated with op1
-	 * @return
+	 * @return final value after some expression has been evaluated
 	 */
 	public static ResultValue add(Parser parser, ResultValue op1, ResultValue op2) {
 		
@@ -56,11 +60,15 @@ public class Operators {
 	}
 	
 	/***
-	 * Subtracts to evaluate operands
+	 * Function: subtract
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a subtraction operator
+	 * Purpose: Subtracts to evaluate operands
 	 * @param parser - information about  values being parsed
 	 * @param op1 	 - first operand to be evaluated with op2
 	 * @param op2	 - second operand to be evaluated with op1
-	 * @return
+	 * @return final value after some expression has been evaluated
 	 */
 	public static ResultValue subtract(Parser parser, ResultValue op1, ResultValue op2) {
 		
@@ -101,11 +109,15 @@ public class Operators {
 	}
 	
 	/***
-	 * Multiplies to evaluate operands
-	 @param parser - information about  values being parsed
+	 * Function: multiply
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a multiplication operator
+	 * Purpose: Multiplies to evaluate operands
+	 * @param parser - information about  values being parsed
 	 * @param op1 	 - first operand to be evaluated with op2
 	 * @param op2	 - second operand to be evaluated with op1
-	 * @return
+	 * @return final value after some expression has been evaluated
 	 */
 	public static ResultValue multiply(Parser parser, ResultValue op1, ResultValue op2) {
 		
@@ -145,7 +157,17 @@ public class Operators {
 		return res;
 	}
 	
-	//divide function
+	/***
+	 * Function: divide
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a division operator
+	 * Purpose: Divides to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue divide(Parser parser, ResultValue op1, ResultValue op2) {
 		
 		//System.out.print("divide: " + op1 + " " + op2);
@@ -184,6 +206,17 @@ public class Operators {
 		return res;
 	}
 	
+	/***
+	 * Function: exponentiate
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with an exponentiation operator
+	 * Purpose: raise to a power to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue exponentiate(Parser parser, ResultValue op1, ResultValue op2) {
 		
 		//System.out.print("exponentiate: " + op1 + " " + op2);
@@ -212,6 +245,17 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: unaryMinus
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a unaryMinus operator
+	 * Purpose: Multiplies by a '-1' to evaluate operand
+	 * @param parser - information about  values being parsed
+	 * @param op1	 - operand to be evaluated with '-1'
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue unaryMinus(Parser parser, ResultValue op1)
 	{
 		
@@ -230,6 +274,17 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: unaryNot
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a negation operator
+	 * Purpose: Negates to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1	 - operand to be negated with '!'
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue unaryNot(Parser parser, ResultValue op1)
 	{
 		
@@ -239,6 +294,18 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: less
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a less than operator
+	 * Purpose: Compares to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue less(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		
@@ -268,6 +335,18 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: greater
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a greater than operator
+	 * Purpose: Compares to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue greater(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();
@@ -296,6 +375,19 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: lessEqual
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a less than or equal to
+	 * 		operator
+	 * Purpose: Compares to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue lessEqual(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();
@@ -324,6 +416,19 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: greaterEqual
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a greater than or equal to
+	 * 		operator
+	 * Purpose: Compares to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue greaterEqual(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();
@@ -352,6 +457,18 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: doubleEqual
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with an '==' operator
+	 * Purpose: Compares to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue doubleEqual(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();
@@ -385,6 +502,17 @@ public class Operators {
 		return res;
 	}
 
+	/***
+	 * Function: notEqual
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a '!=' operator
+	 * Purpose: Compares to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue notEqual(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();
@@ -413,6 +541,19 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: logicalAnd
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a logical and '&&'
+	 * 		operator
+	 * Purpose: Compares one boolean to another to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue logicalAnd(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();
@@ -427,6 +568,19 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: logicalOr
+	 * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a logical or '||'
+	 * 		operator
+	 * Purpose: Compares one boolean to another to evaluate operands
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue logicalOr(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();
@@ -441,6 +595,19 @@ public class Operators {
 		return res;
 	}
 
+	
+	/***
+	 * Function: concatenate
+	 *  * Preconditions:
+	 * 		- parseExpression has identified operands that 
+	 * 		should be evaluated with a concatenation '#'
+	 * 		operator
+	 * Purpose: Appends one string to another
+	 * @param parser - information about  values being parsed
+	 * @param op1 	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return final value after some expression has been evaluated
+	 */
 	public static ResultValue concatenate(Parser parser, ResultValue op1, ResultValue op2)
 	{
 		ResultValue res = new ResultValue();

@@ -80,6 +80,14 @@ public class Token
 		this(""); // invoke the other constructor
 	}
 
+	/***
+	 * Function: printToken
+	 * Preconditions: 
+	 * 		- tokens have been correctly classified by the Scanner
+	 * Purpose: 
+	 * 		- prints a tokenStr based on whether or not it 
+	 * 		  contains hexChars
+	 */
 	public void printToken()
 	{
 		String primClassifStr;
@@ -134,6 +142,15 @@ public class Token
 
 	}
 
+	/***
+	 * Function: clone
+	 * TODO:
+	 * Preconditions:
+	 * 		-
+	 * Purpose:
+	 * 
+	 * @return a newToken with all the same credentials of currentToken
+	*/
 	public Token clone()
 	{
 		Token newToken = new Token();
@@ -222,6 +239,16 @@ public class Token
 		FLOW, END, IDENTIFIER, INTEGER, FLOAT, STRING, BOOLEAN, DATE, VOID, BUILTIN, DECLARE, USER
 	}
 
+	/***
+	 * Function: ResultValue
+	 * Preconditions: 
+	 * 		- currentToken is the token to be changed
+	 * 		to a ResultValue
+	 * Purpose:
+	 * 		- sets the ResultValue of the token based on DataType,
+	 * 		and structure.
+	 * @return the populated result classifications of a single token 
+	 */
 	public ResultValue toResult()
 	{
 		ResultValue res = new ResultValue();

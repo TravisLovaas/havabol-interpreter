@@ -20,7 +20,7 @@ public class Parser {
 	public boolean debugExpr = false;
 	public boolean debugAssignment = false;
 	
-	//precedence initialization
+	//precedence values while operator tokens are outside of stack
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
 		private static final long serialVersionUID = 1L;
 
@@ -28,9 +28,10 @@ public class Parser {
 		put("and", 3); put("or", 3); put("not", 4); put("in", 5); put("notin", 5);    
 		put("<", 5); put(">", 5); put("<=", 5); put(">=", 5); put("==", 5); put("!=", 5);
 		put("#", 6);  put("+", 7); put("-", 7); put("*", 8); put("/", 8); put("^", 10); put("u-", 11);
-		put("(", 12);
+		put("(", 15); put("[", 16);
 	}};
 	
+	//precedence values while tokens are on the stack
 	private final static HashMap<String, Integer> stkPrecedence = new HashMap<String, Integer>(){
 		private static final long serialVersionUID = 1L;
 
@@ -38,9 +39,14 @@ public class Parser {
 		put("and", 3); put("or", 3); put("not", 4); put("in", 5); put("notin", 5);    
 		put("<", 5); put(">", 5); put("<=", 5); put(">=", 5); put("==", 5); put("!=", 5);
 		put("#", 6);  put("+", 7); put("-", 7); put("*", 8); put("/", 8); put("^", 9); put("u-", 11);
-		put("(", 2);
+		put("(", 2); put("[", 0);
 	}};
 	
+	/***
+	 * Function/Constructor: Parser
+	 * @param sourceFilename
+	 * @param symbolTable
+	 */
 	public Parser(String sourceFilename, SymbolTable symbolTable) {
 		
 		this.symbolTable = symbolTable;
@@ -53,6 +59,11 @@ public class Parser {
 		
 	}
 	
+	/***
+	 * Function: beginParsing()
+	 * Purpose: starts the process of parsing tokens based on their
+	 * 			classification in parseStatement()
+	 */
 	public void beginParsing() {
 		scanner.getNext();
 		while (scanner.currentToken.primClassif != Token.EOF) {
@@ -61,9 +72,10 @@ public class Parser {
 	}
 	
 	/**
-	 * parseIf will call parseExpression and to get the conditional path to take
-	 * and in the if-then-else it will call parseStatement until else or endif
-	 * to correctly execute desired statements.
+	 * Function: parseIf 
+	 * Purpose: to call parseExpression and to get the conditional path to take.
+	 * 			In the if-then-else it will call parseStatement until else or endif
+	 * 			to correctly execute desired statements.
 	 * @param bExec
 	 */
 	
@@ -135,7 +147,8 @@ public class Parser {
 	}
 	
 	/**
-	 * parseWhile will evaluated the expression given to while statement and 
+	 * Function: parseWhile
+	 * Purpose: to evaluate the expression given to while statement and 
 	 * parseStatement will evaluate all the statements within the while loop
 	 * until the condition value is no longer true
 	 */
@@ -190,7 +203,13 @@ public class Parser {
 		}
 	}
 	
-	
+	/***
+	 * Function: parseFor
+	 * TODO:
+	 * Preconditions:
+	 * 		-
+	 * Purpose:
+	 */
 	private void parseFor() {
 		// for expr [in/to] expr:
 		// if 3rd token is "in", second expression
@@ -214,10 +233,13 @@ public class Parser {
 	}
 	
 	/**
+	 * Function: parseDebugStatement
 	 * Preconditions:
 	 *  - currentToken is beginning of debug statement, e.g.
 	 *  	debug token on;
 	 *      ^^^^^
+	 * Purpose: to set up printing dimensions for attributes
+	 * 			that need debugging
 	 */
 	private void parseDebugStatement() {
 		
@@ -260,7 +282,7 @@ public class Parser {
 	}
 	
 	/**
-	 * Parses a statement, ending with a semicolon.
+	 * Function: parseStatement
 	 * Preconditions: 
 	 *  - currentToken is the first token in a statement, e.g.
 	 *  			if myVar == 0:
@@ -270,6 +292,7 @@ public class Parser {
 	 *  			i = 0;
 	 *  			myVar = 1;
 	 *              ^^^^^
+	 * Purpose: Parses a statement, ending with a semicolon.
 	 */
 	private void parseStatement() {
 		/* Possible types of statements:
@@ -337,9 +360,13 @@ public class Parser {
 	}
 	
 	/**
+	 * Function: parseDeclaration
 	 * Parses a declaration statement.
 	 * Preconditions:
 	 *    - currentToken is a data type declaration
+	 * Purpose: to accurately declare tokens based on 
+	 * 			their driving data types .i.e for
+	 * 			primitives, homogenous/heterogenous arrays
 	 */
 	private void parseDeclaration() {
 		// Parse declared type
@@ -363,7 +390,9 @@ public class Parser {
 		// Check for an assignment
 		if (scanner.nextToken.tokenStr.equals("=")) {
 			parseAssignment();
-		} else if (scanner.nextToken.tokenStr.equals(";")) {
+		}else if (scanner.nextToken.tokenStr.equals("[")){
+			parseArrayRef();
+		}else if (scanner.nextToken.tokenStr.equals(";")) {
 			scanner.getNext();
 		} else {
 			throw new SyntaxError("Expected semi-colon", scanner.currentToken);
@@ -372,11 +401,12 @@ public class Parser {
 	}
 	
 	/**
-	 * parseAssignment is called for all lines of assignment
-	 * within parseExpression
+	 * Function: parseAssignment
 	 * Preconditions:
 	 *    - currentToken is an identifier
-	 *    
+	 * Purpose:
+	 * 		to parseAssignment's that are00 called for all lines
+	 * 		of an assignment within parseExpression
 	 * @return the evaluated value of the assignment
 	 */
 	private ResultValue parseAssignment() {
@@ -458,6 +488,7 @@ public class Parser {
 	}	
 	
 	/**
+	 * Function: parseArrayRef
 	 * Parses a reference to an array value or slice
 	 * Preconditions:
 	 * 	- currentToken is an array type identifier, e.g.
@@ -468,31 +499,104 @@ public class Parser {
 	private ResultValue parseArrayRef() {
 		
 		String arrayName = scanner.currentToken.tokenStr;
-		
+		String tokenStr = null;
+		ResultValue size = null, rhsExpr = null, res02 = null;
 		// assert currentToken is a valid array identifier
 		if (scanner.currentToken.primClassif != Token.IDENTIFIER ||
 			!symbolTable.containsSymbol(arrayName)) {
 			throw new SyntaxError("Expected an identifier for array reference", scanner.currentToken);
 		}
 		
-		ResultValue array = symbolTable.getSymbol(arrayName).getValue();
+		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
 		
-		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
+		if (array == null) {
+			throw new DeclarationError("Reference to undeclared identifier found", scanner.currentToken);
+		}
+		
+		scanner.getNext();  //get "["
+		
+		//TODO: ASK can a string be passed as an argument to array and be coerced?
+		if(scanner.nextToken.primClassif == Token.OPERAND){
+			//should be an int as argument to array
+			tokenStr = scanner.getNext();
+			//int size = 0;
+			switch(scanner.currentToken.subClassif){
+				case Token.IDENTIFIER:
+					size = symbolTable.getSymbol(tokenStr).getValue();
+					break;
+				case Token.INTEGER:
+					size = scanner.currentToken.toResult();
+					break;
+					//case Token.FLOAT:
+					//case Token.STRING:
+					//maybe try to coerce?
+				default:
+					throw new TypeError("Found invalid array argument type", scanner.currentToken);
+			}	
+			System.out.println("size = " + size.intValue);
+		}
+		if(scanner.nextToken.tokenStr.equals("]")){
+			scanner.getNext();  //get "]"
+			//expecting semicolon or assignment
+			if(scanner.nextToken.equals("=")){
+				scanner.getNext(); //get =
+				if(size == null){
+					//can grow unbounded;
+				}else{
+					int count = 0;
+					while(!scanner.getNext().equals(";") && (count < size.intValue)){
+						//on some number
+						res02 = parseExpression(",");
+						// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
+						rhsExpr = res02.asType(this, array.declaredType); // Parse expression on right-hand side of assignment
+						array.setValue(rhsExpr);
+						count++;
+					}
+				}
+			}
+		}else
+			throw new SyntaxError("Expected closing bracket ']' for array reference", scanner.currentToken);
+
+		System.out.println("----> token = " + scanner.currentToken.tokenStr + "<-----");
+
+		/*
+		ResultValue res02, rhsExpr = null;
+		
+		String token = scanner.getNext();
+
+		// Next token should be an assignment operator
+		switch (token) {
+			case "=":
+				//next token should be an expression
+				scanner.getNext();
+				//System.out.println("check = " + check);
+				res02 = parseExpression(";");
+				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
+				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
+				variable.setValue(rhsExpr);
+				break;
+				*/
+		//System.out.println("-----> array = " + symbolTable.getSymbol(arrayName).getValue());
+		
+
+	/*	if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
 			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
 		}
 		// precondition should be true
 		
-		// TODO
-		throw new UnsupportedOperationError("array reference not yet implemented");
+		// TODO*/
+		//throw new UnsupportedOperationError("array reference not yet implemented");
+		return rhsExpr;
 	}
 
 	/**
-	 * Parses a function call
+	 * Function: parseFunctionCall
 	 * Preconditions:
 	 *    - currentToken is the name of a function in a function call, e.g.
 	 *           print("hello", "world");
 	 *      	 ^^^^^
-	 * @return
+	 * Purpose: Parses a function call
+	 * @return the result of function call
 	 */
 	private ResultValue parseFunctionCall() {
 		
@@ -553,9 +657,12 @@ public class Parser {
 	}
 	
 	/***
-	 * Assumption: parseExpression is called before potential
-	 * infix expression
-	 * Creates a postFix expression from stack
+	 * Function: ParseExpression
+	 * Preconditions: parseExpression is called on the first
+	 * 				  token of a potential infix expression
+	 * Purpose: to create a postFix expression from an input 
+	 *			infix expression and evaluate the expression
+	 *			correctly depending on its operator.
 	 * @return the evaluated value of an expression
 	 */
 	private ResultValue parseExpression(String terminatingStr) throws SyntaxError{
