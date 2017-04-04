@@ -61,10 +61,10 @@ public class SymbolTable {
 	 */
 
 	public STEntry getSymbol(String symbol){
-		if(ST.containsKey(symbol)){
+		if (ST.containsKey(symbol)){
 			return (STEntry) ST.get(symbol);
-		}else{
-			throw new DeclarationError("Attempted to access value of undeclared idendtifier");
+		} else {
+			throw new DeclarationError("Attempted to access value of undeclared identifier");
 		}
 
 	}

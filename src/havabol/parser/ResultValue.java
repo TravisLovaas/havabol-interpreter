@@ -14,6 +14,7 @@ public class ResultValue {
 	public int intValue;
 	public double floatValue;
 	public boolean booleanValue;
+	public int numItems;
 	public List<ResultValue> arrayValue;
 	public Structure structure;
 	public String terminatingStr;

@@ -363,7 +363,14 @@ public class Parser {
 	 * Function: parseDeclaration
 	 * Parses a declaration statement.
 	 * Preconditions:
-	 *    - currentToken is a data type declaration
+	 *    - currentToken is a data type control token
+	 * Examples of declaration statements:
+	 *    Int i = 0;             // primitive = 0
+	 *    Int j;                 // primitive with no value
+	 *    Int arr[10];           // fixed array size 10 [0 ...]
+	 *    Int arr[unbound];      // unbounded array
+	 *    Int arr[] = 1, 2, 3;   // fixed array size 3 [1, 2, 3]
+	 *    Int arr[10] = 1, 2, 3; // fixed array size 10 [1, 2, 3, 0 ...]
 	 * Purpose: to accurately declare tokens based on 
 	 * 			their driving data types .i.e for
 	 * 			primitives, homogenous/heterogenous arrays
@@ -371,32 +378,97 @@ public class Parser {
 	private void parseDeclaration() {
 		// Parse declared type
 		DataType declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
-		Structure structure = Structure.PRIMITIVE;
 		String identifier;
 		
-		// Next token is name of variable
-		if (scanner.nextToken.subClassif == Token.IDENTIFIER) {
-			identifier = scanner.nextToken.tokenStr;
+		scanner.getNext(); // currentToken should be identifier
+		
+		// Current token should be name of variable
+		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+			identifier = scanner.currentToken.tokenStr;
 		} else {
 			throw new DeclarationError("Expected an identifier", scanner.nextToken);
 		}
 		
-		// Create symbol table entry
-		symbolTable.createSymbol(this, identifier, new STIdentifier(identifier, Token.OPERAND, declaredType, structure, "", 0));
+		STIdentifier variable; // symbol table entry for this variable
+		ResultValue rhsExpr; // right hand side of assignment if it exists
 		
-		scanner.getNext();
-		// currentToken should now be an identifier
-		
-		// Check for an assignment
-		if (scanner.nextToken.tokenStr.equals("=")) {
-			parseAssignment();
-		}else if (scanner.nextToken.tokenStr.equals("[")){
-			parseArrayRef();
-		}else if (scanner.nextToken.tokenStr.equals(";")) {
+		// Next token is either "=" (primitive) or "[" (array)
+		switch (scanner.getNext()) {
+		case "=": // expecting a primitive value
+			
+			variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
+			
+			// Get value of right hand side
 			scanner.getNext();
-		} else {
-			throw new SyntaxError("Expected semi-colon", scanner.currentToken);
+			rhsExpr = parseExpression(";");
+			
+			if (rhsExpr.structure != Structure.PRIMITIVE) {
+				throw new TypeError("Right hand side of assignment must be a primitive value if variable is primitive", scanner.currentToken);
+			}
+			
+			// Check and cast (if necessary) type and store value
+			rhsExpr = rhsExpr.asType(this, variable.declaredType);
+			variable.setValue(rhsExpr);
+			
+			break;
+		case "[":
+			// Array is being declared
+			switch (scanner.getNext()) {
+			case "unbound":
+				variable = new STIdentifier(identifier, declaredType, Structure.UNBOUNDED_ARRAY, "", 0);
+
+				rhsExpr = parseValueList(";");
+				variable.setValue(rhsExpr);
+				
+				break;
+			case "]": // Array size depends on the length of given value list
+				variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+				
+				rhsExpr = parseValueList(";");
+				variable.setValue(rhsExpr);
+				variable.declaredSize = rhsExpr.numItems;
+				
+				break;
+			default:
+				if (scanner.currentToken.subClassif == Token.INTEGER) { // Given fixed array size
+					variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+					variable.declaredSize = scanner.currentToken.toResult().asInteger(this).intValue;	
+				} else {
+					throw new SyntaxError("Found invalid size of declared array. Expected an integer, `unbound`, or nothing", scanner.currentToken);
+				}
+				
+				rhsExpr = parseValueList(";");
+				variable.setValue(rhsExpr);
+				
+				break;
+			}
+			
+			break;
+		case ";": // no initialization clause
+			variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
+			break;
+		default:
+			throw new SyntaxError("Expected an assignment '=', array type specifier, or semicolon in declaration", scanner.currentToken);
 		}
+		
+		symbolTable.createSymbol(this, identifier, variable);
+		
+	}
+	
+	/**
+	 * Parses a list of literal values for an array initialization or assignment
+	 * Preconditions:
+	 * 		currentToken is the beginning of a value list:
+	 * 		String fruit[] = "apple", "pear", "orange";
+	 *                       ^^^^^^^
+	 * @param terminatingStr the token string that says to stop parsing values
+	 * @return a ResultValue representing a value list
+	 */
+	private ResultValue parseValueList(String terminatingStr) {
+		
+		// TODO implement
+		
+		return null;
 		
 	}
 	
@@ -405,7 +477,7 @@ public class Parser {
 	 * Preconditions:
 	 *    - currentToken is an identifier
 	 * Purpose:
-	 * 		to parseAssignment's that are00 called for all lines
+	 * 		to parseAssignment's that are called for all lines
 	 * 		of an assignment within parseExpression
 	 * @return the evaluated value of the assignment
 	 */
@@ -494,7 +566,7 @@ public class Parser {
 	 * 	- currentToken is an array type identifier, e.g.
 	 * 		j = tArray[2~4];
 	 *          ^^^^^^		
-	 * @return
+	 * @return a ResultValue with the values of the referenced array
 	 */
 	private ResultValue parseArrayRef() {
 		

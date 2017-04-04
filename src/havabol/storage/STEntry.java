@@ -25,6 +25,9 @@ public class STEntry
 	}
 	
 	public void setValue(ResultValue value) {
+		
+		// TODO: check size and move to STIdentifier
+		
 		this.value = value;
 		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
 	}

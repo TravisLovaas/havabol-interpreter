@@ -12,8 +12,8 @@ public class STIdentifier extends STEntry
 	/*
 	 * Constructor for STIdentifier subclass
 	 */
-	public STIdentifier(String tokenStr, int primClassif, DataType declaredType, Structure structure, String parm, int nonLocal) {
-		super(tokenStr, primClassif);
+	public STIdentifier(String tokenStr, DataType declaredType, Structure structure, String parm, int nonLocal) {
+		super(tokenStr, 0);
 		this.declaredType = declaredType;
 		this.structure = structure;
 		this.parm = parm;
@@ -22,6 +22,7 @@ public class STIdentifier extends STEntry
 	
 	public DataType declaredType;
 	public Structure structure;
+	public int declaredSize = 1;
 	public String parm;
 	public int nonLocal;
 	
