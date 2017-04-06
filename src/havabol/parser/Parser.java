@@ -389,70 +389,72 @@ public class Parser {
 			throw new DeclarationError("Expected an identifier", scanner.nextToken);
 		}
 		
-		STIdentifier variable; // symbol table entry for this variable
+		STIdentifier variable = null; // symbol table entry for this variable
 		ResultValue rhsExpr; // right hand side of assignment if it exists
 		
 		// Next token is either "=" (primitive) or "[" (array)
 		switch (scanner.getNext()) {
-		case "=": // expecting a primitive value
-			
-			variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
-			
-			// Get value of right hand side
-			scanner.getNext();
-			rhsExpr = parseExpression(";");
-			
-			if (rhsExpr.structure != Structure.PRIMITIVE) {
-				throw new TypeError("Right hand side of assignment must be a primitive value if variable is primitive", scanner.currentToken);
-			}
-			
-			// Check and cast (if necessary) type and store value
-			rhsExpr = rhsExpr.asType(this, variable.declaredType);
-			variable.setValue(rhsExpr);
-			
-			break;
-		case "[":
-			// Array is being declared
-			switch (scanner.getNext()) {
-			case "unbound":
-				variable = new STIdentifier(identifier, declaredType, Structure.UNBOUNDED_ARRAY, "", 0);
-
-				rhsExpr = parseValueList(";");
-				variable.setValue(rhsExpr);
+			case "=": // expecting a primitive value
 				
-				break;
-			case "]": // Array size depends on the length of given value list
-				variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+				variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
 				
-				rhsExpr = parseValueList(";");
-				variable.setValue(rhsExpr);
-				variable.declaredSize = rhsExpr.numItems;
+				// Get value of right hand side
+				scanner.getNext();
+				rhsExpr = parseExpression(";");
 				
-				break;
-			default:
-				if (scanner.currentToken.subClassif == Token.INTEGER) { // Given fixed array size
-					variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
-					variable.declaredSize = scanner.currentToken.toResult().asInteger(this).intValue;	
-				} else {
-					throw new SyntaxError("Found invalid size of declared array. Expected an integer, `unbound`, or nothing", scanner.currentToken);
+				if (rhsExpr.structure != Structure.PRIMITIVE) {
+					throw new TypeError("Right hand side of assignment must be a primitive value if variable is primitive", scanner.currentToken);
 				}
 				
-				rhsExpr = parseValueList(";");
+				// Check and cast (if necessary) type and store value
+				rhsExpr = rhsExpr.asType(this, variable.declaredType);
 				variable.setValue(rhsExpr);
 				
 				break;
-			}
-			
-			break;
-		case ";": // no initialization clause
-			variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
-			break;
-		default:
-			throw new SyntaxError("Expected an assignment '=', array type specifier, or semicolon in declaration", scanner.currentToken);
+			case "[":
+				// Array is being declared
+				switch (scanner.getNext()) {
+					case "unbound":
+						variable = new STIdentifier(identifier, declaredType, Structure.UNBOUNDED_ARRAY, "", 0);
+						rhsExpr = parseValueList(";");
+						variable.setValue(rhsExpr);
+						break;
+					case "]": // Array size depends on the length of given value list
+						variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+						rhsExpr = parseValueList(";");
+						variable.setValue(rhsExpr);
+						variable.declaredSize = rhsExpr.numItems;
+						break;
+					default:
+						//array size might be an expression
+						ResultValue value = parseExpression("]");
+						//if (scanner.currentToken.subClassif == Token.INTEGER) { // Given fixed array size
+						if(value.dataType == DataType.INTEGER){
+							variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+							variable.declaredSize = value.intValue;	
+							//variable.declaredSize = scanner.currentToken.toResult().asInteger(this).intValue;	
+						} else {
+							throw new SyntaxError("Found invalid size of declared array. Expected an integer, `unbound`, or nothing", scanner.currentToken);
+						}
+						if(!scanner.currentToken.tokenStr.equals("]")){
+							throw new SyntaxError("Expected a closing parenthesis ']'");
+						}
+						
+						//could be assigned
+						//scanner.getNext();
+						rhsExpr = parseValueList(";");
+						variable.setValue(rhsExpr);
+						//System.out.println("-----> I do get in here <----" + variable.getValue());
+						break;
+				}
+				break;
+				case ";": // no initialization clause
+					variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
+					break;
+				default:
+					throw new SyntaxError("Expected an assignment '=', array type specifier, or semicolon in declaration", scanner.currentToken);
 		}
-		
 		symbolTable.createSymbol(this, identifier, variable);
-		
 	}
 	
 	/**
@@ -467,8 +469,17 @@ public class Parser {
 	private ResultValue parseValueList(String terminatingStr) {
 		
 		// TODO implement
+		ResultValue array = new ResultValue();
+		int count = 1;
+		while(!scanner.currentToken.tokenStr.equals(terminatingStr)){
+			System.out.println("I'm here" + scanner.currentToken.tokenStr);
+			//array.arrayValue.add(scanner.currentToken.toResult());
+			scanner.getNext();
+			count++;
+		}
+		array.numItems = count;
 		
-		return null;
+		return array;
 		
 	}
 	
@@ -571,94 +582,16 @@ public class Parser {
 	private ResultValue parseArrayRef() {
 		
 		String arrayName = scanner.currentToken.tokenStr;
-		String tokenStr = null;
-		ResultValue size = null, rhsExpr = null, res02 = null;
-		// assert currentToken is a valid array identifier
-		if (scanner.currentToken.primClassif != Token.IDENTIFIER ||
-			!symbolTable.containsSymbol(arrayName)) {
-			throw new SyntaxError("Expected an identifier for array reference", scanner.currentToken);
-		}
 		
 		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
-		
-		if (array == null) {
-			throw new DeclarationError("Reference to undeclared identifier found", scanner.currentToken);
-		}
-		
-		scanner.getNext();  //get "["
-		
-		//TODO: ASK can a string be passed as an argument to array and be coerced?
-		if(scanner.nextToken.primClassif == Token.OPERAND){
-			//should be an int as argument to array
-			tokenStr = scanner.getNext();
-			//int size = 0;
-			switch(scanner.currentToken.subClassif){
-				case Token.IDENTIFIER:
-					size = symbolTable.getSymbol(tokenStr).getValue();
-					break;
-				case Token.INTEGER:
-					size = scanner.currentToken.toResult();
-					break;
-					//case Token.FLOAT:
-					//case Token.STRING:
-					//maybe try to coerce?
-				default:
-					throw new TypeError("Found invalid array argument type", scanner.currentToken);
-			}	
-			System.out.println("size = " + size.intValue);
-		}
-		if(scanner.nextToken.tokenStr.equals("]")){
-			scanner.getNext();  //get "]"
-			//expecting semicolon or assignment
-			if(scanner.nextToken.equals("=")){
-				scanner.getNext(); //get =
-				if(size == null){
-					//can grow unbounded;
-				}else{
-					int count = 0;
-					while(!scanner.getNext().equals(";") && (count < size.intValue)){
-						//on some number
-						res02 = parseExpression(",");
-						// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
-						rhsExpr = res02.asType(this, array.declaredType); // Parse expression on right-hand side of assignment
-						array.setValue(rhsExpr);
-						count++;
-					}
-				}
-			}
-		}else
-			throw new SyntaxError("Expected closing bracket ']' for array reference", scanner.currentToken);
 
-		System.out.println("----> token = " + scanner.currentToken.tokenStr + "<-----");
 
-		/*
-		ResultValue res02, rhsExpr = null;
-		
-		String token = scanner.getNext();
-
-		// Next token should be an assignment operator
-		switch (token) {
-			case "=":
-				//next token should be an expression
-				scanner.getNext();
-				//System.out.println("check = " + check);
-				res02 = parseExpression(";");
-				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
-				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
-				variable.setValue(rhsExpr);
-				break;
-				*/
-		//System.out.println("-----> array = " + symbolTable.getSymbol(arrayName).getValue());
-		
-
-	/*	if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
+		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
 			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
 		}
-		// precondition should be true
 		
-		// TODO*/
-		//throw new UnsupportedOperationError("array reference not yet implemented");
-		return rhsExpr;
+		throw new UnsupportedOperationError("array reference not yet implemented");
+		//return rhsExpr;
 	}
 
 	/**
@@ -747,7 +680,8 @@ public class Parser {
 		boolean containsOperator = false;
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 		
-		while (!(token.equals(";") || token.equals(":") || token.equals(","))) {
+		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]"))) {
+			//System.out.println("In parse expr");
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND)
