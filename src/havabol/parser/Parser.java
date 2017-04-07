@@ -599,11 +599,13 @@ public class Parser {
 		
 		scanner.getNext();
 		
-		// currentToken should now be a number
+		// currentToken may be an integer or slice operator:
 		//   tArray[2~4]
-		//          ^
+		//   tArray[~4]
+		//   tArray[2~]
+		//   tArray[2]
 		
-		if (scanner.currentToken.subClassif != Token.INTEGER) {
+		if (!scanner.currentToken.tokenStr.equals("~") && scanner.currentToken.subClassif != Token.INTEGER) {
 			throw new SyntaxError("Expected index or beginning of slice", scanner.currentToken);
 		}
 		
@@ -620,20 +622,26 @@ public class Parser {
 		case "~":
 			// Slice
 			
-			scanner.getNext();
-			if (scanner.currentToken.subClassif != Token.INTEGER) {
-				throw new SyntaxError("Expected index to end slice", scanner.currentToken);
-			}
+			throw new UnsupportedOperationError("Array slicing not supported");
 			
-			int endSliceIndex = scanner.currentToken.toResult().asInteger(this).intValue;
-			
-			// TODO: check and fetch multivalue
-			
-			if (!scanner.getNext().equals("]")) {
-				throw new SyntaxError("Expected ] to end array slice", scanner.currentToken);
-			}
-			
-			break;
+//			int endSliceIndex = 0;
+//			
+//			scanner.getNext();
+//			if (scanner.currentToken.tokenStr.equals("]")) {
+//				endSliceIndex = array.getValue().numItems;
+//			} else if (scanner.currentToken.subClassif == Token.INTEGER) {
+//				endSliceIndex = scanner.currentToken.toResult().asInteger(this).intValue;
+//			} else {
+//				throw new SyntaxError("Expected index to end slice", scanner.currentToken);
+//			}
+//			
+//			// TODO: check and fetch multivalue
+//			
+//			if (!scanner.getNext().equals("]")) {
+//				throw new SyntaxError("Expected ] to end array slice", scanner.currentToken);
+//			}
+//			
+//			break;
 		default:
 			throw new SyntaxError("Expected ] or slice operator ~", scanner.currentToken);
 		}
