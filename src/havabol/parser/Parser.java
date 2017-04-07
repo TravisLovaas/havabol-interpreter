@@ -581,17 +581,64 @@ public class Parser {
 	 */
 	private ResultValue parseArrayRef() {
 		
+		if (scanner.currentToken.subClassif != Token.IDENTIFIER) {
+			throw new SyntaxError("Expected identifer at beginning of array reference", scanner.currentToken);
+		}
+		
 		String arrayName = scanner.currentToken.tokenStr;
 		
 		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
-
 
 		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
 			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
 		}
 		
-		throw new UnsupportedOperationError("array reference not yet implemented");
-		//return rhsExpr;
+		if (!scanner.getNext().equals("[")) {
+			throw new SyntaxError("Expected [ following array reference in expression", scanner.currentToken);
+		}
+		
+		scanner.getNext();
+		
+		// currentToken should now be a number
+		//   tArray[2~4]
+		//          ^
+		
+		if (scanner.currentToken.subClassif != Token.INTEGER) {
+			throw new SyntaxError("Expected index or beginning of slice", scanner.currentToken);
+		}
+		
+		int beginSliceIndex = scanner.currentToken.toResult().asInteger(this).intValue;
+		ResultValue result = null;
+		
+		switch (scanner.getNext()) {
+		case "]":
+			// Singular array value
+			
+			// TODO: check and fetch array value
+			
+			break;
+		case "~":
+			// Slice
+			
+			scanner.getNext();
+			if (scanner.currentToken.subClassif != Token.INTEGER) {
+				throw new SyntaxError("Expected index to end slice", scanner.currentToken);
+			}
+			
+			int endSliceIndex = scanner.currentToken.toResult().asInteger(this).intValue;
+			
+			// TODO: check and fetch multivalue
+			
+			if (!scanner.getNext().equals("]")) {
+				throw new SyntaxError("Expected ] to end array slice", scanner.currentToken);
+			}
+			
+			break;
+		default:
+			throw new SyntaxError("Expected ] or slice operator ~", scanner.currentToken);
+		}
+		
+		return result;
 	}
 
 	/**
