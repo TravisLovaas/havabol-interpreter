@@ -620,56 +620,83 @@ public class Parser {
 		ResultValue res02, rhsExpr = null;
 		
 		String token = scanner.getNext();
+		
+		// Primitive assignment
+		if (token.contains("=")) {
 
-		// Next token should be an assignment operator
-		switch (token) {
-			case "=":
-				scanner.getNext();
-				//System.out.println("check = " + check);
-				res02 = parseExpression(";");
-				// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
-				rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
-				variable.setValue(rhsExpr);
-				break;
-			case "+=":
-				scanner.getNext();
-				res02 = parseExpression(";");
-				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, Operators should figure out if it is valid
-				rhsExpr = Operators.subtract(this, res01, res02);
-				variable.setValue(rhsExpr);
-				break;
-			case "-=":
-				scanner.getNext();
-				res02 = parseExpression(";");
-				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, Operators should figure out if it is valid
-				rhsExpr = Operators.add(this, res01, res02);
-				variable.setValue(rhsExpr);
-				break;
-			case "*=":
-				scanner.getNext();
-				res02 = parseExpression(";");
-				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, Operators should figure out if it is valid
-
-				rhsExpr = Operators.multiply(this, res01, res02);
-				variable.setValue(rhsExpr);
-				break;
-			case "/=":
-				scanner.getNext();
-				res02 = parseExpression(";");
-				res01 = symbolTable.getSymbol(identifier).getValue();
-				//run the subtract, Operators should figure out if it is valid
-				rhsExpr = Operators.divide(this, res01, res02);
-				variable.setValue(rhsExpr);
-				break;
-			default:
-				if(bin){
-					rhsExpr = symbolTable.getSymbol(identifier).getValue();
+			// Next token should be an assignment operator
+			switch (token) {
+				case "=":
+					scanner.getNext();
+					//System.out.println("check = " + check);
+					res02 = parseExpression(";");
+					// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
+					rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
+					variable.setValue(rhsExpr);
 					break;
-				}
-				throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
+				case "+=":
+					scanner.getNext();
+					res02 = parseExpression(";");
+					res01 = symbolTable.getSymbol(identifier).getValue();
+					//run the subtract, Operators should figure out if it is valid
+					rhsExpr = Operators.subtract(this, res01, res02);
+					variable.setValue(rhsExpr);
+					break;
+				case "-=":
+					scanner.getNext();
+					res02 = parseExpression(";");
+					res01 = symbolTable.getSymbol(identifier).getValue();
+					//run the subtract, Operators should figure out if it is valid
+					rhsExpr = Operators.add(this, res01, res02);
+					variable.setValue(rhsExpr);
+					break;
+				case "*=":
+					scanner.getNext();
+					res02 = parseExpression(";");
+					res01 = symbolTable.getSymbol(identifier).getValue();
+					//run the subtract, Operators should figure out if it is valid
+	
+					rhsExpr = Operators.multiply(this, res01, res02);
+					variable.setValue(rhsExpr);
+					break;
+				case "/=":
+					scanner.getNext();
+					res02 = parseExpression(";");
+					res01 = symbolTable.getSymbol(identifier).getValue();
+					//run the subtract, Operators should figure out if it is valid
+					rhsExpr = Operators.divide(this, res01, res02);
+					variable.setValue(rhsExpr);
+					break;
+				default:
+					if(bin){
+						rhsExpr = symbolTable.getSymbol(identifier).getValue();
+						break;
+					}
+					throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
+			}
+		
+		} else if (token.equals("[")) {
+			// Array
+			scanner.getNext(); // get array index for assignment
+			
+			if (scanner.currentToken.subClassif != Token.INTEGER) {
+				throw new SyntaxError("Expected index in bracketed array reference in assignment", scanner.currentToken);
+			}
+			
+			int assignmentIndex = scanner.currentToken.toResult().asInteger(this).intValue;
+			
+			// next token should be "]"
+			if (!scanner.getNext().equals("]")) {
+				throw new SyntaxError("Expected closing bracket after index in assignment", scanner.currentToken);
+			}
+			
+			// next token should be "="
+			if (!scanner.getNext().equals("=")) {
+				throw new SyntaxError("Expected assignment operator after array reference in assignment", scanner.currentToken);
+			}
+			
+		} else {
+			throw new SyntaxError("Expected array reference or assignment operator", scanner.currentToken);
 		}
 		
 		if (debugAssignment) {
@@ -727,7 +754,7 @@ public class Parser {
 		case "]":
 			// Singular array value
 			
-			// TODO: check and fetch array value
+			result = array.getValue().fetch(this, beginSliceIndex);
 			
 			break;
 		case "~":

@@ -4,6 +4,7 @@ import havabol.storage.*;
 
 import java.util.List;
 
+import havabol.error.IndexError;
 import havabol.error.TypeError;
 import havabol.lexer.*;
 
@@ -15,7 +16,7 @@ public class ResultValue {
 	public double floatValue;
 	public boolean booleanValue;
 	public int numItems;
-	public List<ResultValue> arrayValue;
+	public ResultValue[] arrayValue;
 	public Structure structure;
 	public String terminatingStr;
 	
@@ -52,6 +53,47 @@ public class ResultValue {
 		this.dataType = DataType.VOID;
 		this.structure = Structure.VOID;
 		return this;
+	}
+	
+	/**
+	 * Stores the given ResultValue into the index of this array ResultValue
+	 * @param parser Calling parser object
+	 * @param index index to set in this array
+	 * @param value value to set at the given index
+	 */
+	public void set(Parser parser, int index, ResultValue value) {
+		
+		if (this.structure == Structure.PRIMITIVE) {
+			throw new IndexError("Cannot refer to an index of a primitive value");
+		}
+		
+		// TODO: add value to array
+		
+	}
+	
+	/**
+	 * Fetches the ResultValue at the given array index if this ResultValue
+	 * is an array value.
+	 * @param parser Havabol parser that called this method
+	 * @param index Index to access in array value
+	 * @return a primitive ResultValue corresponding to the value at the given index
+	 */
+	public ResultValue fetch(Parser parser, int index) {
+		
+		if (this.structure == Structure.PRIMITIVE) {
+			throw new IndexError("Cannot refer to an index of a primitive value");
+		}
+		
+		if (index >= this.arrayValue.length) {
+			throw new IndexError("Internal array index is out of bounds");
+		}
+		
+		if (index >= this.numItems) {
+			throw new IndexError("Array index is out of bounds");
+		}
+		
+		return this.arrayValue[index];
+		
 	}
 	
 	public ResultValue asInteger(Parser parser) {
