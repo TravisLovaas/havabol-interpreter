@@ -35,8 +35,7 @@ public class TestHavaBol
     	// Find all input files
     	File[] inputFiles = sourceDir.listFiles(new FilenameFilter() {
     		public boolean accept(File dir, String name) {
-    			//return name.matches("^p4.*\\.txt$");
-    			return name.matches("^p4TestStuff.txt$");
+    			return name.matches("^p4.*\\.txt$");
     		}
     	});
     	
