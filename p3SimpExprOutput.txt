@@ -1,0 +1,6 @@
+p3SimpExpr.txt
+variables: 2 * 3 = 6
+constants: 2 * 3 = 6
+right: 12 > 3
+right: 12 >= 3.0
+right: string 12 > 3 is F

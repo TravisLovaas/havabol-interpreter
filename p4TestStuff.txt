@@ -1,0 +1,23 @@
+Int iSimp = 50;
+print ("iSimp=", iSimp);
+
+print("Array C with elements printed using constant subscripts");
+
+
+for 1 to 5:
+	print("Ayy");
+endfor;
+
+for 1 to 5 by 2:
+	print("Ayy2");
+endfor;
+
+for i = 1 to 5:
+	print("Test 2");
+endfor;
+
+String test;
+test = "test";
+for a = "t" in test:
+	print("\tLmao\n");
+endfor; 
