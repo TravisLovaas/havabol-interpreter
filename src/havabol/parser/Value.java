@@ -4,64 +4,67 @@ import havabol.storage.*;
 
 import java.util.List;
 
+import havabol.error.IndexError;
 import havabol.error.TypeError;
 import havabol.lexer.*;
 
-public class ResultValue {
+/**
+ * Represents a primitive value in Havabol
+ */
+public class Value {
 	
 	public DataType dataType;
 	public String strValue;
 	public int intValue;
 	public double floatValue;
 	public boolean booleanValue;
-	public int numItems;
-	public List<ResultValue> arrayValue;
+	
 	public Structure structure;
 	public String terminatingStr;
 	
-	public ResultValue() {
+	public Value() {
 		this.dataType = DataType.VOID;
 		this.structure = Structure.VOID;
 	}
 	
-	public ResultValue(int intValue) {
+	public Value(int intValue) {
 		this.dataType = DataType.INTEGER;
 		this.structure = Structure.PRIMITIVE;
 		this.intValue = intValue;
 	}
 	
-	public ResultValue(double floatValue) {
+	public Value(double floatValue) {
 		this.dataType = DataType.FLOAT;
 		this.structure = Structure.PRIMITIVE;
 		this.floatValue = floatValue;
 	}
 	
-	public ResultValue(String strValue) {
+	public Value(String strValue) {
 		this.dataType = DataType.STRING;
 		this.structure = Structure.PRIMITIVE;
 		this.strValue = strValue;
 	}
 	
-	public ResultValue(boolean booleanValue) {
+	public Value(boolean booleanValue) {
 		this.dataType = DataType.BOOLEAN;
 		this.structure = Structure.PRIMITIVE;
 		this.booleanValue = booleanValue;
 	}
 	
-	public ResultValue asVoid() {
+	public Value asVoid() {
 		this.dataType = DataType.VOID;
 		this.structure = Structure.VOID;
 		return this;
 	}
 	
-	public ResultValue asInteger(Parser parser) {
+	public Value asInteger(Parser parser) {
 		
 		if (this.dataType == DataType.INTEGER) {
 			// nothing to do
 			return this;
 		}
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.INTEGER;
 		
@@ -78,14 +81,14 @@ public class ResultValue {
 		
 	}
 	
-	public ResultValue asFloat(Parser parser) {
+	public Value asFloat(Parser parser) {
 		
 		if (this.dataType == DataType.FLOAT) {
 			// nothing to do
 			return this;
 		}
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.FLOAT;
 		
@@ -102,14 +105,14 @@ public class ResultValue {
 		
 	}
 	
-	public ResultValue asString(Parser parser) {
+	public Value asString(Parser parser) {
 		
 		if (this.dataType == DataType.STRING) {
 			// nothing to do
 			return this;
 		}
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.STRING;
 		
@@ -129,14 +132,14 @@ public class ResultValue {
 		
 	}
 	
-	public ResultValue asBoolean(Parser parser) {
+	public Value asBoolean(Parser parser) {
 		
 		if (this.dataType == DataType.BOOLEAN) {
 			// nothing to do
 			return this;
 		}
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.STRING;
 		
@@ -164,7 +167,7 @@ public class ResultValue {
 		
 	}
 	
-	public ResultValue asType(Parser parser, DataType dataType) {
+	public Value asType(Parser parser, DataType dataType) {
 		switch (dataType) {
 		case INTEGER:
 			return this.asInteger(parser);

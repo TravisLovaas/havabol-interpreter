@@ -2,7 +2,7 @@ package havabol.lexer;
 
 import java.util.*;
 
-import havabol.parser.ResultValue;
+import havabol.parser.Value;
 import havabol.storage.DataType;
 import havabol.storage.Structure;
 
@@ -249,9 +249,9 @@ public class Token
 	 * 		and structure.
 	 * @return the populated result classifications of a single token 
 	 */
-	public ResultValue toResult()
+	public Value toResult()
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		
 		switch (this.subClassif) {
 		case INTEGER:

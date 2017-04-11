@@ -1,7 +1,7 @@
 package havabol.storage;
 
 import havabol.parser.Parser;
-import havabol.parser.ResultValue;
+import havabol.parser.Value;
 
 /*
  *  STEntry class for handling Symbol Table entries.
@@ -18,13 +18,13 @@ public class STEntry
 
 	public String symbol;
 	public int primClassif;
-	private ResultValue value;
+	private Value value;
 	
 	public String toString() {
 		return String.format("GENERIC ENTRY: %s: %d", symbol, primClassif);
 	}
 	
-	public void setValue(ResultValue value) {
+	public void setValue(Value value) {
 		
 		// TODO: check size and move to STIdentifier
 		
@@ -32,7 +32,7 @@ public class STEntry
 		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
 	}
 	
-	public ResultValue getValue() {
+	public Value getValue() {
 		return this.value;
 	}
 	

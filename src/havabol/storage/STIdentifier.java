@@ -1,7 +1,6 @@
 package havabol.storage;
 
-import havabol.parser.Parser;
-import havabol.parser.ResultValue;
+import havabol.parser.*;
 import havabol.storage.*;
 
 /*
@@ -25,6 +24,9 @@ public class STIdentifier extends STEntry
 	public int declaredSize = 1;
 	public String parm;
 	public int nonLocal;
+	
+	public MultiValue arrayValue;
+	public Value primitiveValue;
 	
 	public String toString() {
 		return String.format("IDENTIFIER: %s: %s %s %s %d", symbol, declaredType, structure, parm, nonLocal);

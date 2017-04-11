@@ -19,11 +19,11 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue add(Parser parser, ResultValue op1, ResultValue op2) {
+	public static Value add(Parser parser, Value op1, Value op2) {
 		
 		//System.out.print("add: " + op1 + " " + op2);
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		
 		switch (op1.dataType) {
 		case INTEGER:
@@ -70,11 +70,11 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue subtract(Parser parser, ResultValue op1, ResultValue op2) {
+	public static Value subtract(Parser parser, Value op1, Value op2) {
 		
 		//System.out.print("subtract: " + op1 + " " + op2);
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		
 		DataType resultType = op1.dataType;
 		
@@ -119,11 +119,11 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue multiply(Parser parser, ResultValue op1, ResultValue op2) {
+	public static Value multiply(Parser parser, Value op1, Value op2) {
 		
 		//System.out.print("multiply: " + op1 + " " + op2);
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		
 		DataType resultType = op1.dataType;
 		
@@ -168,11 +168,11 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue divide(Parser parser, ResultValue op1, ResultValue op2) {
+	public static Value divide(Parser parser, Value op1, Value op2) {
 		
 		//System.out.print("divide: " + op1 + " " + op2);
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		
 		DataType resultType = op1.dataType;
 		
@@ -217,11 +217,11 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue exponentiate(Parser parser, ResultValue op1, ResultValue op2) {
+	public static Value exponentiate(Parser parser, Value op1, Value op2) {
 		
 		//System.out.print("exponentiate: " + op1 + " " + op2);
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		
 		// op1 dataType determines result of 
 		if (op1.dataType == DataType.INTEGER) {
@@ -256,10 +256,10 @@ public class Operators {
 	 * @param op1	 - operand to be evaluated with '-1'
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue unaryMinus(Parser parser, ResultValue op1)
+	public static Value unaryMinus(Parser parser, Value op1)
 	{
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.dataType = op1.dataType;
 		res.structure = Structure.PRIMITIVE;
 		
@@ -285,10 +285,10 @@ public class Operators {
 	 * @param op1	 - operand to be negated with '!'
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue unaryNot(Parser parser, ResultValue op1)
+	public static Value unaryNot(Parser parser, Value op1)
 	{
 		
-		ResultValue res = op1.asBoolean(parser);
+		Value res = op1.asBoolean(parser);
 		res.booleanValue = !res.booleanValue;
 		
 		return res;
@@ -306,10 +306,10 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue less(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value less(Parser parser, Value op1, Value op2)
 	{
 		
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -347,9 +347,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue greater(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value greater(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -388,9 +388,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue lessEqual(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value lessEqual(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -429,9 +429,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue greaterEqual(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value greaterEqual(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -469,9 +469,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue doubleEqual(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value doubleEqual(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -513,9 +513,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue notEqual(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value notEqual(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -554,9 +554,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue logicalAnd(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value logicalAnd(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -581,9 +581,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue logicalOr(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value logicalOr(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.BOOLEAN;
 		
@@ -608,9 +608,9 @@ public class Operators {
 	 * @param op2	 - second operand to be evaluated with op1
 	 * @return final value after some expression has been evaluated
 	 */
-	public static ResultValue concatenate(Parser parser, ResultValue op1, ResultValue op2)
+	public static Value concatenate(Parser parser, Value op1, Value op2)
 	{
-		ResultValue res = new ResultValue();
+		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.STRING;
 		
