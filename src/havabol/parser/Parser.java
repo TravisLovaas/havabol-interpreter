@@ -748,6 +748,15 @@ public class Parser {
 				throw new SyntaxError("Expected assignment operator after array reference in assignment", scanner.currentToken);
 			}
 			
+			// Assign value
+			scanner.getNext();
+			
+			rhsExpr = parseExpression(";");
+			
+			variable.arrayValue.set(this, assignmentIndex, rhsExpr);
+			
+			System.out.println("Assigned " + rhsExpr + " to index " + assignmentIndex + " of " + variable.symbol);
+			
 		} else {
 			throw new SyntaxError("Expected array reference or assignment operator", scanner.currentToken);
 		}
@@ -856,15 +865,19 @@ public class Parser {
 	 * Purpose: Parses a function call
 	 * @return the result of function call
 	 */
-	private Value parseFunctionCall() {
+	private Token parseFunctionCall() {
 		
 		if (scanner.currentToken.primClassif != Token.FUNCTION) {
 			throw new SyntaxError("Expected name of a function", scanner.currentToken);
 		}
 		
 		String calledFunction = scanner.currentToken.tokenStr;
+		
+		System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
 		String check = scanner.getNext();
+		
+		assert(scanner.currentToken.tokenStr.equals("("));
 		
 		if (!scanner.currentToken.tokenStr.equals("(")) {
 			throw new SyntaxError("Expected left parenthesis after function name", scanner.currentToken);
@@ -872,49 +885,65 @@ public class Parser {
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
 		
-		List<Value> args = new ArrayList<>();
-		
-		if (scanner.currentToken.tokenStr.equals(")")) {
-			
-		} else {
-			
-			// Parse all function arguments
-			for (;;) {
-				
-				Value arg = parseExpression(")");
-		
-				args.add(arg);
-				
-				if (scanner.currentToken.tokenStr.equals(",")) {
-					scanner.getNext();
-					continue;
-				} else if (scanner.currentToken.tokenStr.equals(")")) {
-					break;
-				} else {
-					throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
-				}0
-				
-			}
-		}
-		
-		scanner.getNext();
+		Value retVal = null;
 		
 		switch (calledFunction) {
 		case "print":
+			List<Value> args = new ArrayList<>();
+			
+			if (scanner.currentToken.tokenStr.equals(")")) {
+				
+			} else {
+				
+				// Parse all function arguments
+				for (;;) {
+					
+					Value arg = parseExpression(")");
+			
+					args.add(arg);
+					
+					if (scanner.currentToken.tokenStr.equals(",")) {
+						scanner.getNext();
+						continue;
+					} else if (scanner.currentToken.tokenStr.equals(")")) {
+						break;
+					} else {
+						throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
+					}
+					
+				}
+			}
 			Functions.print(this, args);
 			break;
+		case "ELEM":
+			String argVar = scanner.currentToken.tokenStr;
+			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			break;
+//		case "MAXELEM":
+//			retVal = Functions.maxElem(this, args.get(0));
+//			break;
+//		case "LENGTH":
+//			retVal = Functions.length(this, args.get(0));
+//			break;
+//		case "SPACES":
+//			retVal = Functions.spaces(this, args.get(0));
+//			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
-		// TODO: function call returns proper result
-		Value retVal = new Value();
-		retVal.dataType = DataType.VOID;
+		assert(scanner.currentToken.tokenStr.equals(")"));
 		
-		return retVal;
+		scanner.getNext();
+		
+		if (retVal == null) {
+			return null;
+		} else {
+			return retVal.toToken(this);
+		}
 	}
 	
-	/***
+	/**
 	 * Function: ParseExpression
 	 * Preconditions: parseExpression is called on the first
 	 * 				  token of a potential infix expression
@@ -953,7 +982,9 @@ public class Parser {
 						out.add(scanner.currentToken);
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
-					parseFunctionCall();
+					Token funcResult = parseFunctionCall();
+					if (funcResult != null)
+						out.add(funcResult);
 				}
 				
 			}
@@ -995,7 +1026,7 @@ public class Parser {
 					continue;
 				}
 				
-				if(token.equals("[")){
+				else if(token.equals("[")){
 					//System.out.println("found an array");
 					break;					
 					//stackToken.push(value);

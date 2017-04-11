@@ -31,7 +31,7 @@ public class Functions {
 	 * @param string
 	 * @return int
 	 */
-	public Value length(Parser parser, Value value){
+	public static Value length(Parser parser, Value value){
 		return new Value(value.asString(parser).strValue.length());
 	}
 	/**
@@ -40,7 +40,7 @@ public class Functions {
 	 * @param string
 	 * @return boolean
 	 */
-	public Value spaces(Parser parser, Value value){
+	public static Value spaces(Parser parser, Value value){
 		char[] check = value.asString(parser).strValue.toCharArray();
 		
 		for (char c : check) {
@@ -57,9 +57,16 @@ public class Functions {
 	 * @param array
 	 * @return String
 	 */
-	public Value elem(Parser parser, Value value) {
+	public static Value elem(Parser parser, STIdentifier array) {
 		
-		throw new UnsupportedOperationError("elem is not yet implemented");
+		if (array.structure != Structure.FIXED_ARRAY
+			&& array.structure != Structure.UNBOUNDED_ARRAY) {
+			
+			throw new TypeError("Invalid args to elem(), argument must be array variable");
+			
+		}
+		
+		return new Value(array.arrayValue.numItems);
 		
 //		if (value.structure == Structure.PRIMITIVE) {
 //			throw new TypeError("ELEM may only operate on array-like values.");
@@ -71,7 +78,7 @@ public class Functions {
 	 * @param array
 	 * @return
 	 */
-	public Value maxElem(Parser parser, Value value) {
+	public static Value maxElem(Parser parser, Value value) {
 		
 		throw new UnsupportedOperationError("maxelem is not yet implemented");
 		
