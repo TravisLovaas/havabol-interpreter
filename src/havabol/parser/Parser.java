@@ -734,16 +734,14 @@ public class Parser {
 			// Array
 			scanner.getNext(); // get array index for assignment
 			
-			if (scanner.currentToken.subClassif != Token.INTEGER) {
-				throw new SyntaxError("Expected index in bracketed array reference in assignment", scanner.currentToken);
-			}
-			
-			int assignmentIndex = scanner.currentToken.toResult().asInteger(this).intValue;
+			int assignmentIndex = parseExpression("]").asInteger(this).intValue;
 			
 			// next token should be "]"
-			if (!scanner.getNext().equals("]")) {
-				throw new SyntaxError("Expected closing bracket after index in assignment", scanner.currentToken);
-			}
+//			if (!scanner.getNext().equals("]")) {
+//				throw new SyntaxError("Expected closing bracket after index in assignment", scanner.currentToken);
+//			}
+			
+			assert(scanner.currentToken.tokenStr.equals("]"));
 			
 			// next token should be "="
 			if (!scanner.getNext().equals("=")) {
@@ -812,6 +810,8 @@ public class Parser {
 		case "]":
 			// Singular array value
 			result = array.arrayValue.fetch(this, beginSliceIndex);
+			
+			System.out.println("Accessing array " + array.symbol + " index " + beginSliceIndex + " value = " + result);
 			
 			break;
 		case "~":
@@ -888,7 +888,7 @@ public class Parser {
 					break;
 				} else {
 					throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
-				}
+				}0
 				
 			}
 		}
