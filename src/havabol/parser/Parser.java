@@ -470,17 +470,53 @@ public class Parser {
 		
 		// TODO implement
 		ResultValue array = new ResultValue();
-		int count = 1;
-		while(!scanner.currentToken.tokenStr.equals(terminatingStr)){
-			System.out.println("I'm here" + scanner.currentToken.tokenStr);
-			//array.arrayValue.add(scanner.currentToken.toResult());
-			scanner.getNext();
-			count++;
+		array.structure = Structure.MULTIVALUE;
+		array.numItems = 0;
+		
+		// Parse first element and set data type to that of first elem
+		ResultValue elem = scanner.currentToken.toResult();
+		array.arrayValue.add(elem);
+		array.dataType = elem.dataType;
+		array.numItems += 1;
+		
+		// next token must be either ";" or ","
+		switch (scanner.getNext()) {
+		case ",":
+			break;
+		case ";":
+			return array;
+		default:
+			throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
 		}
-		array.numItems = count;
+		
+		assert(scanner.currentToken.tokenStr.equals(","));
+		
+		scanner.getNext(); // pass ","
+		
+		while (!scanner.currentToken.tokenStr.equals(terminatingStr)) {
+			//System.out.println("I'm here" + scanner.currentToken.tokenStr);
+			
+			elem = scanner.currentToken.toResult();
+			elem = elem.asType(this, array.dataType);
+			array.numItems += 1;
+			array.arrayValue.add(elem);
+			
+			scanner.getNext(); // currentToken should now be comma or terminatingStr
+			
+			switch (scanner.currentToken.tokenStr) {
+			case ",":
+				scanner.getNext();
+				continue;
+			case ";":
+				break;
+			default:
+				throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
+			}			
+		}
+		
+		assert(scanner.currentToken.tokenStr.equals(";"));
 		
 		return array;
-		
 	}
 	
 	/**
