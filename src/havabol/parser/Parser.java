@@ -772,7 +772,7 @@ public class Parser {
 	 *          ^^^^^^		
 	 * @return a ResultValue with the values of the referenced array
 	 */
-	private Value parseArrayRef() {
+	private Token parseArrayRef() {
 		
 		if (scanner.currentToken.subClassif != Token.IDENTIFIER) {
 			throw new SyntaxError("Expected identifer at beginning of array reference", scanner.currentToken);
@@ -797,10 +797,11 @@ public class Parser {
 		//   tArray[~4]
 		//   tArray[2~]
 		//   tArray[2]
+		//System.out.println("something = " + scanner.currentToken.subClassif);
 		
-		if (!scanner.currentToken.tokenStr.equals("~") && scanner.currentToken.subClassif != Token.INTEGER) {
+		/*if (!scanner.currentToken.tokenStr.equals("~") && (scanner.currentToken.subClassif != Token.INTEGER)){
 			throw new SyntaxError("Expected index or beginning of slice", scanner.currentToken);
-		}
+		}*/
 		
 		// index may be an expression
 		int beginSliceIndex = parseExpression("]").asInteger(this).intValue;
@@ -840,7 +841,10 @@ public class Parser {
 		default:
 			throw new SyntaxError("Expected ] or slice operator ~", scanner.currentToken);
 		}
-		return result;
+		
+		
+		
+		return result.toToken(this);
 	}
 
 	/**
@@ -943,7 +947,8 @@ public class Parser {
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ((STIdentifier) 
 							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY){
-							parseArrayRef();
+							Token array = parseArrayRef();
+							out.add(array);
 					}else
 						out.add(scanner.currentToken);
 				}

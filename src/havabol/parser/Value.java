@@ -57,6 +57,33 @@ public class Value {
 		return this;
 	}
 	
+	public Token toToken(Parser parser) {
+		
+		if (this.structure != Structure.PRIMITIVE) {
+			throw new TypeError("Cannot convert non primitive to token");
+		}
+		
+		Token patch = new Token(); 
+		patch.tokenStr = this.asString(parser).strValue;
+		patch.primClassif = Token.OPERAND;
+		switch(this.dataType){
+		case INTEGER:
+			patch.subClassif = Token.INTEGER;
+			break;
+		case STRING:
+			patch.subClassif = Token.STRING;
+			break;
+		case BOOLEAN:
+			patch.subClassif = Token.BOOLEAN;
+			break;
+		case FLOAT:
+			patch.subClassif = Token.FLOAT;
+			break;
+		}
+		
+		return patch;
+	}
+	
 	public Value asInteger(Parser parser) {
 		
 		if (this.dataType == DataType.INTEGER) {
