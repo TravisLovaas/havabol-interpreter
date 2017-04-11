@@ -808,10 +808,13 @@ public class Parser {
 			throw new SyntaxError("Expected index or beginning of slice", scanner.currentToken);
 		}
 		
-		int beginSliceIndex = scanner.currentToken.toResult().asInteger(this).intValue;
+		// index may be an expression
+		int beginSliceIndex = parseExpression("]").asInteger(this).intValue;
 		Value result = null;
 		
-		switch (scanner.getNext()) {
+		assert(scanner.currentToken.tokenStr.equals("]"));
+		
+		switch (scanner.currentToken.tokenStr) {
 		case "]":
 			// Singular array value
 			
