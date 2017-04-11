@@ -10,7 +10,6 @@ import havabol.error.*;
 import havabol.lexer.*;
 import havabol.runtime.*;
 import havabol.storage.*;
-import havabol.storage.Structure;
 
 public class Parser {
 	
@@ -933,27 +932,33 @@ public class Parser {
 		Token popped;
 		boolean containsOperator = false;
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
-		
+		//if (check.structure != Structure.PRIMITIVE){
+		//	System.out.println("We's in here");
+			//check = parseArrayRef();
+		//}
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in"))) {
-			//System.out.println("-------> In parse expr token = " + token + "<------------------");
+			
+			//System.out.println("-------> In parse expr token = " + token  + "<------------------");
 			//System.out.println("-------> In parse expr token = " + scanner.currentToken. + "<------------------");
 
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
-				if (scanner.currentToken.primClassif == Token.OPERAND)
+				if (scanner.currentToken.primClassif == Token.OPERAND){
+					if(scanner.currentToken.subClassif == Token.IDENTIFIER){
+						STEntry check = symbolTable.getSymbol(token);
+						System.out.println("-------> In parse expr token = " + check.getValue().structure  + "<------------------");
+
+						/*if(check.structure != Structure.PRIMITIVE){
+							System.out.println("-------> In parse expr token = " + token  + "<------------------");
+						}*/
+					}
 					out.add(scanner.currentToken);
+				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
 					parseFunctionCall();
 				}
-				/*ResultValue res = symbolTable.getSymbol(token).getValue();
-				if (res.structure != Structure.PRIMITIVE){
-					System.out.println("We's in here");
-					res = parseArrayRef();
-				}*/
-			}		
-			/*else{
 				
-			}*/
+			}		
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
 				containsOperator = true;
 				while(!stackToken.isEmpty()){
@@ -969,6 +974,7 @@ public class Parser {
 				//if separator, check special cases for parentheses
 				//to determine correctness
 				boolean lParen = false;
+				boolean lBrac = false;
 				if(token.equals("(")){
 					stackToken.push(scanner.currentToken);
 				}
@@ -990,10 +996,18 @@ public class Parser {
 					token = scanner.getNext();
 					continue;
 				}
+				
+				/*if(token.equals("[")){
+					System.out.println("found an array");
+					scanner.getNext();
+					Value value = parseArrayRef();
+					//stackToken.push(value);
+				}*/
 				else {
 						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
 							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 				}
+				
 			}
 			else{
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
