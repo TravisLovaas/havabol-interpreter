@@ -544,7 +544,7 @@ public class Parser {
 		ResultValue array = new ResultValue();
 		int count = 1;
 		while(!scanner.currentToken.tokenStr.equals(terminatingStr)){
-			System.out.println("I'm here" + scanner.currentToken.tokenStr);
+			//System.out.println("I'm here" + scanner.currentToken.tokenStr);
 			//array.arrayValue.add(scanner.currentToken.toResult());
 			scanner.getNext();
 			count++;
@@ -696,6 +696,7 @@ public class Parser {
 			throw new SyntaxError("Expected identifer at beginning of array reference", scanner.currentToken);
 		}
 		
+		System.out.println("---------------->When I get in here<------------");
 		String arrayName = scanner.currentToken.tokenStr;
 		
 		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
@@ -847,7 +848,9 @@ public class Parser {
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 		
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in"))) {
-			//System.out.println("In parse expr");
+			//System.out.println("-------> In parse expr token = " + token + "<------------------");
+			//System.out.println("-------> In parse expr token = " + scanner.currentToken. + "<------------------");
+
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND)
@@ -855,9 +858,15 @@ public class Parser {
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
 					parseFunctionCall();
 				}
-
-			}
-						
+				/*ResultValue res = symbolTable.getSymbol(token).getValue();
+				if (res.structure != Structure.PRIMITIVE){
+					System.out.println("We's in here");
+					res = parseArrayRef();
+				}*/
+			}		
+			/*else{
+				
+			}*/
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
 				containsOperator = true;
 				while(!stackToken.isEmpty()){
@@ -869,7 +878,6 @@ public class Parser {
 				}
 				stackToken.push(scanner.currentToken); 
 			}
-			
 			else if (scanner.currentToken.primClassif == Token.SEPARATOR){
 				//if separator, check special cases for parentheses
 				//to determine correctness
@@ -915,6 +923,8 @@ public class Parser {
 			out.add(popped);
 		}
 		
+		//System.out.println("About to start expressing");
+		
 		//At this point, our postfix expression is already populated
 		//check for possible errors
 		for(Token entry : out){			
@@ -927,8 +937,6 @@ public class Parser {
 					case Token.IDENTIFIER:
 						res = symbolTable.getSymbol(token).getValue();
 						//Array found?
-						if(res.structure != Structure.PRIMITIVE)
-							res = parseArrayRef();
 						stackResult.push(res);
 						break;
 					case Token.INTEGER:
