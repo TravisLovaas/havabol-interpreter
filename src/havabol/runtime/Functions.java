@@ -8,9 +8,9 @@ import havabol.storage.*;
 
 public class Functions {
 	
-	public static ResultValue print(Parser parser, List<ResultValue> args) {
+	public static Value print(Parser parser, List<Value> args) {
 		if (args.size() == 0) {
-			return new ResultValue().asVoid();
+			return new Value().asVoid();
 		}
 
 		System.out.print(args.get(0).asString(parser).strValue);
@@ -22,7 +22,7 @@ public class Functions {
 		
 		System.out.println();
 		
-		return new ResultValue().asVoid();
+		return new Value().asVoid();
 	}
 	
 	/**
@@ -31,8 +31,8 @@ public class Functions {
 	 * @param string
 	 * @return int
 	 */
-	public ResultValue length(Parser parser, ResultValue value){
-		return new ResultValue(value.asString(parser).strValue.length());
+	public Value length(Parser parser, Value value){
+		return new Value(value.asString(parser).strValue.length());
 	}
 	/**
 	 * Havabol SPACES returns true if there are any spaces in the string,
@@ -40,16 +40,16 @@ public class Functions {
 	 * @param string
 	 * @return boolean
 	 */
-	public ResultValue spaces(Parser parser, ResultValue value){
+	public Value spaces(Parser parser, Value value){
 		char[] check = value.asString(parser).strValue.toCharArray();
 		
 		for (char c : check) {
 			if (c == ' ') {
-				return new ResultValue(true);
+				return new Value(true);
 			}
 		}
 		
-		return new ResultValue(false);
+		return new Value(false);
 		
 	}
 	/**
@@ -57,7 +57,7 @@ public class Functions {
 	 * @param array
 	 * @return String
 	 */
-	public ResultValue elem(Parser parser, ResultValue value) {
+	public Value elem(Parser parser, Value value) {
 		
 		throw new UnsupportedOperationError("elem is not yet implemented");
 		
@@ -71,7 +71,7 @@ public class Functions {
 	 * @param array
 	 * @return
 	 */
-	public ResultValue maxElem(Parser parser, ResultValue value) {
+	public Value maxElem(Parser parser, Value value) {
 		
 		throw new UnsupportedOperationError("maxelem is not yet implemented");
 		
