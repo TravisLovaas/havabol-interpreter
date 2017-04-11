@@ -219,6 +219,11 @@ public class Parser {
 	private void parseFor() {
 		
 		scanner.getNext(); // get past "for"
+		String tokenStr = scanner.currentToken.tokenStr;
+		System.out.println("FOR = " + tokenStr);
+		switch(tokenStr){
+		
+		}
 		
 		Value cv = parseAssignment();					// grabs the control variable...
 		
@@ -498,7 +503,10 @@ public class Parser {
 						scanner.getNext(); // pass =
 						
 						rhsMultiVal = parseValueList(";");
-						variable.arrayValue = rhsMultiVal;
+						variable.arrayValue = new Value[rhsMultiVal.numItems];
+						for (int i = 0; i < rhsMultiVal.size; i++) {
+							variable.arrayValue[i] = rhsMultiVal.values.get(i);
+						}
 						variable.declaredSize = rhsMultiVal.size;
 						variable.structure = Structure.FIXED_ARRAY;
 						break;
@@ -508,6 +516,9 @@ public class Parser {
 						int declaredSize = sizeValue.asInteger(this).intValue;
 						
 						variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+						
+						variable.arrayValue = new Value[declaredSize];
+						variable.declaredSize = declaredSize;
 
 						if (!scanner.currentToken.tokenStr.equals("]")) {
 							throw new SyntaxError("Expected a closing parenthesis ']'");
@@ -520,16 +531,28 @@ public class Parser {
 						//             ^
 						
 						switch (scanner.getNext()) {
-						case ";":
+						case ";": 
+							// Size given with no value list
+							// Int array[10];
+							// done
 							break;
 						case "=":
+							// Size given with value list
+							// Int array[10] = 1, 2, 3;
 							scanner.getNext(); // advance past =
 							//could be assigned
 							//scanner.getNext();
 							rhsMultiVal = parseValueList(";");
-							variable.arrayValue = rhsMultiVal;
-							variable.declaredSize = declaredSize;
-							variable.structure = Structure.FIXED_ARRAY;
+							
+							System.out.println("rhsMultiVal.numItems = " + rhsMultiVal.numItems);
+							if (rhsMultiVal.numItems > variable.declaredSize) {
+								throw new IndexError("Value list contains too many elements to fit into given array");
+							}
+							
+							for (int i = 0; i < rhsMultiVal.size; i++) {
+								variable.arrayValue[i] = rhsMultiVal.values.get(i);
+							}
+							
 							System.out.println("Created array with given size and given value list.");
 							
 							break;
@@ -560,7 +583,6 @@ public class Parser {
 	 */
 	private MultiValue parseValueList(String terminatingStr) {
 		
-		// TODO implement
 		MultiValue array = new MultiValue();
 		array.structure = Structure.MULTIVALUE;
 		array.numItems = 0;
@@ -569,7 +591,6 @@ public class Parser {
 		Value elem = scanner.currentToken.toResult();
 		array.add(this, elem);
 		array.dataType = elem.dataType;
-		array.numItems += 1;
 		
 		// next token must be either ";" or ","
 		switch (scanner.getNext()) {
@@ -588,7 +609,6 @@ public class Parser {
 		while (!scanner.currentToken.tokenStr.equals(terminatingStr)) {			
 			elem = scanner.currentToken.toResult();
 			elem = elem.asType(this, array.dataType);
-			array.numItems += 1;
 			array.add(this, elem);
 			
 			scanner.getNext(); // currentToken should now be comma or terminatingStr
@@ -753,7 +773,7 @@ public class Parser {
 			
 			rhsExpr = parseExpression(";");
 			
-			variable.arrayValue.set(this, assignmentIndex, rhsExpr);
+			variable.set(this, assignmentIndex, rhsExpr);
 			
 			System.out.println("Assigned " + rhsExpr + " to index " + assignmentIndex + " of " + variable.symbol);
 			
@@ -819,7 +839,7 @@ public class Parser {
 		switch (scanner.currentToken.tokenStr) {
 		case "]":
 			// Singular array value
-			result = array.arrayValue.fetch(this, beginSliceIndex);
+			result = array.fetch(this, beginSliceIndex);
 			
 			System.out.println("Accessing array " + array.symbol + " index " + beginSliceIndex + " value = " + result);
 			
@@ -872,7 +892,7 @@ public class Parser {
 		}
 		
 		String calledFunction = scanner.currentToken.tokenStr;
-		
+		String argVar = null;
 		System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
 		String check = scanner.getNext();
@@ -916,18 +936,21 @@ public class Parser {
 			Functions.print(this, args);
 			break;
 		case "ELEM":
-			String argVar = scanner.currentToken.tokenStr;
+			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
 			break;
-//		case "MAXELEM":
-//			retVal = Functions.maxElem(this, args.get(0));
-//			break;
-//		case "LENGTH":
-//			retVal = Functions.length(this, args.get(0));
-//			break;
-//		case "SPACES":
-//			retVal = Functions.spaces(this, args.get(0));
-//			break;
+		case "MAXELEM":
+			argVar = scanner.currentToken.tokenStr;
+			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			break;
+		case "LENGTH":
+			argVar = scanner.currentToken.tokenStr;
+			retVal = Functions.length(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			break;
+		case "SPACES":
+			argVar = scanner.currentToken.tokenStr;
+			retVal = Functions.spaces(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
@@ -966,7 +989,7 @@ public class Parser {
 		//	System.out.println("We's in here");
 			//check = parseArrayRef();
 		//}
-		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in"))) {
+		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			
 			//System.out.println("-------> In parse expr token = " + token  + "<------------------");
 			//System.out.println("-------> In parse expr token = " + scanner.currentToken. + "<------------------");

@@ -8,14 +8,37 @@ public class IndexError extends Error {
 		super(message);
 	}
 	
+	/***
+	 * Function: IndexError
+	 * Purpose:				Populates error message
+	 * @param message: 		message to be displayed
+	 * @param token:		token found that caused error 
+	 */
 	public IndexError(String message, Token token) {
 		super(message + " (found \"" + token.tokenStr + "\" + at line " + (token.iSourceLineNr + 1) + " near column " + (token.iColPos + 1) + ")");
 	}
 	
+	/***	 
+	 * Function: IndexError
+	 * Purpose:				Populates error message
+	 * @param message: 		message to be displayed
+	 * @param lineNumber: 	line number of source code where
+	 * 					  	error may have occurred
+	 */
 	public IndexError(String message, int lineNumber) {
 		super(message + " (at line " + lineNumber + ")");
 	}
 	
+
+	/***	 
+	 * Function: IndexError
+	 * Purpose:				Populates error message
+	 * @param message: 		message to be displayed
+	 * @param lineNumber: 	line number of source code where
+	 * 					  	error may have occurred
+	 * @param colPos: 		column number of source code where
+	 * 						error may have occurred
+	 */
 	public IndexError(String message, int lineNumber, int colPos) {
 		super(message + " (at line " + lineNumber + ", near column " + colPos + ")");
 	}
