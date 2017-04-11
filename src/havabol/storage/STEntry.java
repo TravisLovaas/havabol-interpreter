@@ -35,5 +35,4 @@ public class STEntry
 	public Value getValue() {
 		return this.value;
 	}
-	
 }

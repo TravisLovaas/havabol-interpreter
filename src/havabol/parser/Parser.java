@@ -531,7 +531,6 @@ public class Parser {
 							variable.declaredSize = declaredSize;
 							variable.structure = Structure.FIXED_ARRAY;
 							System.out.println("Created array with given size and given value list.");
-							//System.out.println("-----> I do get in here <----" + variable.getValue());
 							
 							break;
 						default:
@@ -586,9 +585,7 @@ public class Parser {
 		
 		scanner.getNext(); // pass ","
 		
-		while (!scanner.currentToken.tokenStr.equals(terminatingStr)) {
-			//System.out.println("I'm here" + scanner.currentToken.tokenStr);
-			
+		while (!scanner.currentToken.tokenStr.equals(terminatingStr)) {			
 			elem = scanner.currentToken.toResult();
 			elem = elem.asType(this, array.dataType);
 			array.numItems += 1;
@@ -687,7 +684,6 @@ public class Parser {
 			switch (token) {
 				case "=":
 					scanner.getNext();
-					//System.out.println("check = " + check);
 					res02 = parseExpression(";");
 					// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
 					rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
@@ -782,7 +778,6 @@ public class Parser {
 			throw new SyntaxError("Expected identifer at beginning of array reference", scanner.currentToken);
 		}
 		
-		System.out.println("---------------->When I get in here<------------");
 		String arrayName = scanner.currentToken.tokenStr;
 		
 		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
@@ -816,7 +811,6 @@ public class Parser {
 		switch (scanner.currentToken.tokenStr) {
 		case "]":
 			// Singular array value
-			
 			result = array.arrayValue.fetch(this, beginSliceIndex);
 			
 			break;
@@ -846,7 +840,6 @@ public class Parser {
 		default:
 			throw new SyntaxError("Expected ] or slice operator ~", scanner.currentToken);
 		}
-		
 		return result;
 	}
 
@@ -927,6 +920,7 @@ public class Parser {
 	 * @return the evaluated value of an expression
 	 */
 	private Value parseExpression(String terminatingStr) throws SyntaxError{
+		//System.out.println("In parse");
 		ArrayList <Token> out = new ArrayList<Token>();
 		Stack<Token> stackToken = new Stack<>();
 		Stack<Value> stackResult = new Stack<>();
@@ -947,21 +941,17 @@ public class Parser {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
-					if(scanner.currentToken.subClassif == Token.IDENTIFIER){
-						STEntry check = symbolTable.getSymbol(token);
-						System.out.println("-------> In parse expr token = " + check.getValue().structure  + "<------------------");
-
-						/*if(check.structure != Structure.PRIMITIVE){
-							System.out.println("-------> In parse expr token = " + token  + "<------------------");
-						}*/
-					}
-					out.add(scanner.currentToken);
+					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ((STIdentifier) 
+							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY){
+							parseArrayRef();
+					}else
+						out.add(scanner.currentToken);
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
 					parseFunctionCall();
 				}
 				
-			}		
+			}
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
 				containsOperator = true;
 				while(!stackToken.isEmpty()){
@@ -1000,12 +990,11 @@ public class Parser {
 					continue;
 				}
 				
-				/*if(token.equals("[")){
-					System.out.println("found an array");
-					scanner.getNext();
-					Value value = parseArrayRef();
+				if(token.equals("[")){
+					//System.out.println("found an array");
+					break;					
 					//stackToken.push(value);
-				}*/
+				}
 				else {
 						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
 							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
@@ -1208,7 +1197,9 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		 
-		//System.out.println("----------> Exit parse expression <---------");
+		//System.out.println("----------> Exit parse expression <---------" + finalValue);
 		return finalValue;
 	}
+
+
 }	
