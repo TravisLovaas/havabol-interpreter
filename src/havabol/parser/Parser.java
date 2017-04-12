@@ -1194,7 +1194,7 @@ public class Parser {
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
-		//System.out.println("returning: " + retVal);
+		System.out.println("returning: " + scanner.currentToken.tokenStr);
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		
@@ -1229,6 +1229,7 @@ public class Parser {
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
+			System.out.println("token = " + scanner.currentToken.tokenStr);
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
@@ -1502,7 +1503,7 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		 
-		//System.out.println("----------> Exit parse expression <---------" + finalValue);
+		System.out.println("----------> Exit parse expression <---------" + finalValue);
 		return finalValue;
 	}
 
