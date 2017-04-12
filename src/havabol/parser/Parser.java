@@ -435,8 +435,8 @@ public class Parser {
 				controlVariable.setValue(value);
 				
 				//System.out.println("looping...");
-				System.out.println("begin loop on " + scanner.currentToken.tokenStr);
-				System.out.println("parse = " + scanner.nextToken.tokenStr);
+				//System.out.println("begin loop on " + scanner.currentToken.tokenStr);
+				//System.out.println("parse = " + scanner.nextToken.tokenStr);
 
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
@@ -458,15 +458,17 @@ public class Parser {
 			}
 			
 			assert(scanner.currentToken.tokenStr.equals("endfor"));
+			
 			scanner.getNext();
+			
 			assert(scanner.currentToken.tokenStr.equals(";"));
+			
 			break;
 			
 		default:
 			// TODO: throw exception
 		}
 //		System.out.println("CV: "+cv+" value: "+controlVariable.getValue()+" limit: "+limit+" incr: "+incr);
-		return;
 	}
 
 	

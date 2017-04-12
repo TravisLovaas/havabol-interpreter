@@ -102,13 +102,19 @@ public class Scanner {
 	 * @return String representation of the next token
 	 */
 	public String getNext() throws SyntaxError {
-		previous = currentToken;		
+		previous = currentToken;	
+		
 		currentToken = getNextToken(false);
 		//debugger for token
 		if (debugToken) {
 			System.out.println("\t\t... Current Token = " + currentToken.tokenStr);
 		}
+
 		if (currentToken.primClassif == Token.EOF) {
+			if (!nextToken.tokenStr.equals("")) {
+				currentToken = nextToken;
+				return currentToken.tokenStr;
+			}
 			return "";
 		}
 		nextToken = getNextToken(true);
@@ -283,7 +289,10 @@ public class Scanner {
 		this.textCharM = sourceLineM.get(iSourceLineNr).toCharArray();
 		this.iSourceLineNr = iSourceLineNr;
 		this.iColPos = iColPos;
+		this.done = false;
 		
+		//System.out.println("Set position to: " + (iSourceLineNr + 1) + " " + (iColPos + 1));
+		//System.out.println("On line: " + String.valueOf(textCharM));
 		this.getNext();
 	}
 	

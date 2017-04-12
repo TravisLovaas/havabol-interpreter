@@ -103,4 +103,3 @@ print("copy of the sorted array, but with just 11 elements not 30");
 for iTemp in iCopyBM:
     print("\t", iTemp);
 endfor;
-
