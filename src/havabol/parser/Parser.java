@@ -1075,13 +1075,15 @@ public class Parser {
 					Value arg = parseExpression(")");
 			
 					args.add(arg);
-					
+					System.out.println("----> cur token " + scanner.currentToken.tokenStr);
+					System.out.println("----> next token " + scanner.nextToken.tokenStr);
 					if (scanner.currentToken.tokenStr.equals(",")) {
 						scanner.getNext();
 						continue;
 					} else if (scanner.currentToken.tokenStr.equals(")")) {
 						break;
-					} else {
+					} 
+					else {
 						throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
 					}
 					
@@ -1116,15 +1118,14 @@ public class Parser {
 		//System.out.println("returning: " + scanner.currentToken.tokenStr);
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
-		
 		scanner.getNext();		
 
-		
 		if (retVal == null) {
 			return null;
 		} else {
 			return retVal.toToken(this);
 		}
+		
 	}
 	
 	/**
