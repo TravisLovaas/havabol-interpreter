@@ -346,7 +346,7 @@ public class Parser {
 				throw new SyntaxError("Expected : or by clause in for loop", scanner.currentToken);
 			}
 			
-			System.out.println("Limit: " + limit + " Incr: " + incr);
+			
 			
 			lineNm = scanner.iSourceLineNr;
 			colPos = scanner.iColPos;
@@ -355,15 +355,19 @@ public class Parser {
 			limit = limit.asInteger(this);
 			incr = incr.asInteger(this);
 			
+			//System.out.println("Limit: " + limit + " Incr: " + incr);
+			//System.out.println(controlVariable);
+			//System.out.println(symbolTable.getSymbol(cv).getValue());
+			
 			assert(scanner.currentToken.tokenStr.equals(":"));
 			
 			scanner.getNext();
 			
 			while (controlVariable.getValue().intValue <= limit.intValue) {
 				
-				System.out.println("begin for body");
+				//System.out.println("begin for body");
 				
-				System.out.println("Control var: " + controlVariable.getValue() + " symbol " + controlVariable.symbol);
+				//System.out.println("Control var: " + controlVariable.getValue() + " symbol " + controlVariable.symbol);
 				
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
@@ -1002,7 +1006,7 @@ public class Parser {
 			throw new SyntaxError("Expected index or beginning of slice", scanner.currentToken);
 		}*/
 		
-		System.out.println("Array ref inside begin symbol: " + scanner.currentToken.tokenStr);
+		//System.out.println("Array ref inside begin symbol: " + scanner.currentToken.tokenStr);
 		
 		Value indexVal = parseExpression("]");
 		
@@ -1021,7 +1025,7 @@ public class Parser {
 			// Singular array value
 			result = array.fetch(this, beginSliceIndex);
 			
-			System.out.println("Accessing array " + array.symbol + " index " + beginSliceIndex + " value = " + result);
+			//System.out.println("Accessing array " + array.symbol + " index " + beginSliceIndex + " value = " + result);
 			
 			break;
 		case "~":
