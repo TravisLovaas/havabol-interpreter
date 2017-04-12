@@ -89,21 +89,21 @@ public class Value {
 		return patch;
 	}
 	
-	public void setCharacter(Parser parser, int index, String character) {
+	public void spliceString(Parser parser, int index, String splice) {
 		
 		if (this.dataType != DataType.STRING) {
 			throw new TypeError("Cannot set character for non-string type");
 		}
 		
-		if (character.length() != 1) {
-			throw new TypeError("Cannot assign a non-character to string");
+		StringBuilder newString = new StringBuilder(this.strValue.substring(0, index));
+		
+		newString.append(splice);
+		
+		if (index < this.strValue.length() - 1) {
+			newString.append(this.strValue.substring(index + 1, this.strValue.length()));
 		}
 		
-		char charArray[] = this.strValue.toCharArray();
-		
-		charArray[index] = character.charAt(0);
-		
-		this.strValue = String.valueOf(charArray);
+		this.strValue = newString.toString();
 		
 	}
 	
