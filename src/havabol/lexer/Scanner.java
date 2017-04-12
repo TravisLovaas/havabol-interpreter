@@ -111,20 +111,25 @@ public class Scanner {
 			System.out.println("\t\t... Current Token = " + currentToken.tokenStr);
 		}
 		
-		if (stop) {
+		/*if (stop) {
 			currentToken.primClassif = Token.EOF;
 			return "";
-		}
+		}*/
 		
 
-		if (currentToken.primClassif == Token.EOF) {
+		/*if (currentToken.primClassif == Token.EOF) {
+			if(nextToken.tokenStr.equals(";")){
+				currentToken = previous;
+				stop = true;
+				return currentToken.tokenStr;
+			}
 			if (!nextToken.tokenStr.equals("")) {
 				currentToken = nextToken;
 				stop = true;
 				return currentToken.tokenStr;
 			}
 			return "";
-		}
+		}*/
 		nextToken = getNextToken(true);
 		//Take care of unary minus
 		if(currentToken.subClassif != Token.STRING && nextToken.subClassif != Token.STRING)
@@ -132,6 +137,7 @@ public class Scanner {
 				currentToken.tokenStr = "u-";
 			}else
 				unary = false;
+		//System.out.println("----> cur token " + currentToken.tokenStr);
 		return currentToken.tokenStr;
 	}
 	

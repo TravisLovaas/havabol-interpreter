@@ -1075,8 +1075,8 @@ public class Parser {
 					Value arg = parseExpression(")");
 			
 					args.add(arg);
-					System.out.println("----> cur token " + scanner.currentToken.tokenStr);
-					System.out.println("----> next token " + scanner.nextToken.tokenStr);
+					//System.out.println("----> cur token " + scanner.currentToken.tokenStr);
+					//System.out.println("----> next token " + scanner.nextToken.tokenStr);
 					if (scanner.currentToken.tokenStr.equals(",")) {
 						scanner.getNext();
 						continue;
