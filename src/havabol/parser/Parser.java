@@ -732,7 +732,7 @@ public class Parser {
 				default:
 					throw new SyntaxError("Expected an assignment '=', array type specifier, or semicolon in declaration", scanner.currentToken);
 		}
-		System.out.println("Added symbol: " + identifier);
+		//System.out.println("Added symbol: " + identifier);
 		symbolTable.createSymbol(this, identifier, variable);
 	}
 	
@@ -878,11 +878,49 @@ public class Parser {
 			// Next token should be an assignment operator
 			switch (token) {
 				case "=":
-					scanner.getNext();
-					res02 = parseExpression(";");
-					// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
-					rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
-					variable.setValue(rhsExpr);
+					
+					if (variable.structure == Structure.FIXED_ARRAY || variable.structure == Structure.UNBOUNDED_ARRAY) {
+						
+						scanner.getNext();
+						
+						if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+							
+							STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(scanner.currentToken.tokenStr);
+						
+							int destSize = variable.declaredSize;
+							int srcSize = srcArray.declaredSize;
+							
+							int fillSize = Math.min(destSize, srcSize);
+							
+							for (int i = 0; i < fillSize; i++) {
+								
+								if (srcArray.arrayValue[i] == null)
+									break;
+								
+								variable.arrayValue[i] = srcArray.arrayValue[i].clone();
+							}
+							
+							scanner.getNext();
+							
+						} else {
+							
+							Value srcForAll = parseExpression(";");
+							
+							for (int i = 0; i < variable.declaredSize; i++) {
+								variable.arrayValue[i] = srcForAll.clone();
+							}
+							
+						}
+						
+					} else { // primitive
+						
+						scanner.getNext();
+						res02 = parseExpression(";");
+						// Ensure type of rhsExpr matches declared type, or can be 	cast to such.
+						rhsExpr = res02.asType(this, variable.declaredType); // Parse expression on right-hand side of assignment
+						variable.setValue(rhsExpr);
+						
+					}
 					break;
 				case "+=":
 					scanner.getNext();

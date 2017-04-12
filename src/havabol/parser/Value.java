@@ -286,5 +286,17 @@ public class Value {
 		return "[" + this.dataType + ": " + valStr + "]";
 		
 	}
+	
+	public Value clone() {
+		Value val = new Value();
+		val.dataType = this.dataType;
+		val.structure = this.structure;
+		val.intValue = this.intValue;
+		val.strValue = this.strValue;
+		val.floatValue = this.floatValue;
+		val.booleanValue = this.booleanValue;
+		val.terminatingStr = this.terminatingStr;
+		return val;
+	}
 
 }
