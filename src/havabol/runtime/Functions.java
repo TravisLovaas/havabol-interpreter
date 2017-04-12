@@ -10,10 +10,10 @@ public class Functions {
 	
 	/**
 	 * Function: print
-	 * Purpose: Print values in source code print function
-	 * @param parser information about  values being parsed
-	 * @param args	arguments passed to be printed
-	 * @return	Value type of print function (void)
+	 * Purpose: 		Print values in source code print function
+	 * @param parser	information about  values being parsed
+	 * @param args		arguments passed to be printed
+	 * @return			Value type of print function (void)
 	 */
 	public static Value print(Parser parser, List<Value> args) {
 		if (args.size() == 0) {
@@ -34,23 +34,23 @@ public class Functions {
 	
 	
 	/**
-	 * Function: length
-	 * Purpose:  Havabol LENGTH implementation. Returns the length of a given string
-	 * @param parser information about  values being parsed
-	 * @param string the STIdentifier containing string to be processed
-	 * @return Value with the length of a string
+	 * Function: 		length
+	 * Purpose:  		Havabol LENGTH implementation. Returns the length of a given string
+	 * @param parser 	information about  values being parsed
+	 * @param string 	the STIdentifier containing string to be processed
+	 * @return 			Value with the length of a string
 	 */
 	public static Value length(Parser parser, STIdentifier string){
 		return new Value(string.getValue().strValue.length());
 	}
 	
 	/**
-	 * Function: spaces
-	 * Purpose:  Havabol SPACES implementation.
-	 * @param parser information about  values being parsed
-	 * @param string the STIdentifier containing string to be processed
-	 * @return Value with the boolean T/F if string contains spaces(T),
-	 * 		   is empty (T), or doesn't contain spaces (F) 
+	 * Function: 		spaces
+	 * Purpose:  		Havabol SPACES implementation.
+	 * @param parser 	information about  values being parsed
+	 * @param string 	the STIdentifier containing string to be processed
+	 * @return 			Value with the boolean T/F if string contains spaces(T),
+	 * 		   			is empty (T), or doesn't contain spaces (F) 
 	 */
 	public static Value spaces(Parser parser, STIdentifier string){
 		char[] check = string.getValue().asString(parser).strValue.toCharArray();
@@ -70,6 +70,7 @@ public class Functions {
 
 	/**
 	 * Function:		elem
+	 * Purpose:			finds maximum 
 	 * @param parser	information about  values being parsed
 	 * @param array		the STIdentifier containing array to be parsed
 	 * @return			Value containing the number of populated elements
@@ -100,6 +101,12 @@ public class Functions {
 	}
 	/**
 	 * maxElem returns the declared length of an array
+	 * @param array
+	 * @return
+	 */
+	/**
+	 * Function: maxElem
+	 * @param parser: 
 	 * @param array
 	 * @return
 	 */

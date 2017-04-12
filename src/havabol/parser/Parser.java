@@ -938,6 +938,7 @@ public class Parser {
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			scanner.getNext();
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
@@ -950,11 +951,13 @@ public class Parser {
 		case "SPACES":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.spaces(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			scanner.getNext();
 			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
+		System.out.println("YELL =" + scanner.currentToken.tokenStr);
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		
 		scanner.getNext();
@@ -991,11 +994,10 @@ public class Parser {
 		//}
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			
-			//System.out.println("-------> In parse expr token = " + token  + "<------------------");
-			//System.out.println("-------> In parse expr token = " + scanner.currentToken. + "<------------------");
 
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
+				boolean function = false;
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ((STIdentifier) 
 							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY){
@@ -1005,11 +1007,14 @@ public class Parser {
 						out.add(scanner.currentToken);
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
+					function = true;
 					Token funcResult = parseFunctionCall();
 					if (funcResult != null)
 						out.add(funcResult);
+					if(scanner.nextToken.tokenStr.equals(";")){
+						break;
+					}
 				}
-				
 			}
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
 				containsOperator = true;
@@ -1067,6 +1072,7 @@ public class Parser {
 			token = scanner.getNext();
 		}
 		
+
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();
 			if(popped.tokenStr == "(")
