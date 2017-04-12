@@ -50,6 +50,7 @@ public class Scanner {
 	private final static String OPERATORS = "!=<>+-*/#^";
 	private final static String SEPARATORS = ",;:[]()";
 	private final static String ESCAPEPRINT ="\\'\"";
+	
 	private final static HashMap<Character, Character> escapeMap = new HashMap<Character, Character>(){
 		private static final long serialVersionUID = 1L;
 

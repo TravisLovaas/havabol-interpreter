@@ -72,7 +72,6 @@ public class Token
 	public Token(String value)
 	{
 		this.tokenStr = value;
-		// ??
 	}
 
 	public Token()
