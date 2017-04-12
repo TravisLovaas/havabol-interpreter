@@ -2,6 +2,7 @@ package havabol.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -1112,7 +1113,7 @@ public class Parser {
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
-		System.out.println("returning: " + scanner.currentToken.tokenStr);
+		//System.out.println("returning: " + scanner.currentToken.tokenStr);
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		
@@ -1136,7 +1137,7 @@ public class Parser {
 	 * @return the evaluated value of an expression
 	 */
 	private Value parseExpression(String terminatingStr) throws SyntaxError{
-		//System.out.println("In parse");
+		//System.out.println("---------> In parse");
 		ArrayList <Token> out = new ArrayList<Token>();
 		Stack<Token> stackToken = new Stack<>();
 		Stack<Value> stackResult = new Stack<>();
@@ -1147,7 +1148,7 @@ public class Parser {
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
-			System.out.println("token = " + scanner.currentToken.tokenStr);
+			//System.out.println("---> curTok = " + token);
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
@@ -1161,8 +1162,9 @@ public class Parser {
 							&& scanner.nextToken.tokenStr.equals("[") ) {
 						Token str = parseArrayRef();
 						out.add(str);
-					} else
+					} else{
 						out.add(scanner.currentToken);
+					}
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
 					Token funcResult = parseFunctionCall();
@@ -1175,7 +1177,7 @@ public class Parser {
 						containsOperator = true;
 						while(!stackToken.isEmpty()){
 							//if operator, check precedence
-							if(precedence.get(token) > stkPrecedence.get(stackToken.peek().tokenStr)){
+							if(precedence.get(scanner.currentToken.tokenStr) > stkPrecedence.get(stackToken.peek().tokenStr)){
 								break;
 							}
 							out.add(stackToken.pop());
@@ -1232,6 +1234,9 @@ public class Parser {
 			}
 			token = scanner.getNext();
 		}
+		//System.out.println("-----> Printing outlist");
+		//out.forEach(t -> System.out.println(t.tokenStr));
+		//System.out.println("-----> End outlist");
 
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();
@@ -1243,7 +1248,7 @@ public class Parser {
 				
 		//At this point, our postfix expression is already populated
 		//check for possible errors
-		for(Token entry : out){			
+		for(Token entry : out){		
 			Value res = null, res2 = null;
 			token = entry.tokenStr;
 			if(entry.primClassif == Token.OPERAND){
@@ -1421,7 +1426,7 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		 
-		System.out.println("----------> Exit parse expression <---------" + finalValue);
+		//System.out.println("----------> Exit parse expression <---------" + finalValue);
 		return finalValue;
 	}
 
