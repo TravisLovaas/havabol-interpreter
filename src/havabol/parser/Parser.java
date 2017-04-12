@@ -394,6 +394,7 @@ public class Parser {
 			break;
 			
 		case "in":
+
 			scanner.getNext();
 			
 			assert(scanner.currentToken.subClassif == Token.IDENTIFIER);
@@ -434,8 +435,9 @@ public class Parser {
 				controlVariable.setValue(value);
 				
 				//System.out.println("looping...");
-				//System.out.println("begin loop on " + scanner.currentToken.tokenStr);
-			
+				System.out.println("begin loop on " + scanner.currentToken.tokenStr);
+				System.out.println("parse = " + scanner.nextToken.tokenStr);
+
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
 				}
@@ -1213,7 +1215,6 @@ public class Parser {
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
-			
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
