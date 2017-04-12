@@ -23,6 +23,10 @@ public class STFunction extends STEntry
 		this.numArgs = numArgs;
 	}
 
+	/**
+	 * Function:	toString
+	 * Purpose:		returns string representation of function
+	 */
 	public String toString() {
 		return String.format("FUNCTION: %s: returns: %s classification: %s num args: %d", symbol, returnType, subClassif, numArgs);
 	}

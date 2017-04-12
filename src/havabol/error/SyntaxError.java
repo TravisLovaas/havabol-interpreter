@@ -8,7 +8,7 @@ public class SyntaxError extends Error {
 		super(message);
 	}
 	
-	/***	 
+	/**	 
 	 * Function: SyntaxError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed
@@ -18,7 +18,7 @@ public class SyntaxError extends Error {
 		super(message + " (found \"" + token.tokenStr + "\" + at line " + (token.iSourceLineNr + 1) + " near column " + (token.iColPos + 1) + ")");
 	}
 	
-	/***	 
+	/**	 
 	 * Function: SyntaxError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed
@@ -30,7 +30,7 @@ public class SyntaxError extends Error {
 		super(message + " (at line " + lineNumber + ")");
 	}
 	
-	/***	 
+	/**	 
 	 * Function: SyntaxError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed

@@ -20,10 +20,18 @@ public class STEntry
 	public int primClassif;
 	private Value value;
 	
+	/**
+	 * Function:	toString
+	 * Purpose:		return string representation of generic token entered into the manager
+	 */
 	public String toString() {
 		return String.format("GENERIC ENTRY: %s: %d", symbol, primClassif);
 	}
 	
+	/**
+	 * Function:	setValue
+	 * @param value the value whose parameters are to be set
+	 */
 	public void setValue(Value value) {
 		
 		// TODO: check size and move to STIdentifier
@@ -32,6 +40,10 @@ public class STEntry
 		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
 	}
 	
+	/**
+	 * Function:	getValue
+	 * @return		Value containing populated parameters
+	 */
 	public Value getValue() {
 		return this.value;
 	}

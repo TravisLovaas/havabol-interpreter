@@ -79,7 +79,7 @@ public class Token
 		this(""); // invoke the other constructor
 	}
 
-	/***
+	/**
 	 * Function: printToken
 	 * Preconditions: 
 	 * 		- tokens have been correctly classified by the Scanner
@@ -141,7 +141,7 @@ public class Token
 
 	}
 
-	/***
+	/**
 	 * Function: clone
 	 * TODO:
 	 * Preconditions:
@@ -238,7 +238,7 @@ public class Token
 		FLOW, END, IDENTIFIER, INTEGER, FLOAT, STRING, BOOLEAN, DATE, VOID, BUILTIN, DECLARE, USER
 	}
 
-	/***
+	/**
 	 * Function: ResultValue
 	 * Preconditions: 
 	 * 		- currentToken is the token to be changed

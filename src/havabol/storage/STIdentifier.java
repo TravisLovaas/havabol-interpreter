@@ -73,6 +73,10 @@ public class STIdentifier extends STEntry
 		
 	}
 	
+	/**
+	 * Function:	toString
+	 * Purpose:		returns string representation of identifier
+	 */
 	public String toString() {
 		return String.format("IDENTIFIER: %s: %s %s %s %d", symbol, declaredType, structure, parm, nonLocal);
 	}
