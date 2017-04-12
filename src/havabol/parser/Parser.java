@@ -1232,11 +1232,16 @@ public class Parser {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
-							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY) /*|| 
-							(symbolTable.containsSymbol(token) && symbolTable.getSymbol(token).getValue().dataType == DataType.STRING)*/){
-							Token array = parseArrayRef();
-							out.add(array);
-					}else
+							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY)) {
+						Token array = parseArrayRef();
+						out.add(array);
+					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
+							&& symbolTable.containsSymbol(token) 
+							&& symbolTable.getSymbol(token).getValue().dataType == DataType.STRING 
+							&& scanner.nextToken.tokenStr.equals("[") ) {
+						Token str = parseArrayRef();
+						out.add(str);
+					} else
 						out.add(scanner.currentToken);
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
