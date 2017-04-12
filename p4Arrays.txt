@@ -27,9 +27,9 @@ print("F", iFM[iSimp-1], iFM[iFM[6]], iFM[(iSimp+2)-1]/10, iFM[iFM[(iSimp+2)-1]/
 // BM[iBM[0]-8]);
 print("iAM originally does not have any elements");
 Int iAM[10];
-print("iAm number of elements is", ELEM(iAM));
+//print("iAm number of elements is", ELEM(iAM));
 String peju = "";
-print("Peju's length is ", SPACES(peju));
+//print("Peju's length is ", SPACES(peju));
 iSimp = 1;
 iAM[iSimp] = 100; // not an error
 //kill me

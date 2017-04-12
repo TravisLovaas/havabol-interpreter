@@ -216,93 +216,159 @@ public class Parser {
 	 * for i = 1 to 15 by 3 :
 	 * for x = "t" in "test" :
 	 */
-	private void parseFor() {
+//	private void parseFor() {
+//		
+//		scanner.getNext(); // get past "for"
+//		
+//		Value cv = parseAssignment();					// grabs the control variable...
+//		
+//		
+//		if (scanner.currentToken.tokenStr.equals("to")) {		// if token is a to...
+//			scanner.getNext();
+//			Value limit = parseAssignment();				// grabs the limit variable...
+//			
+//			if (scanner.currentToken.tokenStr.equals(":")) {		// if end of for statement is reached...
+//				int loopSrcLine = scanner.iSourceLineNr;			// remembers start of body statements...
+//				int loopColPos = scanner.iColPos;
+//				scanner.getNext();
+//				
+//				while(cv.intValue <= limit.intValue){				// loop until limit is reached...
+//					while(!scanner.currentToken.tokenStr.equals("endfor")){
+//						parseStatement();
+//					}
+//					cv.intValue++;
+//					if(cv.intValue <= limit.intValue){
+//						scanner.setPosition(loopSrcLine, loopColPos);	// reset position...
+//					}
+//				}
+//				scanner.getNext();
+//			} 
+//			else if (scanner.currentToken.tokenStr.equals("by")) {	// if token is by...
+//				scanner.getNext();
+//				Value incr = parseAssignment();				// grabs the increment variable...
+//				
+//				if (scanner.currentToken.tokenStr.equals(":")) {	// if end of for statement is reached...
+//					int loopSrcLine = scanner.iSourceLineNr;
+//					int loopColPos = scanner.iColPos;
+//					scanner.getNext();
+//					while(cv.intValue <= limit.intValue){
+//						while(!scanner.currentToken.tokenStr.equals("endfor")){
+//							parseStatement();
+//						}
+//						cv.intValue = cv.intValue+incr.intValue;
+//						if(cv.intValue <= limit.intValue){
+//							scanner.setPosition(loopSrcLine, loopColPos);
+//						}
+//					}
+//				}
+//				else{
+//					throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
+//				}
+//				scanner.getNext();
+//			} 
+//			else{												// else, colon expected here...
+//				throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
+//			}
+//		}
+//		else if (scanner.currentToken.tokenStr.equals("in")) {	// if token is an in...
+//			scanner.getNext();
+//			Value container = parseAssignment();				// grabs the string container...
+//			
+//			if (scanner.currentToken.tokenStr.equals(":")) {		// if end of for statement is reached...
+//				int loopSrcLine = scanner.iSourceLineNr;
+//				int loopColPos = scanner.iColPos;
+//				scanner.getNext();
+//				int i = 1;
+//				while(i <= container.strValue.length()){			// loops through string...
+//					while(!scanner.currentToken.tokenStr.equals("endfor")){
+//						parseStatement();
+//					}
+//					i++;
+//					if(i <= container.strValue.length()){
+//						scanner.setPosition(loopSrcLine, loopColPos);
+//					}
+//				}
+//			}
+//			else{
+//				throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
+//			}
+//			scanner.getNext();
+//		}
+//		else{
+//			throw new SyntaxError("Expected 'to' or 'in' next", scanner.currentToken);
+//		}
+//		
+//	}
+	
+	private void parseFor(){
 		
-		scanner.getNext(); // get past "for"
-		String tokenStr = scanner.currentToken.tokenStr;
-		System.out.println("FOR = " + tokenStr);
-		switch(tokenStr){
+		scanner.getNext(); // get past for
 		
-		}
+
+		assert(scanner.currentToken.subClassif == Token.IDENTIFIER);
 		
-		Value cv = parseAssignment();					// grabs the control variable...
+		String cv = scanner.getNext();
+		Value value, limit = null, incr = new Value(1);
+		STIdentifier controlVariable = null;
 		
-		if (scanner.currentToken.tokenStr.equals("to")) {		// if token is a to...
+		
+		scanner.getNext();
+		
+		
+		switch(scanner.currentToken.tokenStr){
+		case "=":
 			scanner.getNext();
-			Value limit = parseAssignment();				// grabs the limit variable...
+			value = parseExpression("to"); 
+			DataType dt = value.dataType;
+			controlVariable = new STIdentifier(cv, dt, Structure.PRIMITIVE, null, 0);
+			controlVariable.setValue(value);
+			symbolTable.createSymbol(this, cv, controlVariable);
 			
-			if (scanner.currentToken.tokenStr.equals(":")) {		// if end of for statement is reached...
-				int loopSrcLine = scanner.iSourceLineNr;			// remembers start of body statements...
-				int loopColPos = scanner.iColPos;
+			assert(scanner.currentToken.tokenStr.equals("to"));
+			scanner.getNext(); // get past "to"
+			limit = parseExpression("by");
+			//scanner.getNext();
+			switch(scanner.currentToken.tokenStr){
+			case "by":
 				scanner.getNext();
-				
-				while(cv.intValue <= limit.intValue){				// loop until limit is reached...
-					while(!scanner.currentToken.tokenStr.equals("endfor")){
-						parseStatement();
-					}
-					cv.intValue++;
-					if(cv.intValue <= limit.intValue){
-						scanner.setPosition(loopSrcLine, loopColPos);	// reset position...
-					}
-				}
-				scanner.getNext();
-			} 
-			else if (scanner.currentToken.tokenStr.equals("by")) {	// if token is by...
-				scanner.getNext();
-				Value incr = parseAssignment();				// grabs the increment variable...
-				
-				if (scanner.currentToken.tokenStr.equals(":")) {	// if end of for statement is reached...
-					int loopSrcLine = scanner.iSourceLineNr;
-					int loopColPos = scanner.iColPos;
-					scanner.getNext();
-					while(cv.intValue <= limit.intValue){
-						while(!scanner.currentToken.tokenStr.equals("endfor")){
-							parseStatement();
-						}
-						cv.intValue = cv.intValue+incr.intValue;
-						if(cv.intValue <= limit.intValue){
-							scanner.setPosition(loopSrcLine, loopColPos);
-						}
-					}
-				}
-				else{
-					throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
-				}
-				scanner.getNext();
-			} 
-			else{												// else, colon expected here...
-				throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
+				incr = parseExpression(":");
+				break;
+			case ":":
+				break;
+			default:
+				//TODO: throw exception
 			}
-		}
-		else if (scanner.currentToken.tokenStr.equals("in")) {	// if token is an in...
-			scanner.getNext();
-			Value container = parseAssignment();				// grabs the string container...
+			System.out.println("");
 			
-			if (scanner.currentToken.tokenStr.equals(":")) {		// if end of for statement is reached...
-				int loopSrcLine = scanner.iSourceLineNr;
-				int loopColPos = scanner.iColPos;
-				scanner.getNext();
-				int i = 1;
-				while(i <= container.strValue.length()){			// loops through string...
-					while(!scanner.currentToken.tokenStr.equals("endfor")){
-						parseStatement();
-					}
-					i++;
-					if(i <= container.strValue.length()){
-						scanner.setPosition(loopSrcLine, loopColPos);
-					}
-				}
-			}
-			else{
-				throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
-			}
+			break;
+		case "in":
 			scanner.getNext();
+			Token token = scanner.currentToken;
+			if(!symbolTable.containsSymbol(token.tokenStr)){
+				// TODO: exception
+			}
+			STIdentifier array = (STIdentifier) symbolTable.getSymbol(token.tokenStr);
+			if(!(array.structure == Structure.FIXED_ARRAY || array.structure == Structure.UNBOUNDED_ARRAY)){
+				// TODO: exception
+			}
+			
+			//if(controlVariable.setValue(array.fetch(this, 0))){
+				
+			//}
+			
+			
+			break;
+		default:
+			// TODO: throw exception
 		}
-		else{
-			throw new SyntaxError("Expected 'to' or 'in' next", scanner.currentToken);
-		}
-		
+		System.out.println("CV: "+cv+" value: "+controlVariable.getValue()+" limit: "+limit+" incr: "+incr);
 	}
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Function: parseDebugStatement
@@ -676,11 +742,22 @@ public class Parser {
 				return rv;
 			} // for everything with an assignment
 			else{
+				Token token = scanner.currentToken;
 				scanner.getNext();
 				if(scanner.currentToken.tokenStr.equals("=")){
 					scanner.getNext();
 					Value rv = parseExpression(";");
 					return rv;
+				}
+				else{
+					scanner.getNext();
+					if(scanner.currentToken.tokenStr.equals("to") || scanner.currentToken.tokenStr.equals("in")){
+						// check if token is in symbolTable
+						if(symbolTable.containsSymbol(token.tokenStr)){
+							System.out.println("Found token: "+token.tokenStr);
+							return token.toResult();
+						}
+					}
 				}
 			}
 		}
@@ -778,6 +855,7 @@ public class Parser {
 			System.out.println("Assigned " + rhsExpr + " to index " + assignmentIndex + " of " + variable.symbol);
 			
 		} else {
+			System.out.println(scanner.currentToken.tokenStr);
 			throw new SyntaxError("Expected array reference or assignment operator", scanner.currentToken);
 		}
 		
