@@ -1266,7 +1266,6 @@ public class Parser {
 		//At this point, our postfix expression is already populated
 		//check for possible errors
 		for(Token entry : out){			
-			System.out.println("---------->entry = " + entry.tokenStr);
 			Value res = null, res2 = null;
 			token = entry.tokenStr;
 			if(entry.primClassif == Token.OPERAND){
@@ -1444,7 +1443,7 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		 
-		System.out.println("----------> Exit parse expression <---------" + finalValue);
+		//System.out.println("----------> Exit parse expression <---------" + finalValue);
 		return finalValue;
 	}
 
