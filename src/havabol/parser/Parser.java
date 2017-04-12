@@ -1031,7 +1031,6 @@ public class Parser {
 		}
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
-		
 		Value retVal = null;
 		
 		switch (calledFunction) {
@@ -1086,7 +1085,8 @@ public class Parser {
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		
-		scanner.getNext();
+		scanner.getNext();		
+
 		
 		if (retVal == null) {
 			return null;
@@ -1117,7 +1117,6 @@ public class Parser {
 
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			
-
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
@@ -1133,6 +1132,9 @@ public class Parser {
 					if (funcResult != null)
 						out.add(funcResult);
 					if(scanner.nextToken.tokenStr.equals(";")){
+						break;
+					} 
+					if(scanner.currentToken.tokenStr.equals(":")){
 						break;
 					}
 				}
@@ -1186,7 +1188,6 @@ public class Parser {
 			token = scanner.getNext();
 		}
 		
-
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();
 			if(popped.tokenStr == "(")
