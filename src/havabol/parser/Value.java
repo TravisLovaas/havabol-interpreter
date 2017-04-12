@@ -57,6 +57,11 @@ public class Value {
 		return this;
 	}
 	
+	/**
+	 * Function:	toToken
+	 * @param parser information about  values being parsed
+	 * @return		 Value containing Token representation of token
+	 */
 	public Token toToken(Parser parser) {
 		
 		if (this.structure != Structure.PRIMITIVE) {
@@ -84,6 +89,11 @@ public class Value {
 		return patch;
 	}
 	
+	/**
+	 * Function: 	asInteger
+	 * @param parser information about  values being parsed
+	 * @return		 Value containing integer representation of token
+	 */
 	public Value asInteger(Parser parser) {
 		
 		if (this.dataType == DataType.INTEGER) {
@@ -108,6 +118,11 @@ public class Value {
 		
 	}
 	
+	/**
+	 * Function:	asFloat
+	 * @param parser information about  values being parsed
+	 * @return		 Value containing float representation of token
+	 */
 	public Value asFloat(Parser parser) {
 		
 		if (this.dataType == DataType.FLOAT) {
@@ -132,6 +147,11 @@ public class Value {
 		
 	}
 	
+	/**
+	 * Function: 	asString
+	 * @param parser information about  values being parsed
+	 * @return		 Value containing string representation of token
+	 */
 	public Value asString(Parser parser) {
 		
 		if (this.dataType == DataType.STRING) {
@@ -159,6 +179,11 @@ public class Value {
 		
 	}
 	
+	/**
+	 * Function:	asBoolean
+	 * @param parser information about  values being parsed
+	 * @return		 Value contain boolean values based on datatype
+	 */
 	public Value asBoolean(Parser parser) {
 		
 		if (this.dataType == DataType.BOOLEAN) {
@@ -194,6 +219,12 @@ public class Value {
 		
 	}
 	
+	/**
+	 * Function:	asType 	
+	 * @param parser information about  values being parsed
+	 * @param dataType
+	 * @return
+	 */
 	public Value asType(Parser parser, DataType dataType) {
 		switch (dataType) {
 		case INTEGER:
@@ -209,6 +240,10 @@ public class Value {
 		}
 	}
 	
+	/**
+	 * Function:	toString
+	 * Purpose:		returns string representation of dataType
+	 */
 	public String toString() {
 		
 		String valStr = "null";

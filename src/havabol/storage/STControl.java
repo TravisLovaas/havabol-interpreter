@@ -14,6 +14,10 @@ class STControl extends STEntry
 	}
 	int subClassif;
 	
+	/**
+	 * Function:	toString
+	 * Purpose:		return string representation of token entered into the manager
+	 */
 	public String toString() {
 		return String.format("CONTROL: %s: Control subclass: %s", symbol, subClassif);
 	}

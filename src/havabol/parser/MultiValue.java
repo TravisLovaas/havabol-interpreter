@@ -23,7 +23,7 @@ public class MultiValue {
 		this.structure = Structure.VOID;
 	}
 	
-	/***
+	/**
 	 * Function: asVoid
 	 * Purpose:	 initializes array value as void
 	 * @return instance of MultiValue
@@ -37,7 +37,7 @@ public class MultiValue {
 	/**
 	 * Function: add
 	 * Purpose:  Appends an element to this ResultValue array
-	 * @param parser Calling parser
+	 * @param parser information about  values being parsed
 	 * @param value ResultValue to append to this array
 	 */
 	public void add(Parser parser, Value value) {
@@ -48,7 +48,7 @@ public class MultiValue {
 		
 	}
 
-	/***
+	/**
 	 * Function: toString
 	 * Purpose: returns values in array as a string
 	 */

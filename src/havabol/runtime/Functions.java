@@ -70,7 +70,7 @@ public class Functions {
 
 	/**
 	 * Function:		elem
-	 * Purpose:			finds maximum 
+	 * Purpose:			finds maximum populated index + 1
 	 * @param parser	information about  values being parsed
 	 * @param array		the STIdentifier containing array to be parsed
 	 * @return			Value containing the number of populated elements
@@ -93,22 +93,15 @@ public class Functions {
 		}
 		
 		return new Value(highestIndex);
-		
-//		if (value.structure == Structure.PRIMITIVE) {
-//			throw new TypeError("ELEM may only operate on array-like values.");
-//		}
-		
 	}
-	/**
-	 * maxElem returns the declared length of an array
-	 * @param array
-	 * @return
-	 */
+	
+	
 	/**
 	 * Function: maxElem
-	 * @param parser: 
-	 * @param array
-	 * @return
+	 * Purpose:			finds maximum declared size
+	 * @param parser: 	information about  values being parsed
+	 * @param array		the STIdentifier containing array to be parsed
+	 * @return 			Value containing the declared size of an array
 	 */
 	public static Value maxElem(Parser parser, STIdentifier array) {
 		

@@ -54,9 +54,9 @@ public class SymbolTable {
 	}
 
 	/**
-	 * returns the symbol and its corresponding entry in the symbol table.
-	 * 
-	 * @param symbol
+	 * Function:	getSymbol
+	 * Purpose:		returns the symbol and its corresponding entry in the symbol table.
+	 * @param symbol:
 	 *            the symbol to get to the Symbol Table
 	 */
 
@@ -68,13 +68,19 @@ public class SymbolTable {
 		}
 
 	}
-	
+
+	/**
+	 * Function:	containsSymbol
+	 * @param symbol	symbol to be evaluated
+	 * @return			boolean stating the presence or absence of a symbol in the symbolTable
+	 */
 	public boolean containsSymbol(String symbol) {
 		return ST.containsKey(symbol);
 	}
 
 	/**
-	 * creates and/or stores the symbol and its corresponding entry in the symbol table
+	 * Function:	createSymbol
+	 * Purpose:		creates and/or stores the symbol and its corresponding entry in the symbol table
 	 * @param symbol the symbol to add to the Symbol Table
 	 * @param entry the entry in the symbol table that corresponds to the symbol name
 	 */
@@ -87,7 +93,8 @@ public class SymbolTable {
 	}
 	
 	/**
-	 * removes the symbol and its corresponding entry in the symbol table
+	 * Function:	deleteSymbol
+	 * Purpose:		removes the symbol and its corresponding entry in the symbol table
 	 * @param symbol the symbol to delete from the Symbol Table
 	 */
 	public void deleteSymbol(String symbol){
@@ -98,6 +105,10 @@ public class SymbolTable {
 		}
 	}
 	
+	/**
+	 * Function:	printSymbolTable
+	 * Purpose:		prints entries in the symbolTable
+	 */
 	public void printSymbolTable() {
 		System.out.println("******************** SymbolTable ********************");
 		for (STEntry e : ST.values()) {

@@ -8,7 +8,7 @@ public class IndexError extends Error {
 		super(message);
 	}
 	
-	/***
+	/**
 	 * Function: IndexError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed
@@ -18,7 +18,7 @@ public class IndexError extends Error {
 		super(message + " (found \"" + token.tokenStr + "\" + at line " + (token.iSourceLineNr + 1) + " near column " + (token.iColPos + 1) + ")");
 	}
 	
-	/***	 
+	/**	 
 	 * Function: IndexError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed
@@ -30,7 +30,7 @@ public class IndexError extends Error {
 	}
 	
 
-	/***	 
+	/**	 
 	 * Function: IndexError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed

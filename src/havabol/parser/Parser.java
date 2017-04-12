@@ -41,7 +41,7 @@ public class Parser {
 		put("(", 2); put("[", 0);
 	}};
 	
-	/***
+	/**
 	 * Function/Constructor: Parser
 	 * @param sourceFilename
 	 * @param symbolTable
@@ -58,7 +58,7 @@ public class Parser {
 		
 	}
 	
-	/***
+	/**
 	 * Function: beginParsing()
 	 * Purpose: starts the process of parsing tokens based on their
 	 * 			classification in parseStatement()
@@ -202,7 +202,7 @@ public class Parser {
 		}
 	}
 	
-	/***
+	/**
 	 * Function: parseFor
 	 * Preconditions:
 	 * 		currentToken is on "for"
@@ -1035,7 +1035,6 @@ public class Parser {
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
-		System.out.println("YELL =" + scanner.currentToken.tokenStr);
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		
 		scanner.getNext();
@@ -1066,16 +1065,12 @@ public class Parser {
 		Token popped;
 		boolean containsOperator = false;
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
-		//if (check.structure != Structure.PRIMITIVE){
-		//	System.out.println("We's in here");
-			//check = parseArrayRef();
-		//}
+
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			
 
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
-				boolean function = false;
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ((STIdentifier) 
 							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY){
@@ -1085,7 +1080,6 @@ public class Parser {
 						out.add(scanner.currentToken);
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
-					function = true;
 					Token funcResult = parseFunctionCall();
 					if (funcResult != null)
 						out.add(funcResult);
@@ -1109,7 +1103,6 @@ public class Parser {
 				//if separator, check special cases for parentheses
 				//to determine correctness
 				boolean lParen = false;
-				boolean lBrac = false;
 				if(token.equals("(")){
 					stackToken.push(scanner.currentToken);
 				}
@@ -1130,12 +1123,6 @@ public class Parser {
 				else if (token.equals(",")){
 					token = scanner.getNext();
 					continue;
-				}
-				
-				else if(token.equals("[")){
-					//System.out.println("found an array");
-					break;					
-					//stackToken.push(value);
 				}
 				else {
 						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
@@ -1158,9 +1145,7 @@ public class Parser {
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			out.add(popped);
 		}
-		
-		//System.out.println("About to start expressing");
-		
+				
 		//At this point, our postfix expression is already populated
 		//check for possible errors
 		for(Token entry : out){			

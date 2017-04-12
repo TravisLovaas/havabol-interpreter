@@ -8,7 +8,7 @@ public class UnsupportedOperationError extends Error{
 		super(message);
 	}
 	
-	/***	 
+	/**	 
 	 * Function: UnsupportedOperationError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed
@@ -18,7 +18,7 @@ public class UnsupportedOperationError extends Error{
 		super(message + " (found \"" + token.tokenStr + "\" + at line " + (token.iSourceLineNr + 1) + " near column " + (token.iColPos + 1) + ")");
 	}
 	
-	/***	 
+	/**	 
 	 * Function: UnsupportedOperationError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed
@@ -29,7 +29,7 @@ public class UnsupportedOperationError extends Error{
 		super(message + " (at line " + lineNumber + ")");
 	}
 	
-	/***	 
+	/**	 
 	 * Function: UnsupportedOperationError
 	 * Purpose:				Populates error message
 	 * @param message: 		message to be displayed

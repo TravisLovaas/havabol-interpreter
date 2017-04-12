@@ -8,7 +8,7 @@ import havabol.storage.*;
 
 public class Operators {
 	
-	/***
+	/**
 	 * Function: add
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -59,7 +59,7 @@ public class Operators {
 		return res;
 	}
 	
-	/***
+	/**
 	 * Function: subtract
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -102,13 +102,11 @@ public class Operators {
 			// TODO: handle str as first operand, etc
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
 		}
-		
-		//System.out.println(" = " + res);
-		
+				
 		return res;
 	}
 	
-	/***
+	/**
 	 * Function: multiply
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -157,7 +155,7 @@ public class Operators {
 		return res;
 	}
 	
-	/***
+	/**
 	 * Function: divide
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -200,13 +198,11 @@ public class Operators {
 			// TODO: handle str as first operand, etc
 			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
 		}
-		
-		//System.out.println(" = " + res);
-		
+				
 		return res;
 	}
 	
-	/***
+	/**
 	 * Function: exponentiate
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -246,7 +242,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: unaryMinus
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -275,7 +271,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: unaryNot
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -295,7 +291,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: less
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -336,7 +332,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: greater
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -376,7 +372,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: lessEqual
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -417,7 +413,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: greaterEqual
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -458,7 +454,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: doubleEqual
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -502,7 +498,7 @@ public class Operators {
 		return res;
 	}
 
-	/***
+	/**
 	 * Function: notEqual
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -542,7 +538,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: logicalAnd
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -569,7 +565,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: logicalOr
 	 * Preconditions:
 	 * 		- parseExpression has identified operands that 
@@ -596,7 +592,7 @@ public class Operators {
 	}
 
 	
-	/***
+	/**
 	 * Function: concatenate
 	 *  * Preconditions:
 	 * 		- parseExpression has identified operands that 

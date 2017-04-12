@@ -8,6 +8,11 @@ public enum DataType {
 	BOOLEAN,
 	VOID, DATE;
 	
+	/**
+	 * Function:		stringToType
+	 * @param type		string whose datatype should be set
+	 * @return			appropriate datatype
+	 */
 	public static DataType stringToType(String type) {
 		switch (type.toLowerCase()) {
 		case "int":
