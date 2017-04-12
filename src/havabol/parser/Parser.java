@@ -328,11 +328,11 @@ public class Parser {
 			assert(scanner.currentToken.tokenStr.equals("to"));
 			scanner.getNext(); // get past "to"
 			
-			System.out.println(scanner.currentToken.tokenStr);
+			//System.out.println(scanner.currentToken.tokenStr);
 			
 			limit = parseExpression("by");
 			
-			System.out.println("past limit");
+			//System.out.println("past limit");
 
 			//scanner.getNext();
 			switch(scanner.currentToken.tokenStr){
@@ -346,7 +346,7 @@ public class Parser {
 				throw new SyntaxError("Expected : or by clause in for loop", scanner.currentToken);
 			}
 			
-			System.out.println("Limit: " + limit + "Incr: " + incr);
+			System.out.println("Limit: " + limit + " Incr: " + incr);
 			
 			lineNm = scanner.iSourceLineNr;
 			colPos = scanner.iColPos;
@@ -355,7 +355,15 @@ public class Parser {
 			limit = limit.asInteger(this);
 			incr = incr.asInteger(this);
 			
+			assert(scanner.currentToken.tokenStr.equals(":"));
+			
+			scanner.getNext();
+			
 			while (controlVariable.getValue().intValue <= limit.intValue) {
+				
+				System.out.println("begin for body");
+				
+				System.out.println("Control var: " + controlVariable.getValue() + " symbol " + controlVariable.symbol);
 				
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
@@ -994,6 +1002,8 @@ public class Parser {
 			throw new SyntaxError("Expected index or beginning of slice", scanner.currentToken);
 		}*/
 		
+		System.out.println("Array ref inside begin symbol: " + scanner.currentToken.tokenStr);
+		
 		// index may be an expression
 		int beginSliceIndex = parseExpression("]").asInteger(this).intValue;
 		Value result = null;
@@ -1057,7 +1067,7 @@ public class Parser {
 		
 		String calledFunction = scanner.currentToken.tokenStr;
 		String argVar = null;
-		System.out.println("Called: " + calledFunction); 
+		//System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
 		String check = scanner.getNext();
 		
@@ -1120,7 +1130,7 @@ public class Parser {
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
-		System.out.println("returning: " + retVal);
+		//System.out.println("returning: " + retVal);
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		
