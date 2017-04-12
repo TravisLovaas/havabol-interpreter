@@ -361,26 +361,29 @@ public class Parser {
 			assert(scanner.currentToken.tokenStr.equals(":"));
 			scanner.getNext();
 			
+			
 			int lineNm = scanner.iSourceLineNr;
 			int colPos = scanner.iColPos;
-			int endforCount = 0;
+			int controlVariableIterations = 0;
 			
-			for (;;) {
-				
-				
-				
-				break;
-				
-			}
-			while (!scanner.currentToken.equals("endfor") || endforCount > 0) {
-				
-			}
 			
+			//loop until hits declared array size or null
+			while(controlVariable.getValue().intValue < array.declaredSize || token.equals(null)){
+			
+				while (!scanner.currentToken.equals("endfor")) {
+					parseStatement();
+				}
+				controlVariable.setValue(array.fetch(this, controlVariableIterations + 1));
+				if(controlVariable.getValue().intValue < array.declaredSize || token.equals(null)){
+					scanner.setPosition(lineNm,colPos);
+				}
+			}
 			break;
 		default:
 			// TODO: throw exception
 		}
-		System.out.println("CV: "+cv+" value: "+controlVariable.getValue()+" limit: "+limit+" incr: "+incr);
+//		System.out.println("CV: "+cv+" value: "+controlVariable.getValue()+" limit: "+limit+" incr: "+incr);
+		return;
 	}
 	
 	
