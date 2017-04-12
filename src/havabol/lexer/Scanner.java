@@ -39,6 +39,7 @@ public class Scanner {
 	public int commentFoundOn = 0;
 	// Done scanning this file
 	public boolean done = false;
+	private boolean stop = false;
 	public boolean unary = false;
 	public boolean printBuffer = false;
 	
@@ -109,10 +110,17 @@ public class Scanner {
 		if (debugToken) {
 			System.out.println("\t\t... Current Token = " + currentToken.tokenStr);
 		}
+		
+		if (stop) {
+			currentToken.primClassif = Token.EOF;
+			return "";
+		}
+		
 
 		if (currentToken.primClassif == Token.EOF) {
 			if (!nextToken.tokenStr.equals("")) {
 				currentToken = nextToken;
+				stop = true;
 				return currentToken.tokenStr;
 			}
 			return "";
