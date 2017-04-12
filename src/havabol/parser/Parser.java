@@ -307,13 +307,11 @@ public class Parser {
 
 		assert(scanner.currentToken.subClassif == Token.IDENTIFIER);
 		
-		String cv = scanner.getNext();
+		String cv = scanner.currentToken.tokenStr;
 		Value value, limit = null, incr = new Value(1);
 		STIdentifier controlVariable = null;
 		
-		
 		scanner.getNext();
-		
 		
 		switch(scanner.currentToken.tokenStr){
 		case "=":
@@ -326,7 +324,11 @@ public class Parser {
 			
 			assert(scanner.currentToken.tokenStr.equals("to"));
 			scanner.getNext(); // get past "to"
+			
+			System.out.println(scanner.currentToken.tokenStr);
+			
 			limit = parseExpression("by");
+
 			//scanner.getNext();
 			switch(scanner.currentToken.tokenStr){
 			case "by":
@@ -336,13 +338,17 @@ public class Parser {
 			case ":":
 				break;
 			default:
-				//TODO: throw exception
+				throw new SyntaxError("Expected : or by clause in for loop", scanner.currentToken);
 			}
-			System.out.println("");
+			
+			System.out.println("Limit: " + limit + "Incr: " + incr);
 			
 			break;
 		case "in":
 			scanner.getNext();
+			
+			assert(scanner.currentToken.subClassif == Token.IDENTIFIER);
+			
 			Token token = scanner.currentToken;
 			if(!symbolTable.containsSymbol(token.tokenStr)){
 				// TODO: exception
@@ -353,44 +359,65 @@ public class Parser {
 			}
 			
 			controlVariable = new STIdentifier(cv, array.declaredType, Structure.PRIMITIVE, null, 0);
-			
-			// assume there is a first element
-			controlVariable.setValue(array.fetch(this, 0));
+			symbolTable.createSymbol(this, cv, controlVariable);
 			
 			scanner.getNext();
+			
 			assert(scanner.currentToken.tokenStr.equals(":"));
-			scanner.getNext();
-			
 			
 			int lineNm = scanner.iSourceLineNr;
 			int colPos = scanner.iColPos;
-			int controlVariableIterations = 0;
+			int internalIndex = 0;
 			
+			//System.out.println(lineNm + 1 + " " + (colPos + 1));
+			
+			scanner.getNext();
 			
 			//loop until hits declared array size or null
-			while(controlVariable.getValue().intValue < array.declaredSize || token.equals(null)){
+			while (internalIndex < array.declaredSize) {
+				
+				value = array.arrayValue[internalIndex++];
+				
+				if (value == null) {
+					break;
+				}
+				
+				controlVariable.setValue(value);
+				
+				//System.out.println("looping...");
+				//System.out.println("begin loop on " + scanner.currentToken.tokenStr);
 			
-				while (!scanner.currentToken.equals("endfor")) {
+				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
 				}
-				controlVariable.setValue(array.fetch(this, controlVariableIterations + 1));
-				if(controlVariable.getValue().intValue < array.declaredSize || token.equals(null)){
-					scanner.setPosition(lineNm,colPos);
-				}
+				
+				//System.out.println("end loop body on " + scanner.currentToken.tokenStr);
+				
+				scanner.setPosition(lineNm,colPos);
+				
 			}
+			
+			int endForCnt = 0;
+			while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
+				if (scanner.currentToken.tokenStr.equals("for"))
+					endForCnt++;
+				else if (scanner.currentToken.tokenStr.equals("endfor"))
+					endForCnt--;
+				scanner.getNext();
+			}
+			
+			assert(scanner.currentToken.tokenStr.equals("endfor"));
+			scanner.getNext();
+			assert(scanner.currentToken.tokenStr.equals(";"));
 			break;
+			
 		default:
 			// TODO: throw exception
 		}
 //		System.out.println("CV: "+cv+" value: "+controlVariable.getValue()+" limit: "+limit+" incr: "+incr);
 		return;
 	}
-	
-	
-	
-	
-	
-	
+
 	
 	/**
 	 * Function: parseDebugStatement
@@ -993,7 +1020,7 @@ public class Parser {
 		
 		String calledFunction = scanner.currentToken.tokenStr;
 		String argVar = null;
-		System.out.println("Called: " + calledFunction); 
+		//System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
 		String check = scanner.getNext();
 		

@@ -89,6 +89,24 @@ public class Value {
 		return patch;
 	}
 	
+	public void setCharacter(Parser parser, int index, String character) {
+		
+		if (this.dataType != DataType.STRING) {
+			throw new TypeError("Cannot set character for non-string type");
+		}
+		
+		if (character.length() != 1) {
+			throw new TypeError("Cannot assign a non-character to string");
+		}
+		
+		char charArray[] = this.strValue.toCharArray();
+		
+		charArray[index] = character.charAt(0);
+		
+		this.strValue = String.valueOf(charArray);
+		
+	}
+	
 	/**
 	 * Function: 	asInteger
 	 * @param parser information about  values being parsed
