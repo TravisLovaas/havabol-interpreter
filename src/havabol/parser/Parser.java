@@ -216,90 +216,6 @@ public class Parser {
 	 * for i = 1 to 15 by 3 :
 	 * for x = "t" in "test" :
 	 */
-//	private void parseFor() {
-//		
-//		scanner.getNext(); // get past "for"
-//		
-//		Value cv = parseAssignment();					// grabs the control variable...
-//		
-//		
-//		if (scanner.currentToken.tokenStr.equals("to")) {		// if token is a to...
-//			scanner.getNext();
-//			Value limit = parseAssignment();				// grabs the limit variable...
-//			
-//			if (scanner.currentToken.tokenStr.equals(":")) {		// if end of for statement is reached...
-//				int loopSrcLine = scanner.iSourceLineNr;			// remembers start of body statements...
-//				int loopColPos = scanner.iColPos;
-//				scanner.getNext();
-//				
-//				while(cv.intValue <= limit.intValue){				// loop until limit is reached...
-//					while(!scanner.currentToken.tokenStr.equals("endfor")){
-//						parseStatement();
-//					}
-//					cv.intValue++;
-//					if(cv.intValue <= limit.intValue){
-//						scanner.setPosition(loopSrcLine, loopColPos);	// reset position...
-//					}
-//				}
-//				scanner.getNext();
-//			} 
-//			else if (scanner.currentToken.tokenStr.equals("by")) {	// if token is by...
-//				scanner.getNext();
-//				Value incr = parseAssignment();				// grabs the increment variable...
-//				
-//				if (scanner.currentToken.tokenStr.equals(":")) {	// if end of for statement is reached...
-//					int loopSrcLine = scanner.iSourceLineNr;
-//					int loopColPos = scanner.iColPos;
-//					scanner.getNext();
-//					while(cv.intValue <= limit.intValue){
-//						while(!scanner.currentToken.tokenStr.equals("endfor")){
-//							parseStatement();
-//						}
-//						cv.intValue = cv.intValue+incr.intValue;
-//						if(cv.intValue <= limit.intValue){
-//							scanner.setPosition(loopSrcLine, loopColPos);
-//						}
-//					}
-//				}
-//				else{
-//					throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
-//				}
-//				scanner.getNext();
-//			} 
-//			else{												// else, colon expected here...
-//				throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
-//			}
-//		}
-//		else if (scanner.currentToken.tokenStr.equals("in")) {	// if token is an in...
-//			scanner.getNext();
-//			Value container = parseAssignment();				// grabs the string container...
-//			
-//			if (scanner.currentToken.tokenStr.equals(":")) {		// if end of for statement is reached...
-//				int loopSrcLine = scanner.iSourceLineNr;
-//				int loopColPos = scanner.iColPos;
-//				scanner.getNext();
-//				int i = 1;
-//				while(i <= container.strValue.length()){			// loops through string...
-//					while(!scanner.currentToken.tokenStr.equals("endfor")){
-//						parseStatement();
-//					}
-//					i++;
-//					if(i <= container.strValue.length()){
-//						scanner.setPosition(loopSrcLine, loopColPos);
-//					}
-//				}
-//			}
-//			else{
-//				throw new SyntaxError("Expected colon to end statement", scanner.currentToken);
-//			}
-//			scanner.getNext();
-//		}
-//		else{
-//			throw new SyntaxError("Expected 'to' or 'in' next", scanner.currentToken);
-//		}
-//		
-//	}
-	
 	private void parseFor(){
 		
 		scanner.getNext(); // get past for
@@ -1184,13 +1100,13 @@ public class Parser {
 			break;
 		case "LENGTH":
 			argVar = scanner.currentToken.tokenStr;
-			retVal = Functions.length(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			scanner.getNext();
+			retVal = Functions.length(this, parseExpression(")"));
+			//scanner.getNext();
 			break;
 		case "SPACES":
 			argVar = scanner.currentToken.tokenStr;
-			retVal = Functions.spaces(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			scanner.getNext();
+			retVal = Functions.spaces(this, parseExpression(")"));
+			//scanner.getNext();
 			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
