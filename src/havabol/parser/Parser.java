@@ -1431,7 +1431,7 @@ public class Parser {
 		}else if(stackResult.isEmpty() && evaluated){
 			throw new UnsupportedOperationError("Invalid Expression found. There are too few operands for the operators provided"
 					, scanner.currentToken.iSourceLineNr);
-		} if(!stackResult.isEmpty() && evaluated){
+		}else if(!stackResult.isEmpty() && evaluated){
 			throw new UnsupportedOperationError("Invalid Expression found. There are too many operands for the operators provided"
 					, scanner.currentToken.iSourceLineNr);
 		}
