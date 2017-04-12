@@ -86,7 +86,9 @@ public class SymbolTable {
 	 */
 	public void createSymbol(Parser parser, String symbol, STEntry entry){
 		if(this.containsSymbol(symbol)){
-			// TODO: error: already in Symbol Table
+			ST.remove(symbol);
+			ST.put(symbol, entry);
+			//throw new DeclarationError("Attempted to redefine symbol");
 		}else{
 			ST.put(symbol, entry);
 		}
