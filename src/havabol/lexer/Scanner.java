@@ -39,6 +39,7 @@ public class Scanner {
 	public int commentFoundOn = 0;
 	// Done scanning this file
 	public boolean done = false;
+	private boolean stop = false;
 	public boolean unary = false;
 	public boolean printBuffer = false;
 	
@@ -102,13 +103,26 @@ public class Scanner {
 	 * @return String representation of the next token
 	 */
 	public String getNext() throws SyntaxError {
-		previous = currentToken;		
+		previous = currentToken;	
+		
 		currentToken = getNextToken(false);
 		//debugger for token
 		if (debugToken) {
 			System.out.println("\t\t... Current Token = " + currentToken.tokenStr);
 		}
+		
+		if (stop) {
+			currentToken.primClassif = Token.EOF;
+			return "";
+		}
+		
+
 		if (currentToken.primClassif == Token.EOF) {
+			if (!nextToken.tokenStr.equals("")) {
+				currentToken = nextToken;
+				stop = true;
+				return currentToken.tokenStr;
+			}
 			return "";
 		}
 		nextToken = getNextToken(true);
@@ -283,7 +297,10 @@ public class Scanner {
 		this.textCharM = sourceLineM.get(iSourceLineNr).toCharArray();
 		this.iSourceLineNr = iSourceLineNr;
 		this.iColPos = iColPos;
+		this.done = false;
 		
+		//System.out.println("Set position to: " + (iSourceLineNr + 1) + " " + (iColPos + 1));
+		//System.out.println("On line: " + String.valueOf(textCharM));
 		this.getNext();
 	}
 	

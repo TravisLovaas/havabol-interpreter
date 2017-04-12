@@ -40,8 +40,8 @@ public class Functions {
 	 * @param string 	the STIdentifier containing string to be processed
 	 * @return 			Value with the length of a string
 	 */
-	public static Value length(Parser parser, STIdentifier string){
-		return new Value(string.getValue().strValue.length());
+	public static Value length(Parser parser, Value string){
+		return new Value(string.asString(parser).strValue.length());
 	}
 	
 	/**
@@ -52,10 +52,10 @@ public class Functions {
 	 * @return 			Value with the boolean T/F if string contains spaces(T),
 	 * 		   			is empty (T), or doesn't contain spaces (F) 
 	 */
-	public static Value spaces(Parser parser, STIdentifier string){
-		char[] check = string.getValue().asString(parser).strValue.toCharArray();
+	public static Value spaces(Parser parser, Value string){
+		char[] check = string.asString(parser).strValue.toCharArray();
 		
-		if(string.getValue().strValue.isEmpty()){
+		if(string.strValue.isEmpty()){
 			return new Value(true);
 		}
 		for (char c : check) {
