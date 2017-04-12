@@ -708,7 +708,7 @@ public class Parser {
 							//scanner.getNext();
 							rhsMultiVal = parseValueList(";");
 							
-							System.out.println("rhsMultiVal.numItems = " + rhsMultiVal.numItems);
+							//System.out.println("rhsMultiVal.numItems = " + rhsMultiVal.numItems);
 							if (rhsMultiVal.numItems > variable.declaredSize) {
 								throw new IndexError("Value list contains too many elements to fit into given array");
 							}
@@ -717,7 +717,7 @@ public class Parser {
 								variable.arrayValue[i] = rhsMultiVal.values.get(i);
 							}
 							
-							System.out.println("Created array with given size and given value list.");
+							//System.out.println("Created array with given size and given value list.");
 							
 							break;
 						default:
@@ -790,7 +790,7 @@ public class Parser {
 		
 		assert(scanner.currentToken.tokenStr.equals(";"));
 		
-		System.out.println("Value list: " + array);
+		//System.out.println("Value list: " + array);
 		
 		return array;
 	}
@@ -852,7 +852,7 @@ public class Parser {
 					if(scanner.currentToken.tokenStr.equals("to") || scanner.currentToken.tokenStr.equals("in")){
 						// check if token is in symbolTable
 						if(symbolTable.containsSymbol(token.tokenStr)){
-							System.out.println("Found token: "+token.tokenStr);
+							//System.out.println("Found token: "+token.tokenStr);
 							return token.toResult();
 						}
 					}
