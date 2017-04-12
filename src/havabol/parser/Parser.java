@@ -1004,8 +1004,14 @@ public class Parser {
 		
 		System.out.println("Array ref inside begin symbol: " + scanner.currentToken.tokenStr);
 		
+		Value indexVal = parseExpression("]");
+		
+		if (indexVal == null) {
+			throw new SyntaxError("Expected an expression inside bracketed array reference", scanner.currentToken);
+		}
+		
 		// index may be an expression
-		int beginSliceIndex = parseExpression("]").asInteger(this).intValue;
+		int beginSliceIndex = indexVal.asInteger(this).intValue;
 		Value result = null;
 		
 		assert(scanner.currentToken.tokenStr.equals("]"));
