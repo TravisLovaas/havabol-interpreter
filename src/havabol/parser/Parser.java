@@ -710,7 +710,7 @@ public class Parser {
 							//scanner.getNext();
 							rhsMultiVal = parseValueList(";");
 							
-							System.out.println("rhsMultiVal.numItems = " + rhsMultiVal.numItems);
+							//System.out.println("rhsMultiVal.numItems = " + rhsMultiVal.numItems);
 							if (rhsMultiVal.numItems > variable.declaredSize) {
 								throw new IndexError("Value list contains too many elements to fit into given array");
 							}
@@ -719,7 +719,7 @@ public class Parser {
 								variable.arrayValue[i] = rhsMultiVal.values.get(i);
 							}
 							
-							System.out.println("Created array with given size and given value list.");
+							//System.out.println("Created array with given size and given value list.");
 							
 							break;
 						default:
@@ -792,7 +792,7 @@ public class Parser {
 		
 		assert(scanner.currentToken.tokenStr.equals(";"));
 		
-		System.out.println("Value list: " + array);
+		//System.out.println("Value list: " + array);
 		
 		return array;
 	}
@@ -854,7 +854,7 @@ public class Parser {
 					if(scanner.currentToken.tokenStr.equals("to") || scanner.currentToken.tokenStr.equals("in")){
 						// check if token is in symbolTable
 						if(symbolTable.containsSymbol(token.tokenStr)){
-							System.out.println("Found token: "+token.tokenStr);
+							//System.out.println("Found token: "+token.tokenStr);
 							return token.toResult();
 						}
 					}
@@ -988,12 +988,18 @@ public class Parser {
 			
 			rhsExpr = parseExpression(";");
 			
-			variable.set(this, assignmentIndex, rhsExpr);
+			if (variable.structure == Structure.FIXED_ARRAY || variable.structure == Structure.UNBOUNDED_ARRAY) {
+				variable.set(this, assignmentIndex, rhsExpr);
+			} else if (variable.getValue().dataType == DataType.STRING) {
+				variable.getValue().spliceString(this, assignmentIndex, rhsExpr.asString(this).strValue);
+			} else {
+				throw new TypeError("Cannot assign to non-string / non-array value", scanner.currentToken);
+			}
 			
-			System.out.println("Assigned " + rhsExpr + " to index " + assignmentIndex + " of " + variable.symbol);
+			//System.out.println("Assigned " + rhsExpr + " to index " + assignmentIndex + " of " + variable.symbol);
 			
 		} else {
-			System.out.println(scanner.currentToken.tokenStr);
+			//System.out.println(scanner.currentToken.tokenStr);
 			throw new SyntaxError("Expected array reference or assignment operator", scanner.currentToken);
 		}
 		
@@ -1025,7 +1031,7 @@ public class Parser {
 		
 		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
 
-		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY) {
+		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY && array.getValue().dataType != DataType.STRING) {
 			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
 		}
 		
@@ -1062,8 +1068,14 @@ public class Parser {
 		
 		switch (scanner.currentToken.tokenStr) {
 		case "]":
+			
+			if (array.structure == Structure.FIXED_ARRAY || array.structure == Structure.UNBOUNDED_ARRAY) {
+				result = array.fetch(this, beginSliceIndex);
+			} else {
+				result = new Value("" + array.getValue().asString(this).strValue.charAt(beginSliceIndex));
+			}
 			// Singular array value
-			result = array.fetch(this, beginSliceIndex);
+			
 			
 			//System.out.println("Accessing array " + array.symbol + " index " + beginSliceIndex + " value = " + result);
 			
@@ -1166,10 +1178,12 @@ public class Parser {
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			scanner.getNext();
 			break;
 		case "LENGTH":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.length(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			scanner.getNext();
 			break;
 		case "SPACES":
 			argVar = scanner.currentToken.tokenStr;
@@ -1218,11 +1232,17 @@ public class Parser {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
-					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ((STIdentifier) 
-							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY){
-							Token array = parseArrayRef();
-							out.add(array);
-					}else
+					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
+							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY)) {
+						Token array = parseArrayRef();
+						out.add(array);
+					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
+							&& symbolTable.containsSymbol(token) 
+							&& symbolTable.getSymbol(token).getValue().dataType == DataType.STRING 
+							&& scanner.nextToken.tokenStr.equals("[") ) {
+						Token str = parseArrayRef();
+						out.add(str);
+					} else
 						out.add(scanner.currentToken);
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
