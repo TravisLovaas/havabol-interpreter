@@ -352,10 +352,29 @@ public class Parser {
 				// TODO: exception
 			}
 			
-			//if(controlVariable.setValue(array.fetch(this, 0))){
-				
-			//}
+			controlVariable = new STIdentifier(cv, array.declaredType, Structure.PRIMITIVE, null, 0);
 			
+			// assume there is a first element
+			controlVariable.setValue(array.fetch(this, 0));
+			
+			scanner.getNext();
+			assert(scanner.currentToken.tokenStr.equals(":"));
+			scanner.getNext();
+			
+			int lineNm = scanner.iSourceLineNr;
+			int colPos = scanner.iColPos;
+			int endforCount = 0;
+			
+			for (;;) {
+				
+				
+				
+				break;
+				
+			}
+			while (!scanner.currentToken.equals("endfor") || endforCount > 0) {
+				
+			}
 			
 			break;
 		default:
