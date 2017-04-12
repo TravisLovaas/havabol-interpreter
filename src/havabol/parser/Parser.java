@@ -1190,11 +1190,19 @@ public class Parser {
 					Token funcResult = parseFunctionCall();
 					if (funcResult != null)
 						out.add(funcResult);
-					if(scanner.nextToken.tokenStr.equals(";")){
+					if(scanner.nextToken.tokenStr.equals(";") || scanner.currentToken.tokenStr.equals(":") || scanner.currentToken.tokenStr.equals("by")){
 						break;
 					} 
-					if(scanner.currentToken.tokenStr.equals(":")){
-						break;
+					if(scanner.currentToken.primClassif == Token.OPERATOR){
+						containsOperator = true;
+						while(!stackToken.isEmpty()){
+							//if operator, check precedence
+							if(precedence.get(token) > stkPrecedence.get(stackToken.peek().tokenStr)){
+								break;
+							}
+							out.add(stackToken.pop());
+						}
+						stackToken.push(scanner.currentToken); 
 					}
 				}
 			}
@@ -1246,7 +1254,6 @@ public class Parser {
 			}
 			token = scanner.getNext();
 		}
-		
 
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();
@@ -1259,6 +1266,7 @@ public class Parser {
 		//At this point, our postfix expression is already populated
 		//check for possible errors
 		for(Token entry : out){			
+			System.out.println("---------->entry = " + entry.tokenStr);
 			Value res = null, res2 = null;
 			token = entry.tokenStr;
 			if(entry.primClassif == Token.OPERAND){
@@ -1436,7 +1444,7 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		 
-		//System.out.println("----------> Exit parse expression <---------" + finalValue);
+		System.out.println("----------> Exit parse expression <---------" + finalValue);
 		return finalValue;
 	}
 
