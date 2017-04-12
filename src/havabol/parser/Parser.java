@@ -310,6 +310,9 @@ public class Parser {
 		String cv = scanner.currentToken.tokenStr;
 		Value value, limit = null, incr = new Value(1);
 		STIdentifier controlVariable = null;
+		int lineNm;
+		int endForCnt = 0;
+		int colPos;
 		
 		scanner.getNext();
 		
@@ -328,6 +331,8 @@ public class Parser {
 			System.out.println(scanner.currentToken.tokenStr);
 			
 			limit = parseExpression("by");
+			
+			System.out.println("past limit");
 
 			//scanner.getNext();
 			switch(scanner.currentToken.tokenStr){
@@ -343,7 +348,39 @@ public class Parser {
 			
 			System.out.println("Limit: " + limit + "Incr: " + incr);
 			
+			lineNm = scanner.iSourceLineNr;
+			colPos = scanner.iColPos;
+			
+			controlVariable.setValue(controlVariable.getValue().asInteger(this));
+			limit = limit.asInteger(this);
+			incr = incr.asInteger(this);
+			
+			while (controlVariable.getValue().intValue <= limit.intValue) {
+				
+				while (!scanner.currentToken.tokenStr.equals("endfor")) {
+					parseStatement();
+				}
+				
+				controlVariable.getValue().intValue += incr.intValue;
+				
+				scanner.setPosition(lineNm,colPos);
+				
+			}
+			
+			endForCnt = 0;
+			while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
+				if (scanner.currentToken.tokenStr.equals("for"))
+					endForCnt++;
+				else if (scanner.currentToken.tokenStr.equals("endfor"))
+					endForCnt--;
+				scanner.getNext();
+			}
+			
+			assert(scanner.currentToken.tokenStr.equals("endfor"));
+			scanner.getNext();
+			assert(scanner.currentToken.tokenStr.equals(";"));
 			break;
+			
 		case "in":
 			scanner.getNext();
 			
@@ -365,8 +402,8 @@ public class Parser {
 			
 			assert(scanner.currentToken.tokenStr.equals(":"));
 			
-			int lineNm = scanner.iSourceLineNr;
-			int colPos = scanner.iColPos;
+			lineNm = scanner.iSourceLineNr;
+			colPos = scanner.iColPos;
 			int internalIndex = 0;
 			
 			//System.out.println(lineNm + 1 + " " + (colPos + 1));
@@ -397,7 +434,7 @@ public class Parser {
 				
 			}
 			
-			int endForCnt = 0;
+			endForCnt = 0;
 			while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
 				if (scanner.currentToken.tokenStr.equals("for"))
 					endForCnt++;
@@ -1020,7 +1057,7 @@ public class Parser {
 		
 		String calledFunction = scanner.currentToken.tokenStr;
 		String argVar = null;
-		//System.out.println("Called: " + calledFunction); 
+		System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
 		String check = scanner.getNext();
 		
@@ -1083,6 +1120,8 @@ public class Parser {
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
+		
+		System.out.println("returning: " + retVal);
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		
