@@ -1243,6 +1243,7 @@ public class Parser {
 			token = scanner.getNext();
 		}
 		
+
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();
 			if(popped.tokenStr == "(")
@@ -1262,6 +1263,7 @@ public class Parser {
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
 						res = symbolTable.getSymbol(token).getValue();
+						//System.out.println("----------->token = " + res);
 						//Array found?
 						stackResult.push(res);
 						break;
