@@ -378,7 +378,8 @@ public class Parser {
 			assert(scanner.currentToken.tokenStr.equals("endfor"));
 			
 			scanner.getNext();
-			
+			//System.out.println("returning: " + scanner.currentToken.tokenStr);
+			//System.out.println("returning: " + scanner.nextToken.tokenStr);
 			assert(scanner.currentToken.tokenStr.equals(";"));
 			
 			break;
@@ -1097,10 +1098,14 @@ public class Parser {
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			if(!scanner.currentToken.equals(")"))
+				scanner.getNext();
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			if(!scanner.currentToken.equals(")"))
+				scanner.getNext();
 			break;
 		case "LENGTH":
 			argVar = scanner.currentToken.tokenStr;
@@ -1114,7 +1119,6 @@ public class Parser {
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
 		
-		//System.out.println("returning: " + scanner.currentToken.tokenStr);
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		scanner.getNext();		
