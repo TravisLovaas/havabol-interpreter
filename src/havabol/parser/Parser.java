@@ -248,7 +248,8 @@ public class Parser {
 			//System.out.println(scanner.currentToken.tokenStr);
 			
 			limit = parseExpression("by");
-			
+			//System.out.println("*********" + limit);
+
 			//System.out.println("past limit");
 
 			//scanner.getNext();
@@ -280,7 +281,7 @@ public class Parser {
 			
 			scanner.getNext();
 			
-			while (controlVariable.getValue().intValue <= limit.intValue) {
+			while (controlVariable.getValue().intValue < limit.intValue) {
 				
 				//System.out.println("begin for body");
 				
@@ -989,6 +990,8 @@ public class Parser {
 		case "]":
 			
 			if (array.structure == Structure.FIXED_ARRAY || array.structure == Structure.UNBOUNDED_ARRAY) {
+				//System.out.println("**********" + beginSliceIndex);
+				//if(beginSliceIndex < )
 				result = array.fetch(this, beginSliceIndex);
 			} else {
 				result = new Value("" + array.getValue().asString(this).strValue.charAt(beginSliceIndex));
@@ -1226,6 +1229,7 @@ public class Parser {
 				
 			}
 			else{
+					System.out.println("************ " + token);
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}
