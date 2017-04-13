@@ -99,7 +99,7 @@ public class TestHavaBol
     		SymbolTable st = new SymbolTable();
             Parser parser = new Parser(sourceFile, st);
             parser.beginParsing();
-            st.printSymbolTable();
+            //st.printSymbolTable();
         }
         catch (Exception e)
         {

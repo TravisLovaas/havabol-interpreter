@@ -379,10 +379,8 @@ public class Parser {
 			assert(scanner.currentToken.tokenStr.equals("endfor"));
 			
 			scanner.getNext();
-			//System.out.println("returning: " + scanner.currentToken.tokenStr);
-			//System.out.println("returning: " + scanner.nextToken.tokenStr);
-			if(scanner.currentToken.primClassif != Token.EOF)
-				assert(scanner.currentToken.tokenStr.equals(";"));
+			
+			assert(scanner.currentToken.tokenStr.equals(";"));
 			
 			break;
 			
@@ -1049,6 +1047,10 @@ public class Parser {
 	 *    - currentToken is the name of a function in a function call, e.g.
 	 *           print("hello", "world");
 	 *      	 ^^^^^
+	 * Postconditions:
+	 * 	  - currentToken is the closing parenthesis of the function call, e.g.
+	 * 			 print("hello", "world");
+	 *                                 ^
 	 * Purpose: Parses a function call
 	 * @return the result of function call
 	 */
