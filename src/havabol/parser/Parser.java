@@ -375,12 +375,14 @@ public class Parser {
 				scanner.getNext();
 			}
 			
+			
 			assert(scanner.currentToken.tokenStr.equals("endfor"));
 			
 			scanner.getNext();
 			//System.out.println("returning: " + scanner.currentToken.tokenStr);
 			//System.out.println("returning: " + scanner.nextToken.tokenStr);
-			assert(scanner.currentToken.tokenStr.equals(";"));
+			if(scanner.currentToken.primClassif != Token.EOF)
+				assert(scanner.currentToken.tokenStr.equals(";"));
 			
 			break;
 			
