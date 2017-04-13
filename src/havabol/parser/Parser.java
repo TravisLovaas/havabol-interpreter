@@ -1110,11 +1110,7 @@ public class Parser {
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
-<<<<<<< HEAD
-			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));	
-=======
 			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
->>>>>>> refs/remotes/origin/master
 			scanner.getNext();
 			break;
 		case "LENGTH":
