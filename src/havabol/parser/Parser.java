@@ -1098,14 +1098,12 @@ public class Parser {
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			if(!scanner.currentToken.equals(")"))
-				scanner.getNext();
+			scanner.getNext();
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
-			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			if(!scanner.currentToken.equals(")"))
-				scanner.getNext();
+			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));	
+			scanner.getNext();
 			break;
 		case "LENGTH":
 			argVar = scanner.currentToken.tokenStr;
