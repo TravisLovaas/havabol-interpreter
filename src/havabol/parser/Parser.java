@@ -438,6 +438,10 @@ public class Parser {
 			throw new SyntaxError("Found unsupported \"debug\" argument", scanner.currentToken);
 		}
 		
+		scanner.getNext();
+		
+		assert(scanner.currentToken.tokenStr.equals(";"));
+		
 	}
 	
 	/**
@@ -495,6 +499,8 @@ public class Parser {
 			}
 		} else if (scanner.currentToken.primClassif == Token.FUNCTION) {
 			parseFunctionCall();
+			assert(scanner.currentToken.tokenStr.equals(")"));
+			scanner.getNext();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 					parseAssignment();
@@ -1098,14 +1104,12 @@ public class Parser {
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			if(!scanner.currentToken.equals(")"))
-				scanner.getNext();
+			scanner.getNext();
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			if(!scanner.currentToken.equals(")"))
-				scanner.getNext();
+			scanner.getNext();
 			break;
 		case "LENGTH":
 			argVar = scanner.currentToken.tokenStr;
@@ -1121,7 +1125,7 @@ public class Parser {
 		
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
-		scanner.getNext();		
+		//scanner.getNext();		
 
 		if (retVal == null) {
 			return null;
