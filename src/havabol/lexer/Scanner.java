@@ -137,7 +137,7 @@ public class Scanner {
 				currentToken.tokenStr = "u-";
 			}else
 				unary = false;
-		//System.out.println("----> cur token " + currentToken.tokenStr);
+		//System.out.println("----> Line " + iSourceLineNr);
 		return currentToken.tokenStr;
 	}
 	

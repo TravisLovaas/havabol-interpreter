@@ -92,7 +92,11 @@ public class Functions {
 				highestIndex = i;
 		}
 		
-		return new Value(highestIndex);
+		if(highestIndex == 0)
+			return new Value(highestIndex);
+		else
+			return new Value(highestIndex + 1);
+
 	}
 	
 	

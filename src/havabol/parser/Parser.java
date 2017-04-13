@@ -1094,22 +1094,18 @@ public class Parser {
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			scanner.getNext();
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
-			scanner.getNext();
 			break;
 		case "LENGTH":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.length(this, parseExpression(")"));
-			//scanner.getNext();
 			break;
 		case "SPACES":
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.spaces(this, parseExpression(")"));
-			//scanner.getNext();
 			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
