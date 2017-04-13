@@ -1149,6 +1149,8 @@ public class Parser {
 
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			//System.out.println("---> curTok = " + token);
+			//System.out.println("************cur= " + scanner.currentToken.tokenStr);					
+
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
@@ -1168,6 +1170,7 @@ public class Parser {
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
 					Token funcResult = parseFunctionCall();
+					//System.out.println("************funccur= " + scanner.currentToken.tokenStr);					
 					if (funcResult != null)
 						out.add(funcResult);
 					if(scanner.nextToken.tokenStr.equals(";") || scanner.currentToken.tokenStr.equals(":") || scanner.currentToken.tokenStr.equals("by")){
@@ -1229,7 +1232,6 @@ public class Parser {
 				
 			}
 			else{
-					System.out.println("************ " + token);
 				throw new SyntaxError("Invalid token '" + token + "' found in expression",
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}

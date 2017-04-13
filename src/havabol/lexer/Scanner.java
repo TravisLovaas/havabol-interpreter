@@ -114,10 +114,10 @@ public class Scanner {
 		/*if (stop) {
 			currentToken.primClassif = Token.EOF;
 			return "";
-		}*/
+		}
 		
 
-		/*if (currentToken.primClassif == Token.EOF) {
+		if (currentToken.primClassif == Token.EOF) {
 			if(nextToken.tokenStr.equals(";")){
 				currentToken = previous;
 				stop = true;
@@ -137,7 +137,7 @@ public class Scanner {
 				currentToken.tokenStr = "u-";
 			}else
 				unary = false;
-		//System.out.println("----> Line " + iSourceLineNr);
+		//System.out.println("----> cur token " + currentToken.tokenStr);
 		return currentToken.tokenStr;
 	}
 	
