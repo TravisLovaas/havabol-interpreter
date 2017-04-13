@@ -854,7 +854,7 @@ public class Parser {
 				case "+=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = symbolTable.getSymbol(identifier).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.subtract(this, res01, res02);
 					variable.setValue(rhsExpr);
@@ -862,7 +862,7 @@ public class Parser {
 				case "-=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = symbolTable.getSymbol(identifier).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.add(this, res01, res02);
 					variable.setValue(rhsExpr);
@@ -870,7 +870,7 @@ public class Parser {
 				case "*=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = symbolTable.getSymbol(identifier).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 	
 					rhsExpr = Operators.multiply(this, res01, res02);
@@ -879,14 +879,14 @@ public class Parser {
 				case "/=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = symbolTable.getSymbol(identifier).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.divide(this, res01, res02);
 					variable.setValue(rhsExpr);
 					break;
 				default:
 					if(bin){
-						rhsExpr = symbolTable.getSymbol(identifier).getValue();
+						rhsExpr = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
 						break;
 					}
 					throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
@@ -1172,7 +1172,7 @@ public class Parser {
 						out.add(array);
 					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
 							&& symbolTable.containsSymbol(token) 
-							&& symbolTable.getSymbol(token).getValue().dataType == DataType.STRING 
+							&& ((STIdentifier) symbolTable.getSymbol(token)).getValue().dataType == DataType.STRING 
 							&& scanner.nextToken.tokenStr.equals("[") ) {
 						Token str = parseArrayRef();
 						out.add(str);
@@ -1271,7 +1271,7 @@ public class Parser {
 				//if not, convert to an actual value and push to stack
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
-						res = symbolTable.getSymbol(token).getValue();
+						res = ((STIdentifier) symbolTable.getSymbol(token)).getValue();
 						//System.out.println("----------->token = " + res);
 						//Array found?
 						stackResult.push(res);
