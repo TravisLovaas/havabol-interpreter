@@ -13,19 +13,17 @@ public class STIdentifier extends STEntry
 	 * Constructor for STIdentifier subclass
 	 */
 	public DataType declaredType;
-	public Structure structure;
+	public StorageStructure structure;
 	public int declaredSize = 1;
-	public String parm;
-	public int nonLocal;
+	//public String parm;
+	//public int nonLocal;
 	
 	public Value[] arrayValue;
 	public Value value;
-	public STIdentifier(String tokenStr, DataType declaredType, Structure structure, String parm, int nonLocal) {
+	public STIdentifier(String tokenStr, DataType declaredType, StorageStructure structure) {
 		super(tokenStr, 0);
 		this.declaredType = declaredType;
 		this.structure = structure;
-		this.parm = parm;
-		this.nonLocal = nonLocal;
 	}
 	
 	/**
@@ -37,7 +35,7 @@ public class STIdentifier extends STEntry
 	 */
 	public Value fetch(Parser parser, int index) {
 		
-		if (this.structure == Structure.PRIMITIVE) {
+		if (this.structure == StorageStructure.PRIMITIVE) {
 			throw new IndexError("Cannot refer to an index of a primitive value");
 		}
 		
@@ -61,7 +59,7 @@ public class STIdentifier extends STEntry
 	 */
 	public void set(Parser parser, int index, Value value) {
 		
-		if (this.structure == Structure.PRIMITIVE) {
+		if (this.structure == StorageStructure.PRIMITIVE) {
 			throw new IndexError("Cannot refer to an index of a primitive value");
 		}
 		
@@ -95,7 +93,7 @@ public class STIdentifier extends STEntry
 	 * Purpose:		returns string representation of identifier
 	 */
 	public String toString() {
-		return String.format("IDENTIFIER: %s: %s %s %s %d", symbol, declaredType, structure, parm, nonLocal);
+		return String.format("IDENTIFIER: %s: %s %s", symbol, declaredType, structure);
 	}
 	
 }

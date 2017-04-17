@@ -2,6 +2,7 @@ package havabol.parser;
 
 import havabol.storage.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import havabol.error.IndexError;
@@ -14,13 +15,16 @@ import havabol.lexer.*;
 public class Value {
 	
 	public DataType dataType;
+	public Structure structure;
+	public String terminatingStr;
+	
 	public String strValue;
 	public int intValue;
 	public double floatValue;
 	public boolean booleanValue;
+	public List<Value> arrayValue = new ArrayList<>();
 	
-	public Structure structure;
-	public String terminatingStr;
+	public int numItems = 1;
 	
 	public Value() {
 		this.dataType = DataType.VOID;
@@ -87,6 +91,19 @@ public class Value {
 		}
 		
 		return patch;
+	}
+	
+	/**
+	 * Function: add
+	 * Purpose:  Appends an element to this ResultValue array
+	 * @param parser information about  values being parsed
+	 * @param value ResultValue to append to this array
+	 */
+	public void add(Parser parser, Value value) {
+		
+		this.arrayValue.add(value);
+		numItems++;
+		
 	}
 	
 	public void spliceString(Parser parser, int index, String splice) {
@@ -264,26 +281,49 @@ public class Value {
 	 */
 	public String toString() {
 		
-		String valStr = "null";
+		if (this.structure == Structure.PRIMITIVE) {
 		
-		switch (dataType) {
-		case INTEGER:
-			valStr = String.valueOf(this.intValue);
-			break;
-		case FLOAT:
-			valStr = String.valueOf(this.floatValue);
-			break;
-		case STRING:
-			valStr = strValue;
-			break;
-		case BOOLEAN:
-			valStr = String.valueOf(booleanValue);
-			break;
-		default:
-			break;
+			String valStr = "null";
+			
+			switch (dataType) {
+			case INTEGER:
+				valStr = String.valueOf(this.intValue);
+				break;
+			case FLOAT:
+				valStr = String.valueOf(this.floatValue);
+				break;
+			case STRING:
+				valStr = strValue;
+				break;
+			case BOOLEAN:
+				valStr = String.valueOf(booleanValue);
+				break;
+			default:
+				break;
+			}
+			
+			return "[" + this.dataType + ": " + valStr + "]";
+		
+		} else if (this.structure == Structure.MULTIVALUE) {
+			
+			StringBuilder str = new StringBuilder("[");
+			
+			for (Value v : this.arrayValue) {
+				str.append(v.toString());
+				str.append(", ");
+			}
+			
+			str.deleteCharAt(str.length() - 1);
+			str.deleteCharAt(str.length() - 1);
+			str.append("]");
+			
+			return str.toString();
+			
+		} else {
+			
+			return "[Empty value]";
+			
 		}
-		
-		return "[" + this.dataType + ": " + valStr + "]";
 		
 	}
 	

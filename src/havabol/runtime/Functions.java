@@ -78,8 +78,8 @@ public class Functions {
 	 */
 	public static Value elem(Parser parser, STIdentifier array) {
 		
-		if (array.structure != Structure.FIXED_ARRAY
-			&& array.structure != Structure.UNBOUNDED_ARRAY) {
+		if (array.structure != StorageStructure.FIXED_ARRAY
+			&& array.structure != StorageStructure.UNBOUNDED_ARRAY) {
 			
 			throw new TypeError("Invalid args to elem(), argument must be array variable");
 			
