@@ -56,7 +56,7 @@ public class TestHavaBol
     		assert testSuccessful;
     		
     	   	System.out.println("===========================================");
-    		System.out.println("Test complete. Resetting environment...");
+    		System.out.println("Test completed for: " + f.getName());
     		System.out.println("===========================================");
     	}
         
