@@ -2,9 +2,10 @@ package havabol.lexer;
 
 import java.util.*;
 
+import havabol.parser.Structure;
 import havabol.parser.Value;
 import havabol.storage.DataType;
-import havabol.storage.Structure;
+import havabol.storage.StorageStructure;
 
 public class Token
 {

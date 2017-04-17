@@ -238,7 +238,7 @@ public class Parser {
 			scanner.getNext();
 			value = parseExpression("to"); 
 			DataType dt = value.dataType;
-			controlVariable = new STIdentifier(cv, dt, Structure.PRIMITIVE, null, 0);
+			controlVariable = new STIdentifier(cv, dt, StorageStructure.PRIMITIVE);
 			controlVariable.setValue(value);
 			symbolTable.createSymbol(this, cv, controlVariable);
 			
@@ -322,11 +322,11 @@ public class Parser {
 				// TODO: exception
 			}
 			STIdentifier array = (STIdentifier) symbolTable.getSymbol(token.tokenStr);
-			if(!(array.structure == Structure.FIXED_ARRAY || array.structure == Structure.UNBOUNDED_ARRAY)){
+			if(!(array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY)){
 				// TODO: exception
 			}
 			
-			controlVariable = new STIdentifier(cv, array.declaredType, Structure.PRIMITIVE, null, 0);
+			controlVariable = new STIdentifier(cv, array.declaredType, StorageStructure.PRIMITIVE);
 			symbolTable.createSymbol(this, cv, controlVariable);
 			
 			scanner.getNext();
@@ -560,13 +560,12 @@ public class Parser {
 		
 		STIdentifier variable = null; // symbol table entry for this variable
 		Value rhsExpr; // right hand side of assignment if it exists
-		MultiValue rhsMultiVal;
 		
 		// Next token is either "=" (primitive) or "[" (array)
 		switch (scanner.getNext()) {
 			case "=": // expecting a primitive value
 				
-				variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
+				variable = new STIdentifier(identifier, declaredType, StorageStructure.PRIMITIVE);
 				
 				// Get value of right hand side
 				scanner.getNext();
@@ -590,25 +589,25 @@ public class Parser {
 //						variable.setValue(rhsExpr);
 //						break;
 					case "]": // Array size depends on the length of given value list
-						variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+						variable = new STIdentifier(identifier, declaredType, StorageStructure.FIXED_ARRAY);
 
 						scanner.getNext(); // pass "]". Int array[] = 1, 2, 3;
 						scanner.getNext(); // pass =
 						
-						rhsMultiVal = parseValueList(";");
-						variable.arrayValue = new Value[rhsMultiVal.numItems];
-						for (int i = 0; i < rhsMultiVal.size; i++) {
-							variable.arrayValue[i] = rhsMultiVal.values.get(i);
+						rhsExpr = parseValueList(";");
+						variable.arrayValue = new Value[rhsExpr.numItems];
+						for (int i = 0; i < rhsExpr.numItems; i++) {
+							variable.arrayValue[i] = rhsExpr.arrayValue.get(i);
 						}
-						variable.declaredSize = rhsMultiVal.size;
-						variable.structure = Structure.FIXED_ARRAY;
+						variable.declaredSize = rhsExpr.numItems;
+						variable.structure = StorageStructure.FIXED_ARRAY;
 						break;
 					default:
 						// Array size might be an expression
 						Value sizeValue = parseExpression("]");						
 						int declaredSize = sizeValue.asInteger(this).intValue;
 						
-						variable = new STIdentifier(identifier, declaredType, Structure.FIXED_ARRAY, "", 0);
+						variable = new STIdentifier(identifier, declaredType, StorageStructure.FIXED_ARRAY);
 						
 						variable.arrayValue = new Value[declaredSize];
 						variable.declaredSize = declaredSize;
@@ -635,15 +634,15 @@ public class Parser {
 							scanner.getNext(); // advance past =
 							//could be assigned
 							//scanner.getNext();
-							rhsMultiVal = parseValueList(";");
+							rhsExpr = parseValueList(";");
 							
 							//System.out.println("rhsMultiVal.numItems = " + rhsMultiVal.numItems);
-							if (rhsMultiVal.numItems > variable.declaredSize) {
+							if (rhsExpr.numItems > variable.declaredSize) {
 								throw new IndexError("Value list contains too many elements to fit into given array");
 							}
 							
-							for (int i = 0; i < rhsMultiVal.size; i++) {
-								variable.arrayValue[i] = rhsMultiVal.values.get(i);
+							for (int i = 0; i < rhsExpr.numItems; i++) {
+								variable.arrayValue[i] = rhsExpr.arrayValue.get(i);
 							}
 							
 							//System.out.println("Created array with given size and given value list.");
@@ -656,7 +655,7 @@ public class Parser {
 				}
 				break;
 				case ";": // no initialization clause
-					variable = new STIdentifier(identifier, declaredType, Structure.PRIMITIVE, "", 0);
+					variable = new STIdentifier(identifier, declaredType, StorageStructure.PRIMITIVE);
 					break;
 				default:
 					throw new SyntaxError("Expected an assignment '=', array type specifier, or semicolon in declaration", scanner.currentToken);
@@ -674,9 +673,9 @@ public class Parser {
 	 * @param terminatingStr the token string that says to stop parsing values
 	 * @return a ResultValue representing a value list
 	 */
-	private MultiValue parseValueList(String terminatingStr) {
+	private Value parseValueList(String terminatingStr) {
 		
-		MultiValue array = new MultiValue();
+		Value array = new Value();
 		array.structure = Structure.MULTIVALUE;
 		array.numItems = 0;
 		
@@ -808,7 +807,7 @@ public class Parser {
 			switch (token) {
 				case "=":
 					
-					if (variable.structure == Structure.FIXED_ARRAY || variable.structure == Structure.UNBOUNDED_ARRAY) {
+					if (variable.structure == StorageStructure.FIXED_ARRAY || variable.structure == StorageStructure.UNBOUNDED_ARRAY) {
 						
 						scanner.getNext();
 						
@@ -915,7 +914,7 @@ public class Parser {
 			
 			rhsExpr = parseExpression(";");
 			
-			if (variable.structure == Structure.FIXED_ARRAY || variable.structure == Structure.UNBOUNDED_ARRAY) {
+			if (variable.structure == StorageStructure.FIXED_ARRAY || variable.structure == StorageStructure.UNBOUNDED_ARRAY) {
 				variable.set(this, assignmentIndex, rhsExpr);
 			} else if (variable.getValue().dataType == DataType.STRING) {
 				variable.getValue().spliceString(this, assignmentIndex, rhsExpr.asString(this).strValue);
@@ -958,7 +957,7 @@ public class Parser {
 		
 		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
 
-		if (array.structure != Structure.FIXED_ARRAY && array.structure != Structure.UNBOUNDED_ARRAY && array.getValue().dataType != DataType.STRING) {
+		if (array.structure != StorageStructure.FIXED_ARRAY && array.structure != StorageStructure.UNBOUNDED_ARRAY && array.getValue().dataType != DataType.STRING) {
 			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
 		}
 		
@@ -996,7 +995,7 @@ public class Parser {
 		switch (scanner.currentToken.tokenStr) {
 		case "]":
 			
-			if (array.structure == Structure.FIXED_ARRAY || array.structure == Structure.UNBOUNDED_ARRAY) {
+			if (array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY) {
 				//System.out.println("**********" + beginSliceIndex);
 				//if(beginSliceIndex < )
 				result = array.fetch(this, beginSliceIndex);
@@ -1168,7 +1167,7 @@ public class Parser {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
-							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY)) {
+							symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY)) {
 						Token array = parseArrayRef();
 						out.add(array);
 					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
