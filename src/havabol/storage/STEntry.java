@@ -18,7 +18,6 @@ public class STEntry
 
 	public String symbol;
 	public int primClassif;
-	private Value value;
 	
 	/**
 	 * Function:	toString
@@ -28,23 +27,4 @@ public class STEntry
 		return String.format("GENERIC ENTRY: %s: %d", symbol, primClassif);
 	}
 	
-	/**
-	 * Function:	setValue
-	 * @param value the value whose parameters are to be set
-	 */
-	public void setValue(Value value) {
-		
-		// TODO: check size and move to STIdentifier
-		
-		this.value = value;
-		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
-	}
-	
-	/**
-	 * Function:	getValue
-	 * @return		Value containing populated parameters
-	 */
-	public Value getValue() {
-		return this.value;
-	}
 }

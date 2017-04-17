@@ -19,7 +19,7 @@ public class STIdentifier extends STEntry
 	public int nonLocal;
 	
 	public Value[] arrayValue;
-	public Value primitiveValue;
+	public Value value;
 	public STIdentifier(String tokenStr, DataType declaredType, Structure structure, String parm, int nonLocal) {
 		super(tokenStr, 0);
 		this.declaredType = declaredType;
@@ -71,6 +71,23 @@ public class STIdentifier extends STEntry
 		
 		this.arrayValue[index] = value;
 		
+	}
+	
+	/**
+	 * Function:	setValue
+	 * @param value the value whose parameters are to be set
+	 */
+	public void setValue(Value value) {
+		this.value = value;
+		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
+	}
+	
+	/**
+	 * Function:	getValue
+	 * @return		Value containing populated parameters
+	 */
+	public Value getValue() {
+		return this.value;
 	}
 	
 	/**
