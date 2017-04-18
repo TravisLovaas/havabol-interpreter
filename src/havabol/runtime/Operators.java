@@ -618,4 +618,66 @@ public class Operators {
 		return res;
 	}
 
+	
+	/**
+	 * Function: IN
+	 *  * Preconditions:
+	 *  	- parseExpression has identified operands that
+	 *  	should be evaluated with an IN operator
+	 * Purpose: Checks if a string is inside another string
+	 * @param parser - information about values being parsed
+	 * @param op1	 - first operand to be evaluated with op2
+	 * @param op2	 - second operand to be evaluated with op1
+	 * @return boolean true or false if string is found
+	 */
+	public static Value IN(Parser parser, Value op1, Value op2)
+	{
+		int i;
+		Value res = new Value();
+		res.structure = Structure.PRIMITIVE;
+		res.dataType = DataType.BOOLEAN;
+		
+		op1 = op1.asString(parser);
+		op2 = op2.asString(parser);
+		int first = 0;
+		int last = op1.asString(parser).strValue.length();
+		
+		for(i = 0; last <= op2.strValue.length(); i++){
+			if(op2.strValue.substring(first, last).equals(op1.strValue)){
+				res.booleanValue = true;
+				return res;
+			}
+			first++;
+			last++;
+		}
+		
+		res.booleanValue = false;
+		return res;
+	}
+	
+	public static Value NOTIN(Parser parser, Value op1, Value op2)
+	{
+		int i;
+		Value res = new Value();
+		res.structure = Structure.PRIMITIVE;
+		res.dataType = DataType.BOOLEAN;
+		
+		op1 = op1.asString(parser);
+		op2 = op2.asString(parser);
+		int first = 0;
+		int last = op1.asString(parser).strValue.length();
+		
+		for(i = 0; last <= op2.strValue.length(); i++){
+			if(op2.strValue.substring(first, last).equals(op1.strValue)){
+				res.booleanValue = false;
+				return res;
+			}
+			first++;
+			last++;
+		}
+		
+		res.booleanValue = true;
+		return res;
+	}
+	
 }

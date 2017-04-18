@@ -1161,6 +1161,7 @@ public class Parser {
 
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			//System.out.println("---> curTok = " + token);
+			//System.out.println("---> primClassif = " + scanner.currentToken.primClassif);
 			//System.out.println("************cur= " + scanner.currentToken.tokenStr);					
 
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
@@ -1414,6 +1415,25 @@ public class Parser {
 								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
 							stackResult.push(Operators.logicalOr(this, res2, res));
 							break;
+							
+						case "IN":
+							res = stackResult.pop();
+							if(!stackResult.isEmpty())
+								res2 = stackResult.pop();
+							else
+								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
+							stackResult.push(Operators.IN(this, res2, res));
+							break;
+							
+						case "NOTIN":
+							res = stackResult.pop();
+							if(!stackResult.isEmpty())
+								res2 = stackResult.pop();
+							else
+								throw new UnsupportedOperationError("Too few operands for operation to be evaluated.", entry.iSourceLineNr, entry.iColPos);
+							stackResult.push(Operators.NOTIN(this, res2, res));
+							break;
+							
 						default:
 							throw new UnsupportedOperationError("The expression cannot be evaluated because of an invalid operator.", entry);
 					}
