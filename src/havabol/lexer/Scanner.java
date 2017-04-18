@@ -48,7 +48,7 @@ public class Scanner {
 	private final static String DELIMITERS = " \t;:()\'\"=!<>+-*/[]#^,\n"; // terminate a token
 	private final static String WHITESPACE = " \t\n";
 	private final static String QUOTES = "\"'";
-	private final static String OPERATORS = "!=<>+-*/#^";
+	private final static String OPERATORS = "!=<>+-*/#^\'IN\'\'NOTIN\'";
 	private final static String SEPARATORS = ",;:[]()";
 	private final static String ESCAPEPRINT ="\\'\"";
 	
