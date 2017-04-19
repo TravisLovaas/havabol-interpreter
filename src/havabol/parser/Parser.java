@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
-
 import havabol.error.*;
 import havabol.lexer.*;
 import havabol.runtime.*;
@@ -19,6 +18,10 @@ public class Parser {
 	
 	public boolean debugExpr = false;
 	public boolean debugAssignment = false;
+	
+	public enum mode{
+		IGNORE_EXEC, EXECUTE, BREAK_EXEC, CONTINUE_EXEC;
+	}
 	
 	//precedence values while operator tokens are outside of stack
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
@@ -503,6 +506,14 @@ public class Parser {
 			scanner.getNext();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+				if(scanner.currentToken.tokenStr.equals("continue"))
+					//do something
+					System.out.println("continue");
+				else if (scanner.currentToken.tokenStr.equals("break")){
+					//do something
+					System.out.println("break");
+				}
+				else
 					parseAssignment();
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
@@ -1158,12 +1169,99 @@ public class Parser {
 		Token popped;
 		boolean containsOperator = false;
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
-
+		
+		//System.out.println("termsTr = " + terminatingStr);
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
-			//System.out.println("---> curTok = " + token);
-			//System.out.println("---> primClassif = " + scanner.currentToken.primClassif);
-			//System.out.println("************cur= " + scanner.currentToken.tokenStr);					
+			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
+				//if function or operand place in postfix out
+				if (scanner.currentToken.primClassif == Token.OPERAND){
+					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
+							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY)) {
+						Token array = parseArrayRef();
+						out.add(array);
+					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
+							&& symbolTable.containsSymbol(token) 
+							&& ((STIdentifier) symbolTable.getSymbol(token)).getValue().dataType == DataType.STRING 
+							&& scanner.nextToken.tokenStr.equals("[") ) {
+						Token str = parseArrayRef();
+						out.add(str);
+					} else{
+						out.add(scanner.currentToken);
+					}
+				}
+				if (scanner.currentToken.primClassif == Token.FUNCTION){
 
+					Token funcResult = parseFunctionCall();
+					//System.out.println("************funccur= " + scanner.currentToken.tokenStr);					
+					if (funcResult != null)
+						out.add(funcResult);
+					if(scanner.nextToken.tokenStr.equals(";") || scanner.currentToken.tokenStr.equals(":") || scanner.currentToken.tokenStr.equals("by")){
+						break;
+					} 
+					if(scanner.currentToken.primClassif == Token.OPERATOR){
+						containsOperator = true;
+						while(!stackToken.isEmpty()){
+							//if operator, check precedence
+							if(precedence.get(scanner.currentToken.tokenStr) > stkPrecedence.get(stackToken.peek().tokenStr)){
+								break;
+							}
+							out.add(stackToken.pop());
+						}
+						stackToken.push(scanner.currentToken); 
+					}
+				}
+			}
+			else if (scanner.currentToken.primClassif == Token.OPERATOR){
+				containsOperator = true;
+				while(!stackToken.isEmpty()){
+					//if operator, check precedence
+					if(precedence.get(token) > stkPrecedence.get(stackToken.peek().tokenStr)){
+						break;
+					}
+					out.add(stackToken.pop());
+				}
+				stackToken.push(scanner.currentToken); 
+			}
+			else if (scanner.currentToken.primClassif == Token.SEPARATOR){
+				//if separator, check special cases for parentheses
+				//to determine correctness
+				boolean lParen = false;
+				if(token.equals("(")){
+					stackToken.push(scanner.currentToken);
+				}
+				else if(token.equals(")")){
+					while(!stackToken.isEmpty()){
+						popped = stackToken.pop();
+						if(popped.tokenStr.equals("(")){
+							lParen = true;
+						}else		
+							out.add(popped);
+					}
+					if(!lParen){
+						//no matching parenthesis found
+						//if parenthesis id for function, leave it to parseFunc
+						break;
+					}
+				}
+				else if (token.equals(",")){
+					token = scanner.getNext();
+					continue;
+				}
+				else {
+						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
+							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
+				}
+				
+			}
+			else{
+				throw new SyntaxError("Invalid token '" + token + "' found in expression",
+						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
+			}
+			token = scanner.getNext();
+		}
+		
+		/*while (!(token.equals(terminatingStr))){ 
+			System.out.println("curTok = " + token);
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
@@ -1249,7 +1347,8 @@ public class Parser {
 						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 			}
 			token = scanner.getNext();
-		}
+		}*/
+		
 		//System.out.println("-----> Printing outlist");
 		//out.forEach(t -> System.out.println(t.tokenStr));
 		//System.out.println("-----> End outlist");

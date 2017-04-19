@@ -18,6 +18,7 @@ public class Value {
 	public int intValue;
 	public double floatValue;
 	public boolean booleanValue;
+	public int iExecMode;
 	
 	public Structure structure;
 	public String terminatingStr;
@@ -83,6 +84,8 @@ public class Value {
 			break;
 		case FLOAT:
 			patch.subClassif = Token.FLOAT;
+			break;
+		default:
 			break;
 		}
 		
