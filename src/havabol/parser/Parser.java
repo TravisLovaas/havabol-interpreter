@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Stack;
 import havabol.error.*;
 import havabol.lexer.*;
+import havabol.parser.Value.mode;
 import havabol.runtime.*;
 import havabol.storage.*;
 
@@ -19,9 +20,7 @@ public class Parser {
 	public boolean debugExpr = false;
 	public boolean debugAssignment = false;
 	
-	public enum mode{
-		IGNORE_EXEC, EXECUTE, BREAK_EXEC, CONTINUE_EXEC;
-	}
+	
 	
 	//precedence values while operator tokens are outside of stack
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
@@ -102,6 +101,9 @@ public class Parser {
 				} else if (scanner.currentToken.tokenStr.equals("endif")) {
 					scanner.getNext();
 					return; // currentToken should be ;, handled by parseStatement
+				}else if (scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
+					//System.out.println("This is where we end it");
+					return;
 				}
 			}
 		
@@ -181,7 +183,35 @@ public class Parser {
 			if (whileCond.asBoolean(this).booleanValue) {
 				// Evaluated to true, execute loop
 				while (!scanner.currentToken.tokenStr.equals("endwhile")) {
+					//System.out.println("tok = " + scanner.currentToken.tokenStr);
 					parseStatement();
+					if (scanner.currentToken.tokenStr.equals("continue") ){
+						//whileCond.iExecMode = Value.mode.CONTINUE_EXEC;
+						System.out.println("ummm is where we end it");
+						int whileCnt = 0;
+						while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
+							if (scanner.currentToken.tokenStr.equals("while")) {
+								whileCnt++;
+							} else if (scanner.currentToken.tokenStr.equals("endwhile")) {
+								whileCnt--;
+							}
+							scanner.getNext();
+						}	
+					}
+					if(scanner.currentToken.tokenStr.equals("break")){
+						// Evaluated to false, skip loop past endwhile and return				
+						int whileCnt = 0;
+						while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
+							if (scanner.currentToken.tokenStr.equals("while")) {
+								whileCnt++;
+							} else if (scanner.currentToken.tokenStr.equals("endwhile")) {
+								whileCnt--;
+							}
+							scanner.getNext();
+						}				
+						scanner.getNext(); // pass "endwhile"
+						return; // return to parseStatement, expects ;
+					}
 				}
 				
 				scanner.getNext(); // pass "endwhile"
@@ -292,6 +322,28 @@ public class Parser {
 				
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
+					//come back continue for forStmt
+					if(scanner.currentToken.tokenStr.equals("continue")){
+						while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
+							if (scanner.currentToken.tokenStr.equals("for"))
+								endForCnt++;
+							else if (scanner.currentToken.tokenStr.equals("endfor"))
+								endForCnt--;
+							scanner.getNext();
+						}
+					}
+					if(scanner.currentToken.tokenStr.equals("break")){
+						while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
+							if (scanner.currentToken.tokenStr.equals("for"))
+								endForCnt++;
+							else if (scanner.currentToken.tokenStr.equals("endfor"))
+								endForCnt--;
+							scanner.getNext();
+						}
+						scanner.getNext();
+						return;
+					}
+					
 				}
 				
 				controlVariable.getValue().intValue += incr.intValue;
@@ -476,6 +528,11 @@ public class Parser {
 			if (scanner.currentToken.tokenStr.equals("debug")) {
 				parseDebugStatement();
 			}
+			//if(scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
+				//System.out.println("continue");
+				//scanner.getNext();
+				//return;
+			//}
 		}
 		
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
@@ -485,6 +542,10 @@ public class Parser {
 				switch (scanner.currentToken.tokenStr) {
 				case "if":
 					parseIf();
+					if (scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
+						//System.out.println("sooooo");
+						return;
+					}
 					break;
 				case "while":
 					parseWhile();
@@ -506,14 +567,17 @@ public class Parser {
 			scanner.getNext();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				if(scanner.currentToken.tokenStr.equals("continue"))
+				/*if(scanner.currentToken.tokenStr.equals("continue")){
 					//do something
-					System.out.println("continue");
+					System.out.println("continue1");
+					return;
+				}
 				else if (scanner.currentToken.tokenStr.equals("break")){
 					//do something
 					System.out.println("break");
+					breakStmt();
 				}
-				else
+				else*/
 					parseAssignment();
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
@@ -539,6 +603,19 @@ public class Parser {
 		}
 	}
 	
+	private mode breakStmt()
+	{
+		// TODO Auto-generated method stub
+		return Value.mode.BREAK_EXEC;
+	}
+
+	private mode continueStmt()
+	{
+		// TODO Auto-generated method stub
+		return Value.mode.CONTINUE_EXEC;
+		
+	}
+
 	/**
 	 * Function: parseDeclaration
 	 * Parses a declaration statement.
@@ -1175,7 +1252,7 @@ public class Parser {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
-							symbolTable.getSymbol(token)).structure == Structure.FIXED_ARRAY)) {
+							symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY)) {
 						Token array = parseArrayRef();
 						out.add(array);
 					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 

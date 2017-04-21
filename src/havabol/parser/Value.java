@@ -27,6 +27,11 @@ public class Value {
 	
 	public int numItems = 1;
 	
+	public enum mode{
+		IGNORE_EXEC, EXECUTE, BREAK_EXEC, CONTINUE_EXEC;
+	}
+	 mode iExecMode;
+	 
 	public Value() {
 		this.dataType = DataType.VOID;
 		this.structure = Structure.VOID;
