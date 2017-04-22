@@ -1,0 +1,4 @@
+print("p5AdditionalAssignments.txt");
+Int i = 10;
+i /= (2*2);
+print("i =", i);
