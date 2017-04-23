@@ -68,6 +68,7 @@ public class Parser {
 	public void beginParsing() {
 		scanner.getNext();
 		while (scanner.currentToken.primClassif != Token.EOF) {
+			//System.out.println("current = " + scanner.currentToken.tokenStr);
 			parseStatement();
 		}
 	}
@@ -541,6 +542,10 @@ public class Parser {
 		 * 	print( ... );			function call
 		 * 
 		 */
+		
+		//System.out.println("current = " + scanner.currentToken.tokenStr);
+		//System.out.println("next = " + scanner.nextToken.tokenStr);
+
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 			if (scanner.currentToken.tokenStr.equals("debug")) {
 				parseDebugStatement();
@@ -589,18 +594,7 @@ public class Parser {
 			scanner.getNext();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				/*if(scanner.currentToken.tokenStr.equals("continue")){
-					//do something
-					System.out.println("continue1");
-					return;
-				}
-				else if (scanner.currentToken.tokenStr.equals("break")){
-					//do something
-					System.out.println("break");
-					breakStmt();
-				}
-				else*/
-					parseAssignment();
+				parseAssignment();
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
@@ -663,7 +657,7 @@ public class Parser {
 			case "=": // expecting a primitive value
 				
 				variable = new STIdentifier(identifier, declaredType, StorageStructure.PRIMITIVE);
-				
+				//System.out.println("variable = " + variable);
 				// Get value of right hand side
 				scanner.getNext();
 				rhsExpr = parseExpression(";");
@@ -673,6 +667,7 @@ public class Parser {
 				}
 				
 				// Check and cast (if necessary) type and store value
+				//System.out.println("where = " + scanner.currentToken.tokenStr);
 				rhsExpr = rhsExpr.asType(this, variable.declaredType);
 				variable.setValue(rhsExpr);
 				
@@ -886,6 +881,7 @@ public class Parser {
 		}
 		
 		// Ensure identifier has been declared
+		System.out.println("date toke = " + scanner.currentToken.primClassif);
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
 		
 		if (variable == null && !bfor) {
@@ -1158,6 +1154,7 @@ public class Parser {
 		
 		String calledFunction = scanner.currentToken.tokenStr;
 		String argVar = null;
+		String argVar2 = null;
 		//System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
 		String check = scanner.getNext();
@@ -1170,6 +1167,7 @@ public class Parser {
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
 		Value retVal = null;
+		Value dateVal1, dateVal2;
 		
 		switch (calledFunction) {
 		case "print":
@@ -1219,10 +1217,30 @@ public class Parser {
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.spaces(this, parseExpression(")"));
 			break;
+		case "dateDiff":
+			dateVal1 = parseExpression(",");
+			scanner.getNext(); //get ","
+			dateVal2 = parseExpression(")");
+			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
+			retVal = Functions.dateDiff(this, dateVal1, dateVal2);
+			break;
+		case "dateAdj":
+			dateVal1 = parseExpression(",");
+			scanner.getNext(); //get ","
+			dateVal2 = parseExpression(")");
+			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
+			retVal = Functions.dateAdj(this, dateVal1, dateVal2);
+			break;
+		case "dateAge":
+			dateVal1 = parseExpression(",");
+			scanner.getNext(); //get ","
+			dateVal2 = parseExpression(")");
+			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
+			retVal = Functions.dateAge(this, dateVal1, dateVal2);
+			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
-		
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		//scanner.getNext();		
@@ -1260,6 +1278,7 @@ public class Parser {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
+					//System.out.println("curTok = " + scanner.currentToken.tokenStr);
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
 							symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY)) {
 						Token array = parseArrayRef();
