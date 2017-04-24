@@ -881,7 +881,7 @@ public class Parser {
 		}
 		
 		// Ensure identifier has been declared
-		System.out.println("date toke = " + scanner.currentToken.primClassif);
+		//System.out.println("date toke = " + scanner.currentToken.primClassif);
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
 		
 		if (variable == null && !bfor) {
