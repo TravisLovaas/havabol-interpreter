@@ -90,9 +90,13 @@ public class Functions {
 			
 		}
 		
+		if (array.arrayValue == null) {
+			return new Value(0);
+		}
+		
 		int highestIndex = 0;
 		
-		for (int i = 0; i < array.declaredSize; i++) {
+		for (int i = 0; i < array.arrayValue.length; i++) {
 			if (array.arrayValue[i] != null)
 				highestIndex = i;
 		}

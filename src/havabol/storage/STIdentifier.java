@@ -1,6 +1,10 @@
 package havabol.storage;
 
+import java.util.Arrays;
+
 import havabol.error.IndexError;
+import havabol.error.TypeError;
+import havabol.error.UnsupportedOperationError;
 import havabol.parser.*;
 import havabol.storage.*;
 
@@ -14,7 +18,8 @@ public class STIdentifier extends STEntry
 	 */
 	public DataType declaredType;
 	public StorageStructure structure;
-	public int declaredSize = 1;
+	public int declaredSize = 1; // for use in fixed arrays ONLY
+	public int maxPopulatedIndex = 0; // for use in unbounded arrays ONLY
 	//public String parm;
 	//public int nonLocal;
 	
@@ -39,11 +44,13 @@ public class STIdentifier extends STEntry
 			throw new IndexError("Cannot refer to an index of a primitive value");
 		}
 		
-		if (index >= this.declaredSize) {
-			throw new IndexError("Array index is out of bounds");
+		if (this.structure == StorageStructure.FIXED_ARRAY) {
+			if (index >= this.declaredSize) {
+				throw new IndexError("Array index is out of bounds");
+			}
 		}
 		
-		if (this.arrayValue[index] == null) {
+		if (index >= this.arrayValue.length || this.arrayValue[index] == null) {
 			throw new IndexError("Reference to undefined array index");
 		}
 		
@@ -52,7 +59,7 @@ public class STIdentifier extends STEntry
 	}
 	
 	/**
-	 * Stores the given ResultValue into the index of this array ResultValue
+	 * Stores the given Value into the given index
 	 * @param parser Calling parser object
 	 * @param index index to set in this array
 	 * @param value value to set at the given index
@@ -60,23 +67,78 @@ public class STIdentifier extends STEntry
 	public void set(Parser parser, int index, Value value) {
 		
 		if (this.structure == StorageStructure.PRIMITIVE) {
-			throw new IndexError("Cannot refer to an index of a primitive value");
+			
+			if (this.declaredType == DataType.STRING) {
+				throw new UnsupportedOperationError("slicing not yet implemented");
+			} else {
+				throw new IndexError("Cannot refer to an index of a primitive value");
+			}
 		}
 		
-		if (index >= this.declaredSize) {
-			throw new IndexError("Array index is out of bounds");
+		if (this.structure == StorageStructure.FIXED_ARRAY) {
+		
+			if (index >= this.declaredSize) {
+				throw new IndexError("Array index is out of bounds");
+			}
+			
+			this.arrayValue[index] = value.clone();
+		
+		} else {
+			
+			// Any index in an unbounded array can be set
+			
+			if (index >= arrayValue.length) {
+				// resize array to fit new index
+				int newSize = (index + 1) * 2;
+				Value[] resizedArray = Arrays.copyOf(this.arrayValue, newSize);
+				this.arrayValue = resizedArray;
+			}
+			
+			this.arrayValue[index] = value.clone();
+			
 		}
 		
-		this.arrayValue[index] = value;
+	}
+	
+	public void fetchSlice(Parser parser, int beginIndex, int endIndex) {
 		
 	}
 	
 	/**
-	 * Function:	setValue
-	 * @param value the value whose parameters are to be set
+	 * Sets the stored value of this variable.
+	 * @param value the value to store in this variable
 	 */
 	public void setValue(Value value) {
-		this.value = value;
+		if (value.structure == Structure.PRIMITIVE) {
+			if (this.structure == StorageStructure.PRIMITIVE) {
+				// primitive into primitive
+				this.value = value;
+			} else {
+				if (this.structure == StorageStructure.FIXED_ARRAY) {
+					// primitive into fixed array
+					for (int i = 0; i < this.declaredSize; i++) {
+						this.arrayValue[i] = value.clone();
+					}
+				} else {
+					// primitive into unbounded array
+					throw new TypeError("Cannot perform primitive assignment on unbounded array");
+				}
+			}
+		} else if (value.structure == Structure.MULTIVALUE) {
+			if (this.structure == StorageStructure.FIXED_ARRAY) {
+				// multivalue into fixed array
+				if (value.numItems > this.declaredSize) {
+					throw new IndexError("Array does not have enough space to store array value");
+				} else {
+					for (int i = 0; i < value.numItems; i++) {
+						this.arrayValue[i] = value.arrayValue.get(i).clone();
+					}
+				}
+			} else {
+				// multivalue into unbounded array
+				this.arrayValue = value.arrayValue.toArray(new Value[0]);
+			}
+		}
 		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
 	}
 	
