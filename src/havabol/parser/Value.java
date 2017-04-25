@@ -22,16 +22,12 @@ public class Value {
 	public int intValue;
 	public double floatValue;
 	public boolean booleanValue;
+	public int year, month, day;
 
 	public List<Value> arrayValue = new ArrayList<>();
 	
 	public int numItems = 1;
-	
-	public enum mode{
-		IGNORE_EXEC, EXECUTE, BREAK_EXEC, CONTINUE_EXEC;
-	}
-	 mode iExecMode;
-	 
+
 	public Value() {
 		this.dataType = DataType.VOID;
 		this.structure = Structure.VOID;
@@ -275,6 +271,7 @@ public class Value {
 		case FLOAT:
 			return this.asFloat(parser);
 		case STRING:
+		case DATE:
 			return this.asString(parser);
 		case BOOLEAN:
 			return this.asBoolean(parser);

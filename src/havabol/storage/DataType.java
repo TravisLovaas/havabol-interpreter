@@ -23,6 +23,8 @@ public enum DataType {
 			return STRING;
 		case "bool":
 			return BOOLEAN;
+		case "date":
+			return DATE;
 		default:
 			return null;
 		}

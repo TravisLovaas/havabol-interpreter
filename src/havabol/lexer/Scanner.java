@@ -324,6 +324,7 @@ public class Scanner {
 			case "Float":
 			case "String":
 			case "Bool":
+			case "Date":
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.DECLARE;
 				return;
@@ -365,6 +366,9 @@ public class Scanner {
 			case "MAXLENGTH":
 			case "ELEM":
 			case "MAXELEM":
+			case "dateDiff":
+			case "dateAdj":
+			case "dateAge":
 				token.primClassif = Token.FUNCTION;
 				token.subClassif = Token.BUILTIN;
 				return;

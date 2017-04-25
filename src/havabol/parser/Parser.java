@@ -2,13 +2,11 @@ package havabol.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import havabol.error.*;
 import havabol.lexer.*;
-import havabol.parser.Value.mode;
 import havabol.runtime.*;
 import havabol.storage.*;
 
@@ -19,7 +17,8 @@ public class Parser {
 	
 	public boolean debugExpr = false;
 	public boolean debugAssignment = false;
-	
+	public boolean whileStmt = false;
+	public boolean forStmt = false;
 	
 	
 	//precedence values while operator tokens are outside of stack
@@ -69,6 +68,7 @@ public class Parser {
 	public void beginParsing() {
 		scanner.getNext();
 		while (scanner.currentToken.primClassif != Token.EOF) {
+			//System.out.println("current = " + scanner.currentToken.tokenStr);
 			parseStatement();
 		}
 	}
@@ -185,9 +185,9 @@ public class Parser {
 				while (!scanner.currentToken.tokenStr.equals("endwhile")) {
 					//System.out.println("tok = " + scanner.currentToken.tokenStr);
 					parseStatement();
+					
+					//continue for whileStmt
 					if (scanner.currentToken.tokenStr.equals("continue") ){
-						//whileCond.iExecMode = Value.mode.CONTINUE_EXEC;
-						System.out.println("ummm is where we end it");
 						int whileCnt = 0;
 						while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
 							if (scanner.currentToken.tokenStr.equals("while")) {
@@ -198,6 +198,8 @@ public class Parser {
 							scanner.getNext();
 						}	
 					}
+					
+					//break for whileStmt
 					if(scanner.currentToken.tokenStr.equals("break")){
 						// Evaluated to false, skip loop past endwhile and return				
 						int whileCnt = 0;
@@ -254,7 +256,6 @@ public class Parser {
 		
 		scanner.getNext(); // get past for
 		
-
 		assert(scanner.currentToken.subClassif == Token.IDENTIFIER);
 		
 		String cv = scanner.currentToken.tokenStr;
@@ -306,10 +307,6 @@ public class Parser {
 			limit = limit.asInteger(this);
 			incr = incr.asInteger(this);
 			
-			//System.out.println("Limit: " + limit + " Incr: " + incr);
-			//System.out.println(controlVariable);
-			//System.out.println(symbolTable.getSymbol(cv).getValue());
-			
 			assert(scanner.currentToken.tokenStr.equals(":"));
 			
 			scanner.getNext();
@@ -322,7 +319,7 @@ public class Parser {
 				
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
-					//come back continue for forStmt
+					//continue for forStmt
 					if(scanner.currentToken.tokenStr.equals("continue")){
 						while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
 							if (scanner.currentToken.tokenStr.equals("for"))
@@ -332,6 +329,7 @@ public class Parser {
 							scanner.getNext();
 						}
 					}
+					//break for forStmt
 					if(scanner.currentToken.tokenStr.equals("break")){
 						while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
 							if (scanner.currentToken.tokenStr.equals("for"))
@@ -413,6 +411,26 @@ public class Parser {
 
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
+					if(scanner.currentToken.tokenStr.equals("continue")){
+						while (!scanner.currentToken.tokenStr.equals("endfor")) {
+							if (scanner.currentToken.tokenStr.equals("for"))
+								endForCnt++;
+							else if (scanner.currentToken.tokenStr.equals("endfor"))
+								endForCnt--;
+							scanner.getNext();
+						}
+					}
+					if(scanner.currentToken.tokenStr.equals("break")){
+						while (!scanner.currentToken.tokenStr.equals("endfor")) {
+							if (scanner.currentToken.tokenStr.equals("for"))
+								endForCnt++;
+							else if (scanner.currentToken.tokenStr.equals("endfor"))
+								endForCnt--;
+							scanner.getNext();
+						}
+						scanner.getNext();
+						return;
+					}
 				}
 				
 				//System.out.println("end loop body on " + scanner.currentToken.tokenStr);
@@ -643,15 +661,20 @@ public class Parser {
 		 * 	print( ... );			function call
 		 * 
 		 */
+		
+		//System.out.println("current = " + scanner.currentToken.tokenStr);
+		//System.out.println("next = " + scanner.nextToken.tokenStr);
+
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 			if (scanner.currentToken.tokenStr.equals("debug")) {
 				parseDebugStatement();
 			}
-			//if(scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
-				//System.out.println("continue");
-				//scanner.getNext();
-				//return;
-			//}
+			if(scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break"))
+				if(whileStmt || forStmt){
+					return;
+				}else{
+					throw new SyntaxError("Statement needs to be within a for or a while loop", scanner.currentToken);
+				}
 		}
 		
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
@@ -667,10 +690,14 @@ public class Parser {
 					}
 					break;
 				case "while":
+					whileStmt = true;
 					parseWhile();
+					whileStmt = false;
 					break;
 				case "for":
+					forStmt = true;
 					parseFor();	// Exceptions handled in parseFor function
+					forStmt = false;
 					return;
 				case "select":
 					parseSelect();
@@ -689,18 +716,7 @@ public class Parser {
 			scanner.getNext();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				/*if(scanner.currentToken.tokenStr.equals("continue")){
-					//do something
-					System.out.println("continue1");
-					return;
-				}
-				else if (scanner.currentToken.tokenStr.equals("break")){
-					//do something
-					System.out.println("break");
-					breakStmt();
-				}
-				else*/
-					parseAssignment();
+				parseAssignment();
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
@@ -725,19 +741,6 @@ public class Parser {
 		}
 	}
 	
-	private mode breakStmt()
-	{
-		// TODO Auto-generated method stub
-		return Value.mode.BREAK_EXEC;
-	}
-
-	private mode continueStmt()
-	{
-		// TODO Auto-generated method stub
-		return Value.mode.CONTINUE_EXEC;
-		
-	}
-
 	/**
 	 * Function: parseDeclaration
 	 * Parses a declaration statement.
@@ -776,7 +779,7 @@ public class Parser {
 			case "=": // expecting a primitive value
 				
 				variable = new STIdentifier(identifier, declaredType, StorageStructure.PRIMITIVE);
-				
+				//System.out.println("variable = " + variable);
 				// Get value of right hand side
 				scanner.getNext();
 				rhsExpr = parseExpression(";");
@@ -786,6 +789,7 @@ public class Parser {
 				}
 				
 				// Check and cast (if necessary) type and store value
+				//System.out.println("where = " + scanner.currentToken.tokenStr);
 				rhsExpr = rhsExpr.asType(this, variable.declaredType);
 				variable.setValue(rhsExpr);
 				
@@ -1003,6 +1007,7 @@ public class Parser {
 		}
 		
 		// Ensure identifier has been declared
+		//System.out.println("date toke = " + scanner.currentToken.primClassif);
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
 		
 		if (variable == null && !bfor) {
@@ -1275,6 +1280,7 @@ public class Parser {
 		
 		String calledFunction = scanner.currentToken.tokenStr;
 		String argVar = null;
+		String argVar2 = null;
 		//System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
 		String check = scanner.getNext();
@@ -1287,6 +1293,7 @@ public class Parser {
 		
 		scanner.getNext(); // currentToken is beginning of first arg expression or )
 		Value retVal = null;
+		Value dateVal1, dateVal2;
 		
 		switch (calledFunction) {
 		case "print":
@@ -1336,10 +1343,30 @@ public class Parser {
 			argVar = scanner.currentToken.tokenStr;
 			retVal = Functions.spaces(this, parseExpression(")"));
 			break;
+		case "dateDiff":
+			dateVal1 = parseExpression(",");
+			scanner.getNext(); //get ","
+			dateVal2 = parseExpression(")");
+			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
+			retVal = Functions.dateDiff(this, dateVal1, dateVal2);
+			break;
+		case "dateAdj":
+			dateVal1 = parseExpression(",");
+			scanner.getNext(); //get ","
+			dateVal2 = parseExpression(")");
+			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
+			retVal = Functions.dateAdj(this, dateVal1, dateVal2);
+			break;
+		case "dateAge":
+			dateVal1 = parseExpression(",");
+			scanner.getNext(); //get ","
+			dateVal2 = parseExpression(")");
+			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
+			retVal = Functions.dateAge(this, dateVal1, dateVal2);
+			break;
 		default:
 			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
 		}
-		
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
 		//scanner.getNext();		
@@ -1377,6 +1404,7 @@ public class Parser {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
+					//System.out.println("curTok = " + scanner.currentToken.tokenStr);
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
 							symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY)) {
 						Token array = parseArrayRef();
@@ -1461,99 +1489,6 @@ public class Parser {
 			}
 			token = scanner.getNext();
 		}
-		
-		/*while (!(token.equals(terminatingStr))){ 
-			System.out.println("curTok = " + token);
-			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
-				//if function or operand place in postfix out
-				if (scanner.currentToken.primClassif == Token.OPERAND){
-					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
-							symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY)) {
-						Token array = parseArrayRef();
-						out.add(array);
-					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
-							&& symbolTable.containsSymbol(token) 
-							&& ((STIdentifier) symbolTable.getSymbol(token)).getValue().dataType == DataType.STRING 
-							&& scanner.nextToken.tokenStr.equals("[") ) {
-						Token str = parseArrayRef();
-						out.add(str);
-					} else{
-						out.add(scanner.currentToken);
-					}
-				}
-				if (scanner.currentToken.primClassif == Token.FUNCTION){
-					Token funcResult = parseFunctionCall();
-					//System.out.println("************funccur= " + scanner.currentToken.tokenStr);					
-					if (funcResult != null)
-						out.add(funcResult);
-					if(scanner.nextToken.tokenStr.equals(";") || scanner.currentToken.tokenStr.equals(":") || scanner.currentToken.tokenStr.equals("by")){
-						break;
-					} 
-					if(scanner.currentToken.primClassif == Token.OPERATOR){
-						containsOperator = true;
-						while(!stackToken.isEmpty()){
-							//if operator, check precedence
-							if(precedence.get(scanner.currentToken.tokenStr) > stkPrecedence.get(stackToken.peek().tokenStr)){
-								break;
-							}
-							out.add(stackToken.pop());
-						}
-						stackToken.push(scanner.currentToken); 
-					}
-				}
-			}
-			else if (scanner.currentToken.primClassif == Token.OPERATOR){
-				containsOperator = true;
-				while(!stackToken.isEmpty()){
-					//if operator, check precedence
-					if(precedence.get(token) > stkPrecedence.get(stackToken.peek().tokenStr)){
-						break;
-					}
-					out.add(stackToken.pop());
-				}
-				stackToken.push(scanner.currentToken); 
-			}
-			else if (scanner.currentToken.primClassif == Token.SEPARATOR){
-				//if separator, check special cases for parentheses
-				//to determine correctness
-				boolean lParen = false;
-				if(token.equals("(")){
-					stackToken.push(scanner.currentToken);
-				}
-				else if(token.equals(")")){
-					while(!stackToken.isEmpty()){
-						popped = stackToken.pop();
-						if(popped.tokenStr.equals("(")){
-							lParen = true;
-						}else		
-							out.add(popped);
-					}
-					if(!lParen){
-						//no matching parenthesis found
-						//if parenthesis id for function, leave it to parseFunc
-						break;
-					}
-				}
-				else if (token.equals(",")){
-					token = scanner.getNext();
-					continue;
-				}
-				else {
-						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
-							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
-				}
-				
-			}
-			else{
-				throw new SyntaxError("Invalid token '" + token + "' found in expression",
-						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
-			}
-			token = scanner.getNext();
-		}*/
-		
-		//System.out.println("-----> Printing outlist");
-		//out.forEach(t -> System.out.println(t.tokenStr));
-		//System.out.println("-----> End outlist");
 
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();
