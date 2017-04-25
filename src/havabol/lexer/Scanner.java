@@ -279,6 +279,9 @@ public class Scanner {
 
 		token.tokenStr = tokenStr.toString();
 		classifyToken(token, isStringLiteral);
+		//System.out.println("token is = " + token.tokenStr);
+		//System.out.println("token subclass is = " + token.subClassif);
+		
 		if (lookahead) {
 			iSourceLineNr = beforeSourceLineNr;
 			iColPos = beforeColPos;
@@ -325,6 +328,7 @@ public class Scanner {
 			case "String":
 			case "Bool":
 			case "Date":
+			//case "Void":
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.DECLARE;
 				return;
@@ -335,6 +339,7 @@ public class Scanner {
 			case "when":
 			case "by":
 			case "to":
+			//case "def":
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.FLOW;
 				return;
@@ -342,6 +347,7 @@ public class Scanner {
 			case "endif":
 			case "endwhile":
 			case "endfor":
+			case "enddef":
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.END;
 				return;
@@ -372,7 +378,6 @@ public class Scanner {
 				token.primClassif = Token.FUNCTION;
 				token.subClassif = Token.BUILTIN;
 				return;
-			// Two-char operators
 			case ">=":
 			case "<=":
 			case "==":

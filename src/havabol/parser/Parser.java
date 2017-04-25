@@ -545,6 +545,8 @@ public class Parser {
 		
 		//System.out.println("current = " + scanner.currentToken.tokenStr);
 		//System.out.println("next = " + scanner.nextToken.tokenStr);
+		
+		//System.out.println("tok = " + scanner.currentToken.tokenStr);
 
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 			if (scanner.currentToken.tokenStr.equals("debug")) {
@@ -580,6 +582,10 @@ public class Parser {
 					parseFor();	// Exceptions handled in parseFor function
 					forStmt = false;
 					return;
+				//case "def":
+					//parseDef();
+					//scanner.getNext();
+					//return;
 				default:
 					throw new UnsupportedOperationError("Unsupported FLOW token found.");
 				}
@@ -594,7 +600,23 @@ public class Parser {
 			scanner.getNext();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				parseAssignment();
+				/*if(scanner.currentToken.tokenStr.equals("def")){
+					int enddef = 0;
+					scanner.getNext(); //return value
+					scanner.getNext(); //name of function
+					while(!scanner.currentToken.tokenStr.equals("enddef") || enddef > 0){
+						if (scanner.currentToken.tokenStr.equals("def")){
+							scanner.getNext();
+							scanner.getNext();
+							enddef++;
+						}
+						else if (scanner.currentToken.tokenStr.equals("enddef"))
+							enddef--;
+						scanner.getNext();
+					}
+					scanner.getNext();	//get ";"
+				}else*/
+					parseAssignment();
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
 			}
@@ -619,6 +641,13 @@ public class Parser {
 		}
 	}
 	
+	private void parseDef()
+	{
+		// TODO Auto-generated method stub
+		System.out.println("parse def");
+		return;
+	}
+
 	/**
 	 * Function: parseDeclaration
 	 * Parses a declaration statement.
@@ -881,7 +910,7 @@ public class Parser {
 		}
 		
 		// Ensure identifier has been declared
-		System.out.println("date toke = " + scanner.currentToken.primClassif);
+		//System.out.println("date toke = " + scanner.currentToken.primClassif);
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
 		
 		if (variable == null && !bfor) {

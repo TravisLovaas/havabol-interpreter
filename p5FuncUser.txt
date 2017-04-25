@@ -6,6 +6,9 @@ def Void minMax (Float fArrayM[]
     for fItem in fArrayM:
         if fItem > fMax:
             fMax = fItem;
+            def huds Int (kjds, dshui):
+            stuff;
+            enddef;
         endif;
         if fItem < fMin:
             fMin = fItem;
