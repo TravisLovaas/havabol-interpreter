@@ -108,7 +108,7 @@ public class STIdentifier extends STEntry
 	 * 
 	 * arr[0~4] is a slice of size 4 => arr[0] -> arr[3]
 	 * mstr = "hello world"
-	 * mstr[0~6] => "world"
+	 * mstr[0~5] => "hello"
 	 * 
 	 * @param parser
 	 * @param beginIndex
@@ -148,7 +148,7 @@ public class STIdentifier extends STEntry
 			retVal.dataType = this.declaredType;
 			
 			// TODO
-			
+
 		}
 		
 		throw new UnsupportedOperationError("Internal HavaBol error!");
