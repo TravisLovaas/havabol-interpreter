@@ -100,7 +100,58 @@ public class STIdentifier extends STEntry
 		
 	}
 	
-	public void fetchSlice(Parser parser, int beginIndex, int endIndex) {
+	/**
+	 * Retrieves a slice from this variable if it is a string or array.
+	 * Lower bound is inclusive
+	 * Upper bound is exclusive
+	 * lower < upper
+	 * 
+	 * arr[0~4] is a slice of size 4 => arr[0] -> arr[3]
+	 * mstr = "hello world"
+	 * mstr[0~6] => "world"
+	 * 
+	 * @param parser
+	 * @param beginIndex
+	 * @param endIndex
+	 */
+	public Value fetchSlice(Parser parser, int beginIndex, int endIndex) {
+		
+		if (beginIndex < 0) {
+			throw new IndexError("Negative indices are not supported", parser.scanner.currentToken);
+		}
+		
+		if (beginIndex >= endIndex) {
+			throw new IndexError("Lower bound of slice must be strictly less than upper bound", parser.scanner.currentToken);
+		}
+		
+		if (this.structure == StorageStructure.PRIMITIVE) {
+			
+			if (this.declaredType == DataType.STRING) {
+				
+				Value strVal = this.value.asString(parser);
+				
+				if (endIndex > strVal.strValue.length()) {
+					throw new IndexError("Upper bound of slice may not exceed size of string", parser.scanner.currentToken);
+				}
+				
+				// begin and end indices should be valid
+				return new Value(strVal.strValue.substring(beginIndex, endIndex));
+				
+			} else {
+				throw new TypeError("Cannot slice a non-string primitive", parser.scanner.currentToken);
+			}
+			
+		} else {
+			
+			Value retVal = new Value();
+			retVal.structure = Structure.MULTIVALUE;
+			retVal.dataType = this.declaredType;
+			
+			// TODO
+			
+		}
+		
+		throw new UnsupportedOperationError("Internal HavaBol error!");
 		
 	}
 	
