@@ -395,7 +395,7 @@ public class Parser {
 			scanner.getNext();
 			
 			//loop until hits declared array size or null
-			while (internalIndex < array.declaredSize) {
+			while (internalIndex < array.arrayValue.length) {
 				
 				value = array.arrayValue[internalIndex++];
 				
@@ -797,11 +797,27 @@ public class Parser {
 			case "[":
 				// Array is being declared
 				switch (scanner.getNext()) {
-//					case "unbound":
-//						variable = new STIdentifier(identifier, declaredType, Structure.UNBOUNDED_ARRAY, "", 0);
-//						rhsExpr = parseValueList(";");
-//						variable.setValue(rhsExpr);
-//						break;
+					case "unbound":
+						variable = new STIdentifier(identifier, declaredType, StorageStructure.UNBOUNDED_ARRAY);
+						
+						scanner.getNext();
+						
+						assert(scanner.currentToken.tokenStr.equals("]"));
+						
+						switch (scanner.getNext()) {
+						
+						case "=": // value list will follow
+							scanner.getNext();
+							rhsExpr = parseValueList(";");
+							variable.setValue(rhsExpr);
+							break;
+						case ";": // init empty array value and we're done
+							variable.arrayValue = new Value[0];
+							break;
+						default: // syntax error
+							throw new SyntaxError("Expected assignment or semi-colon after array declaration", scanner.currentToken);
+						}
+						break;
 					case "]": // Array size depends on the length of given value list
 						variable = new STIdentifier(identifier, declaredType, StorageStructure.FIXED_ARRAY);
 
@@ -1405,8 +1421,10 @@ public class Parser {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					//System.out.println("curTok = " + scanner.currentToken.tokenStr);
-					if(scanner.currentToken.subClassif == Token.IDENTIFIER && (((STIdentifier) 
-							symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY)) {
+					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ( 
+						  ((STIdentifier) symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY ||
+						  ((STIdentifier) symbolTable.getSymbol(token)).structure == StorageStructure.UNBOUNDED_ARRAY
+						)) {
 						Token array = parseArrayRef();
 						out.add(array);
 					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
