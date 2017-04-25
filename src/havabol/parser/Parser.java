@@ -444,7 +444,126 @@ public class Parser {
 		}
 //		System.out.println("CV: "+cv+" value: "+controlVariable.getValue()+" limit: "+limit+" incr: "+incr);
 	}
-
+	
+	/**
+	 * Function: parseSelect
+	 * Preconditions:
+	 * 		currentToken is on "select"
+	 * Purpose:
+	 * 		purpose is to execute statements that match the case
+	 * 		value.
+	 */
+	/**
+	 * Possible select statements:
+	 * select i:
+	 * 		when 1, 2, 5, 6:
+	 * 			print("1, 2, 5, or 6");
+	 * 		when 3, 4:
+	 * 			print("3 or 4");
+	 * 		default:
+	 * 			print("default case");
+	 * endselect;
+	 * select name:
+	 * 		when Jerry, Beth:
+	 * 			print("Parents");
+	 * 		when Morty, Summer:
+	 * 			print("Children");
+	 * 		when Rick:
+	 * 			print("Let's get SHWIFTY!");
+	 * endselect;
+	 */
+	private void parseSelect() {
+		
+		Value caseVal;
+		int selects = 1;
+		
+		scanner.getNext();
+		
+		// currentToken should be beginning of conditional expression
+		String cv = scanner.currentToken.tokenStr;
+		parseExpression(":"); // used to get to colon: 
+		STIdentifier sti = ((STIdentifier) symbolTable.getSymbol(cv));
+		STIdentifier controlVariable = sti;
+		
+		if (!controlVariable.getValue().asBoolean(this).booleanValue)
+			throw new TypeError("Expected boolean value", scanner.currentToken);
+		
+		if (!scanner.currentToken.tokenStr.equals(":")){
+			throw new SyntaxError("Expected ':' after conditional expression in select", scanner.currentToken);
+		}
+		
+		scanner.getNext(); // advance past :
+		
+		assert(scanner.currentToken.tokenStr.equals("when"));
+		for(;;){
+			if(scanner.currentToken.tokenStr.equals("when")){ // if first case is a when
+				scanner.getNext();
+				caseVal = parseValueList(":");
+				for(Value v : caseVal.arrayValue){
+					if(controlVariable.declaredType.toString().equals("STRING")){
+						if(controlVariable.getValue().strValue.equals(v.strValue)){
+							scanner.getNext();
+							while(!(scanner.currentToken.tokenStr.equals("when") || scanner.currentToken.tokenStr.equals("default"))){
+								parseStatement();
+							}
+							while(!scanner.currentToken.tokenStr.equals("endselect") || selects > 0){
+								scanner.getNext();
+								if(scanner.currentToken.tokenStr.equals("select"))
+									selects++;
+								if(scanner.currentToken.tokenStr.equals("endselect"))
+									selects--;
+							}
+							scanner.getNext();
+							return;
+						}
+					}else if(controlVariable.declaredType.toString().equals("INTEGER")){
+						if(controlVariable.getValue().intValue == v.intValue){
+							scanner.getNext();
+							while(!(scanner.currentToken.tokenStr.equals("when") || scanner.currentToken.tokenStr.equals("default"))){
+								parseStatement();
+							}
+							while(!scanner.currentToken.tokenStr.equals("endselect") || selects > 0){
+								scanner.getNext();
+								if(scanner.currentToken.tokenStr.equals("select"))
+									selects++;
+								if(scanner.currentToken.tokenStr.equals("endselect"))
+									selects--;
+							}
+							scanner.getNext();
+							return;
+						}
+					}
+				}
+			}
+			if(scanner.currentToken.tokenStr.equals("default")){
+				scanner.getNext(); // advance past default
+				scanner.getNext(); // advance past :
+				for(;;){
+					if(scanner.currentToken.tokenStr.equals("endselect")){
+						scanner.getNext(); //advance past ;
+						return;
+					}
+					parseStatement();
+				}
+			}
+			else{
+				selects = 0;
+				while(!(scanner.currentToken.tokenStr.equals("when") || scanner.currentToken.tokenStr.equals("default"))){
+					scanner.getNext();
+					if(scanner.currentToken.tokenStr.equals("select")){
+						while(!scanner.currentToken.tokenStr.equals("endselect") || selects > 0){
+							scanner.getNext();
+							if(scanner.currentToken.tokenStr.equals("select"))
+								selects++;
+							if(scanner.currentToken.tokenStr.equals("endselect"))
+								selects--;
+						}
+						scanner.getNext();
+					}
+				}
+			}
+		}
+	}
 	
 	/**
 	 * Function: parseDebugStatement
@@ -553,6 +672,9 @@ public class Parser {
 				case "for":
 					parseFor();	// Exceptions handled in parseFor function
 					return;
+				case "select":
+					parseSelect();
+					break;
 				default:
 					throw new UnsupportedOperationError("Unsupported FLOW token found.");
 				}
@@ -778,11 +900,13 @@ public class Parser {
 			break;
 		case ";":
 			return array;
+		case ":":
+			return array;
 		default:
 			throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
 		}
 		
-		assert(scanner.currentToken.tokenStr.equals(","));
+		//assert(scanner.currentToken.tokenStr.equals(","));
 		
 		scanner.getNext(); // pass ","
 		
@@ -799,12 +923,14 @@ public class Parser {
 				continue;
 			case ";":
 				break;
+			case ":":
+				break;
 			default:
 				throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
 			}			
 		}
 		
-		assert(scanner.currentToken.tokenStr.equals(";"));
+		//assert(scanner.currentToken.tokenStr.equals(";"));
 		
 		//System.out.println("Value list: " + array);
 		
