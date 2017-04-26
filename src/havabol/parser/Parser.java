@@ -25,7 +25,6 @@ public class Parser {
 	//precedence values while operator tokens are outside of stack
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
 		private static final long serialVersionUID = 1L;
-
 	{
 		put("and", 3); put("or", 3); put("not", 4); put("in", 5); put("notin", 5);    
 		put("<", 5); put(">", 5); put("<=", 5); put(">=", 5); put("==", 5); put("!=", 5);
@@ -381,17 +380,11 @@ public class Parser {
 			if(!symbolTable.containsSymbol(token.tokenStr)){
 				throw new InternalError("Implictly generated symbol does not exist");
 			}
-<<<<<<< HEAD
 			STIdentifier array = (STIdentifier) symbolTable.getSymbol(this, token.tokenStr);
-			if(!(array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY)){
-				// TODO: exception
-=======
-			STIdentifier array = (STIdentifier) symbolTable.getSymbol(token.tokenStr);
 			if(array.structure != StorageStructure.FIXED_ARRAY && 
 			   array.structure != StorageStructure.UNBOUNDED_ARRAY &&
 			   array.declaredType != DataType.STRING){
 				throw new TypeError("Cannot iterate over " + token.tokenStr + " because it is not a string or array", scanner.currentToken);
->>>>>>> refs/remotes/origin/master
 			}
 			
 			controlVariable = new STIdentifier(cv, array.declaredType, StorageStructure.PRIMITIVE);
@@ -1214,7 +1207,7 @@ public class Parser {
 							
 							if (scanner.nextToken.tokenStr.equals(";")) {
 								// case 3
-								STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(scanner.currentToken.tokenStr);
+								STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(this, scanner.currentToken.tokenStr);
 								
 								int destSize = variable.declaredSize;
 								int srcSize = srcArray.declaredSize;
@@ -1248,7 +1241,6 @@ public class Parser {
 								break;
 							
 							}
-<<<<<<< HEAD
 							
 							STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(this, scanner.currentToken.tokenStr);
 						
@@ -1265,9 +1257,6 @@ public class Parser {
 								variable.arrayValue[i] = srcArray.arrayValue[i].clone();
 							}
 							
-=======
-														
->>>>>>> refs/remotes/origin/master
 							scanner.getNext();
 							
 						} else {

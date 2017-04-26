@@ -58,7 +58,7 @@ endfor;
 print("after while loop i=", i);
 
 print("\n** Test for loop within if Stmt within for loop **\n");
-print("** Pay attention to iTemp values **);
+print("** Pay attention to iTemp values **");
 print("Unsorted array");
 Int iDM[20] = 60,30,20,10,5,50,70,25,35,45,15;
 Int iTemp;
