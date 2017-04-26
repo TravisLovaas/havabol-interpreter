@@ -701,16 +701,13 @@ public class Parser {
 					parseFor();	// Exceptions handled in parseFor function
 					forStmt = false;
 					return;
-<<<<<<< HEAD
 				//case "def":
 					//parseDef();
 					//scanner.getNext();
 					//return;
-=======
 				case "select":
 					parseSelect();
 					break;
->>>>>>> refs/remotes/origin/master
 				default:
 					throw new UnsupportedOperationError("Unsupported FLOW token found.");
 				}
