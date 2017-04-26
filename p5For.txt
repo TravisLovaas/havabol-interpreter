@@ -1,0 +1,20 @@
+print("p5For.txt");
+
+Int x[unbound] = 1, 2, 3, 4, 5;
+Int y[] = 10, 20, 30, 40, 50;
+String apple = "apple";
+
+print("");
+for i in x:
+	print(i);
+endfor;
+
+print("");
+for i in y:
+	print(i);
+endfor;
+
+print("");
+for i in apple:
+	print(i);
+endfor;

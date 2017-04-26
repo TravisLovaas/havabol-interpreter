@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import havabol.error.*;
+import havabol.error.InternalError;
 import havabol.lexer.*;
 import havabol.runtime.*;
 import havabol.storage.*;
@@ -378,17 +379,25 @@ public class Parser {
 			
 			Token token = scanner.currentToken;
 			if(!symbolTable.containsSymbol(token.tokenStr)){
-				// TODO: exception
+				throw new InternalError("Implictly generated symbol does not exist");
 			}
 			STIdentifier array = (STIdentifier) symbolTable.getSymbol(token.tokenStr);
-			if(!(array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY)){
-				// TODO: exception
+			if(array.structure != StorageStructure.FIXED_ARRAY && 
+			   array.structure != StorageStructure.UNBOUNDED_ARRAY &&
+			   array.declaredType != DataType.STRING){
+				throw new TypeError("Cannot iterate over " + token.tokenStr + " because it is not a string or array", scanner.currentToken);
 			}
 			
 			controlVariable = new STIdentifier(cv, array.declaredType, StorageStructure.PRIMITIVE);
 			symbolTable.createSymbol(this, cv, controlVariable);
 			
-			scanner.getNext();
+			Value iterable = null;
+			
+			if (!scanner.nextToken.tokenStr.equals(":")) {
+				iterable = parseExpression(":");
+			} else {
+				scanner.getNext();
+			}
 			
 			assert(scanner.currentToken.tokenStr.equals(":"));
 			
@@ -400,12 +409,36 @@ public class Parser {
 			
 			scanner.getNext();
 			
+			Value[] loopOver;
+			
+			if (iterable != null) {
+				if (iterable.structure == Structure.MULTIVALUE) {
+					loopOver = iterable.arrayValue.toArray(new Value[0]);
+				} else {
+					char[] strToLoop = iterable.asString(this).strValue.toCharArray();
+					loopOver = new Value[strToLoop.length];
+					for (int i = 0; i < strToLoop.length; i++) {
+						loopOver[i] = new Value(String.valueOf(strToLoop[i]));
+					}
+				}
+			} else {
+				if (array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY) {
+					loopOver = array.arrayValue;
+				} else {
+					char[] strToLoop = array.getValue().asString(this).strValue.toCharArray();
+					loopOver = new Value[strToLoop.length];
+					for (int i = 0; i < strToLoop.length; i++) {
+						loopOver[i] = new Value(String.valueOf(strToLoop[i]));
+					}
+				}
+			}
+			
 			//loop until hits declared array size or null
-			while (internalIndex < array.arrayValue.length) {
+			while (internalIndex < loopOver.length) {
 				
-				value = array.arrayValue[internalIndex++];
+				value = loopOver[internalIndex++];
 				if (value == null) {
-					break;
+					continue;
 				}
 				
 				controlVariable.setValue(value);

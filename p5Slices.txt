@@ -90,3 +90,32 @@ print("\nSlicing in for ... in loop");
 for x in bFixed[3~8]:
 	print(x);
 endfor;
+
+print("\nString slicing");
+
+String myStr = "hello world";
+String from = "moon";
+
+print(myStr);
+
+print("hello moon: " # myStr[0~6] # from);
+
+myStr[6~] = from;
+
+print("hello moon:", myStr);
+
+myStr[~5] = "goodbye";
+
+print("goodbye moon:", myStr);
+
+myStr[4~7] = "night";
+
+print("goodnight moon", myStr);
+
+print("\nString slice in for ... in loop");
+for x in myStr[~9]:
+	print(x);
+endfor;
+
+
+
