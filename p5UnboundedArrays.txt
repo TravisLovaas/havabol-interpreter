@@ -1,4 +1,4 @@
-print("p5UnboundedArrays.txt\n");
+print("p5Slices.txt\n");
 
 Int a[unbound] = 0, 2, 4, 6, 8;
 print("Initialized `a` with 5 elements.");
@@ -37,3 +37,6 @@ print("\nLooping over `a` with `in` for loop");
 for x in a:
 	print(x);
 endfor;
+
+print("\nScalar assignment to unbounded array is a TypeError");
+//a = 5;

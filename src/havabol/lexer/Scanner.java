@@ -45,7 +45,7 @@ public class Scanner {
 	
 	public boolean debugToken = false;
 	
-	private final static String DELIMITERS = " \t;:()\'\"=!<>+-*/[]#^,\n"; // terminate a token
+	private final static String DELIMITERS = " \t;:()\'\"~=!<>+-*/[]#^,\n"; // terminate a token
 	private final static String WHITESPACE = " \t\n";
 	private final static String QUOTES = "\"'";
 	private final static String OPERATORS = "!=<>+-*/#^\'IN\'\'NOTIN\'";
@@ -384,6 +384,10 @@ public class Scanner {
 			case "!=":
 			case "u-":
 				token.primClassif = Token.OPERATOR;
+				return;
+			case "~":
+				token.primClassif = Token.SEPARATOR;
+				token.subClassif = Token.SEPARATOR;
 				return;
 		}
 		

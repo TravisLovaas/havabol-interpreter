@@ -6,6 +6,7 @@ import havabol.error.IndexError;
 import havabol.error.TypeError;
 import havabol.error.UnsupportedOperationError;
 import havabol.parser.*;
+import havabol.runtime.Functions;
 import havabol.storage.*;
 
 /*
@@ -19,7 +20,7 @@ public class STIdentifier extends STEntry
 	public DataType declaredType;
 	public StorageStructure structure;
 	public int declaredSize = 1; // for use in fixed arrays ONLY
-	public int maxPopulatedIndex = 0; // for use in unbounded arrays ONLY
+	public int maxPopulatedIndex = 0;
 	//public String parm;
 	//public int nonLocal;
 	
@@ -90,13 +91,36 @@ public class STIdentifier extends STEntry
 			if (index >= arrayValue.length) {
 				// resize array to fit new index
 				int newSize = (index + 1) * 2;
-				Value[] resizedArray = Arrays.copyOf(this.arrayValue, newSize);
-				this.arrayValue = resizedArray;
+				this.arrayValue = Arrays.copyOf(this.arrayValue, newSize);
 			}
 			
 			this.arrayValue[index] = value.clone();
 			
+			if (index > maxPopulatedIndex) {
+				maxPopulatedIndex = index;
+			}
+			
 		}
+		
+	}
+	
+	public Value sliceWithoutEnd(Parser parser, int beginIndex) {
+		
+		int endIndex;
+		
+		if (this.structure == StorageStructure.FIXED_ARRAY) {
+			endIndex = this.declaredSize;
+		} else {
+			endIndex = this.maxPopulatedIndex + 1;
+		}
+		
+		return fetchSlice(parser, beginIndex, endIndex);
+		
+	}
+	
+	public Value sliceWithoutBegin(Parser parser, int endIndex) {
+		
+		return fetchSlice(parser, 0, endIndex);
 		
 	}
 	
@@ -147,11 +171,28 @@ public class STIdentifier extends STEntry
 			retVal.structure = Structure.MULTIVALUE;
 			retVal.dataType = this.declaredType;
 			
-			// TODO
+			int maxBound = 0;
+			
+			if (this.structure == StorageStructure.FIXED_ARRAY) {
+				maxBound = this.declaredSize;
+			} else {
+				maxBound = this.maxPopulatedIndex + 1;
+			}
+			
+			if (endIndex > maxBound) {
+				throw new IndexError("Upper bound of slice may not exceed array bounds", parser.scanner.currentToken);
+			}
+			
+			for (int i = beginIndex; i < endIndex; i++) {
+				if (this.arrayValue[i] == null) {
+					throw new IndexError("Included an uninitialized array index inside slice", parser.scanner.currentToken);
+				}
+				retVal.arrayValue.add(this.arrayValue[i].clone());
+			}
+			
+			return retVal;
 
 		}
-		
-		throw new UnsupportedOperationError("Internal HavaBol error!");
 		
 	}
 	
@@ -188,6 +229,7 @@ public class STIdentifier extends STEntry
 			} else {
 				// multivalue into unbounded array
 				this.arrayValue = value.arrayValue.toArray(new Value[0]);
+				maxPopulatedIndex = this.arrayValue.length;
 			}
 		}
 		//System.out.println("----------------->Value of symbol: " + symbol + " is: " + this.value);
