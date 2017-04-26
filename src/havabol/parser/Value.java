@@ -26,7 +26,7 @@ public class Value {
 
 	public List<Value> arrayValue = new ArrayList<>();
 	
-	public int numItems = 1;
+	public int numItems = 0;
 
 	public Value() {
 		this.dataType = DataType.VOID;
@@ -70,31 +70,36 @@ public class Value {
 	 */
 	public Token toToken(Parser parser) {
 		
-		if (this.structure != Structure.PRIMITIVE) {
-			throw new TypeError("Cannot convert non primitive to token");
-		}
+		Token newToken = new Token();
+		newToken.tempValue = this;
+		newToken.isValueContainer = true;
+		return newToken;
 		
-		Token patch = new Token(); 
-		patch.tokenStr = this.asString(parser).strValue;
-		patch.primClassif = Token.OPERAND;
-		switch(this.dataType){
-		case INTEGER:
-			patch.subClassif = Token.INTEGER;
-			break;
-		case STRING:
-			patch.subClassif = Token.STRING;
-			break;
-		case BOOLEAN:
-			patch.subClassif = Token.BOOLEAN;
-			break;
-		case FLOAT:
-			patch.subClassif = Token.FLOAT;
-			break;
-		default:
-			break;
-		}
-		
-		return patch;
+//		if (this.structure != Structure.PRIMITIVE) {
+//			throw new TypeError("Cannot convert non primitive to token");
+//		}
+//		
+//		Token patch = new Token(); 
+//		patch.tokenStr = this.asString(parser).strValue;
+//		patch.primClassif = Token.OPERAND;
+//		switch(this.dataType){
+//		case INTEGER:
+//			patch.subClassif = Token.INTEGER;
+//			break;
+//		case STRING:
+//			patch.subClassif = Token.STRING;
+//			break;
+//		case BOOLEAN:
+//			patch.subClassif = Token.BOOLEAN;
+//			break;
+//		case FLOAT:
+//			patch.subClassif = Token.FLOAT;
+//			break;
+//		default:
+//			break;
+//		}
+//		
+//		return patch;
 	}
 	
 	/**

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import havabol.error.*;
+import havabol.error.InternalError;
 import havabol.lexer.*;
 import havabol.runtime.*;
 import havabol.storage.*;
@@ -378,17 +379,31 @@ public class Parser {
 			
 			Token token = scanner.currentToken;
 			if(!symbolTable.containsSymbol(token.tokenStr)){
-				// TODO: exception
+				throw new InternalError("Implictly generated symbol does not exist");
 			}
+<<<<<<< HEAD
 			STIdentifier array = (STIdentifier) symbolTable.getSymbol(this, token.tokenStr);
 			if(!(array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY)){
 				// TODO: exception
+=======
+			STIdentifier array = (STIdentifier) symbolTable.getSymbol(token.tokenStr);
+			if(array.structure != StorageStructure.FIXED_ARRAY && 
+			   array.structure != StorageStructure.UNBOUNDED_ARRAY &&
+			   array.declaredType != DataType.STRING){
+				throw new TypeError("Cannot iterate over " + token.tokenStr + " because it is not a string or array", scanner.currentToken);
+>>>>>>> refs/remotes/origin/master
 			}
 			
 			controlVariable = new STIdentifier(cv, array.declaredType, StorageStructure.PRIMITIVE);
 			symbolTable.createSymbol(this, cv, controlVariable);
 			
-			scanner.getNext();
+			Value iterable = null;
+			
+			if (!scanner.nextToken.tokenStr.equals(":")) {
+				iterable = parseExpression(":");
+			} else {
+				scanner.getNext();
+			}
 			
 			assert(scanner.currentToken.tokenStr.equals(":"));
 			
@@ -400,12 +415,36 @@ public class Parser {
 			
 			scanner.getNext();
 			
+			Value[] loopOver;
+			
+			if (iterable != null) {
+				if (iterable.structure == Structure.MULTIVALUE) {
+					loopOver = iterable.arrayValue.toArray(new Value[0]);
+				} else {
+					char[] strToLoop = iterable.asString(this).strValue.toCharArray();
+					loopOver = new Value[strToLoop.length];
+					for (int i = 0; i < strToLoop.length; i++) {
+						loopOver[i] = new Value(String.valueOf(strToLoop[i]));
+					}
+				}
+			} else {
+				if (array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY) {
+					loopOver = array.arrayValue;
+				} else {
+					char[] strToLoop = array.getValue().asString(this).strValue.toCharArray();
+					loopOver = new Value[strToLoop.length];
+					for (int i = 0; i < strToLoop.length; i++) {
+						loopOver[i] = new Value(String.valueOf(strToLoop[i]));
+					}
+				}
+			}
+			
 			//loop until hits declared array size or null
-			while (internalIndex < array.arrayValue.length) {
+			while (internalIndex < loopOver.length) {
 				
-				value = array.arrayValue[internalIndex++];
+				value = loopOver[internalIndex++];
 				if (value == null) {
-					break;
+					continue;
 				}
 				
 				controlVariable.setValue(value);
@@ -1164,19 +1203,52 @@ public class Parser {
 				case "=":
 					
 					if (variable.structure == StorageStructure.FIXED_ARRAY) {
+						// Fixed array on LHS of assignment:
+						// case 1: fixedM = 4 + 1;       set all indices in fixedM to 5
+						// case 2: fixedM = arr[2~];     fixedM now consists only of elements from slice of arr
+						// case 3: fixedM = myArray;     fixedM is filled with elements from myArray
 						
 						scanner.getNext();
 						
 						if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 							
-							if (!scanner.nextToken.tokenStr.equals(";")) {
-								Value srcForAll = parseExpression(";");
+							if (scanner.nextToken.tokenStr.equals(";")) {
+								// case 3
+								STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(scanner.currentToken.tokenStr);
 								
-								for (int i = 0; i < variable.declaredSize; i++) {
-									variable.arrayValue[i] = srcForAll.clone();
+								int destSize = variable.declaredSize;
+								int srcSize = srcArray.declaredSize;
+								
+								int fillSize = Math.min(destSize, srcSize);
+								
+								for (int i = 0; i < fillSize; i++) {
+									
+									if (srcArray.arrayValue[i] == null)
+										break;
+									
+									variable.arrayValue[i] = srcArray.arrayValue[i].clone();
 								}
+								
+							} else {
+								// case 1 or 2
+							
+								Value toAssign = parseExpression(";");
+								
+								if (toAssign.structure == Structure.PRIMITIVE) {
+								
+									for (int i = 0; i < variable.declaredSize; i++) {
+										variable.arrayValue[i] = toAssign.clone();
+									}
+								
+								} else {
+									//System.out.println(toAssign);
+									variable.setValue(toAssign);
+								}
+								
 								break;
+							
 							}
+<<<<<<< HEAD
 							
 							STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(this, scanner.currentToken.tokenStr);
 						
@@ -1193,9 +1265,13 @@ public class Parser {
 								variable.arrayValue[i] = srcArray.arrayValue[i].clone();
 							}
 							
+=======
+														
+>>>>>>> refs/remotes/origin/master
 							scanner.getNext();
 							
 						} else {
+							// case 1
 							
 							Value srcForAll = parseExpression(";");
 							
@@ -1205,8 +1281,18 @@ public class Parser {
 							
 						}
 						
-					} else if (variable.structure == StorageStructure.UNBOUNDED_ARRAY) { 
-						throw new TypeError("Cannot perform scalar assignment to an unbounded array", scanner.currentToken);
+					} else if (variable.structure == StorageStructure.UNBOUNDED_ARRAY) {
+						
+						Value rhs = parseExpression(";");
+						
+						if (rhs.structure == Structure.MULTIVALUE) {
+							// unboundedM = myArr[2~];
+							variable.setValue(rhs);
+						} else {
+							// unboundedM = 4 + 1;
+							throw new TypeError("Cannot perform scalar assignment to an unbounded array", scanner.currentToken);
+						}
+						
 					} else { // primitive
 						
 						scanner.getNext();
@@ -1333,6 +1419,21 @@ public class Parser {
 		}
 		
 		scanner.getNext();
+		// cursor is now inside brackets
+		// tArray[...]
+		//        ^
+		
+		if (scanner.currentToken.tokenStr.equals("~")) {
+			// no begin slice
+			scanner.getNext();
+			
+			int endIndex = parseExpression("]").asInteger(this).intValue;
+			
+			Value res = array.sliceWithoutBegin(this, endIndex);
+			
+			return res.toToken(this);
+			
+		}
 		
 		// currentToken may be an integer or slice operator:
 		//   tArray[2~4]
@@ -1639,7 +1740,9 @@ public class Parser {
 		for(Token entry : out){		
 			Value res = null, res2 = null;
 			token = entry.tokenStr;
-			if(entry.primClassif == Token.OPERAND){
+			if (entry.isValueContainer) {
+				stackResult.push(entry.tempValue);
+			} else if(entry.primClassif == Token.OPERAND){
 				//Found operand; check if it is an actual value
 				//if not, convert to an actual value and push to stack
 				switch(entry.subClassif){

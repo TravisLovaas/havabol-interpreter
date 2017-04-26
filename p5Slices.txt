@@ -1,17 +1,121 @@
 print("p5Slices.txt\n");
 
 Int aUn[unbound] = 0, 2, 4, 6, 8;
-print("Initialized `aUn` with 0 2 4 ... 8");
+print("Initialized `aUn` with 0 2 4 6 8");
 print("ELEM(aUn) =", ELEM(aUn));
 
 Int bFixed[] = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;
-print("\nInitialized `bFixed` with 1 2 3 ... 10");
+print("\nInitialized `bFixed` with 1 2 3 4 5 6 7 8 9 10");
 print("ELEM(bFixed) =", ELEM(bFixed));
 
-Int m[2];
-print("\nSlice to array assignment");
+print("\nSlicing into fixed array `m`");
+
+Int m[5];
+print("\nSlice aUn[2~4] = 4, 6. m contains: ");
 m = aUn[2~4];
 
 for x in m:
-	print(m);
+	print(x);
 endfor;
+
+print("\nSlice aUn[0~ELEM(aUn)] into m:");
+m = aUn[0~ELEM(aUn)];
+
+for x in m:
+	print(x);
+endfor;
+
+print("\nSlice bFixed[1~3] = 2, 3. m contains: ");
+m = bFixed[1~3];
+
+for x in m:
+	print(x);
+endfor;
+
+print("\nSlice bFixed[~2] = 1, 2. m contains: ");
+m = bFixed[~2];
+
+for x in m:
+	print(x);
+endfor;
+
+print("\nSlice bFixed[~9] = 9, 10. m contains: ");
+m = bFixed[8~];
+
+for x in m:
+	print(x);
+endfor;
+
+print("\nELEM(m) =", ELEM(m), "and MAXELEM(m) =", MAXELEM(m));
+
+print("\nSlicing into unbounded array `u`");
+
+Int u[5];
+print("\nSlice aUn[2~4] = 4, 6. u contains: ");
+u = aUn[2~4];
+
+for x in u:
+	print(x);
+endfor;
+
+print("\nSlice aUn[0~ELEM(aUn)] into u:");
+u = aUn[0~ELEM(aUn)];
+
+for x in u:
+	print(x);
+endfor;
+
+print("\nSlice bFixed[1~3] = 2, 3. u contains: ");
+u = bFixed[1~3];
+
+for x in u:
+	print(x);
+endfor;
+
+print("\nSlice bFixed[~2] = 1, 2. u contains: ");
+u = bFixed[~2];
+
+for x in u:
+	print(x);
+endfor;
+
+print("\nSlice bFixed[~9] = 9, 10. u contains: ");
+u = bFixed[8~];
+
+for x in u:
+	print(x);
+endfor;
+
+print("\nSlicing in for ... in loop");
+for x in bFixed[3~8]:
+	print(x);
+endfor;
+
+print("\nString slicing");
+
+String myStr = "hello world";
+String from = "moon";
+
+print(myStr);
+
+print("hello moon: " # myStr[0~6] # from);
+
+myStr[6~] = from;
+
+print("hello moon:", myStr);
+
+myStr[~5] = "goodbye";
+
+print("goodbye moon:", myStr);
+
+myStr[4~7] = "night";
+
+print("goodnight moon", myStr);
+
+print("\nString slice in for ... in loop");
+for x in myStr[~9]:
+	print(x);
+endfor;
+
+
+
