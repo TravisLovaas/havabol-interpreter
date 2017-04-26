@@ -97,6 +97,7 @@ public class Parser {
 			for (;;) {
 				parseStatement();
 				if (scanner.currentToken.tokenStr.equals("else")) {
+					//System.out.println("here = " + scanner.currentToken.tokenStr);
 					break;
 				} else if (scanner.currentToken.tokenStr.equals("endif")) {
 					scanner.getNext();
@@ -123,6 +124,8 @@ public class Parser {
 			// done, semi-colon handled by parseStatement
 		} else {
 			// Skip everything until else or endif
+			//System.out.println("---> token " + scanner.currentToken.tokenStr);
+			
 			int ifCnt = 0;
 			for (;;) {
 				scanner.getNext();
@@ -146,6 +149,9 @@ public class Parser {
 			// skip everything inside else
 			while (!scanner.currentToken.tokenStr.equals("endif")) {
 				parseStatement();
+				if (scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
+					return;
+				}
 			}
 			scanner.getNext(); // pass "endif"
 		}
