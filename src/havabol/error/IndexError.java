@@ -15,7 +15,7 @@ public class IndexError extends Error {
 	 * @param token:		token found that caused error 
 	 */
 	public IndexError(String message, Token token) {
-		super(message + " (found \"" + token.tokenStr + "\" + at line " + (token.iSourceLineNr + 1) + " near column " + (token.iColPos + 1) + ")");
+		super("\n" + message + "\n(found \"" + token.tokenStr + "\" + at line " + (token.iSourceLineNr + 1) + " near column " + (token.iColPos + 1) + ")");
 	}
 	
 	/**	 
@@ -26,7 +26,7 @@ public class IndexError extends Error {
 	 * 					  	error may have occurred
 	 */
 	public IndexError(String message, int lineNumber) {
-		super(message + " (at line " + lineNumber + ")");
+		super("\n" + message + "\n(at line " + lineNumber + ")");
 	}
 	
 
@@ -40,7 +40,7 @@ public class IndexError extends Error {
 	 * 						error may have occurred
 	 */
 	public IndexError(String message, int lineNumber, int colPos) {
-		super(message + " (at line " + lineNumber + ", near column " + colPos + ")");
+		super("\n" + message + "\n(at line " + lineNumber + ", near column " + colPos + ")");
 	}
 
 }
