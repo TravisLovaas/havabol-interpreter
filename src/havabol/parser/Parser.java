@@ -12,8 +12,8 @@ import havabol.storage.*;
 
 public class Parser {
 	
-	private Scanner scanner;
-	private SymbolTable symbolTable;
+	public Scanner scanner;
+	public SymbolTable symbolTable;
 	
 	public boolean debugExpr = false;
 	public boolean debugAssignment = false;
