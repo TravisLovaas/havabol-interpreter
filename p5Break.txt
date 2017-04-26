@@ -38,6 +38,17 @@ for iTemp in iDM:
     print("\t", iTemp);
 endfor;
 
+print("Test for tokenizing with String");
+String santa = 'He said ';
+String team = "Peju& Travis& Andrew";
+for cv from santa by ' ':
+    print ('cv=', cv);
+    for name from team by "&":
+    	print("name=", name);
+    endfor;
+    santa = santa # 'ho ';
+endfor;
+
 print("Nested for loops, sorting the array");
 Bool bChange;
 Int j;

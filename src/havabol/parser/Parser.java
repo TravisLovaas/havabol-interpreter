@@ -398,7 +398,6 @@ public class Parser {
 			while (internalIndex < array.arrayValue.length) {
 				
 				value = array.arrayValue[internalIndex++];
-				
 				if (value == null) {
 					break;
 				}
@@ -455,6 +454,93 @@ public class Parser {
 			
 			assert(scanner.currentToken.tokenStr.equals(";"));
 			
+			break;
+			
+		case "from":
+			scanner.getNext();
+			value = parseExpression("by"); 
+			//DataType dt = value.dataType;
+			controlVariable = new STIdentifier(cv, value.dataType, StorageStructure.PRIMITIVE);
+			controlVariable.setValue(value);
+			symbolTable.createSymbol(this, cv, controlVariable);
+			
+			assert(scanner.currentToken.tokenStr.equals("by"));
+			scanner.getNext(); // get past "by"
+			
+			//System.out.println(scanner.currentToken.tokenStr);
+			
+			limit = parseExpression(":");
+			//System.out.println("*********'" + limit + "'");
+
+			//System.out.println("past limit");
+
+			//scanner.getNext();
+			
+			lineNm = scanner.iSourceLineNr;
+			colPos = scanner.iColPos;
+			
+			controlVariable.setValue(controlVariable.getValue().asString(this));
+			//System.out.println("cur tok = " + scanner.currentToken.tokenStr);
+			limit = limit.asString(this);
+			
+			assert(scanner.currentToken.tokenStr.equals(":"));
+			
+			scanner.getNext();
+			String[] splitString = controlVariable.getValue().strValue.split(limit.strValue);
+			
+			//for (String word: splitString){
+			//System.out.println("limit = '" + limit.strValue + "'");
+			//}
+			for (String word: splitString) {
+				value = new Value(word);
+				controlVariable.setValue(value);
+				//System.out.println("word = '" + controlVariable.getValue().strValue + "'");
+
+				while (!scanner.currentToken.tokenStr.equals("endfor")) {
+					parseStatement();
+					//continue for forStmt
+					if(scanner.currentToken.tokenStr.equals("continue")){
+						while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
+							if (scanner.currentToken.tokenStr.equals("for"))
+								endForCnt++;
+							else if (scanner.currentToken.tokenStr.equals("endfor"))
+								endForCnt--;
+							scanner.getNext();
+						}
+					}
+					//break for forStmt
+					if(scanner.currentToken.tokenStr.equals("break")){
+						while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
+							if (scanner.currentToken.tokenStr.equals("for"))
+								endForCnt++;
+							else if (scanner.currentToken.tokenStr.equals("endfor"))
+								endForCnt--;
+							scanner.getNext();
+						}
+						scanner.getNext();
+						return;
+					}
+					
+				}
+				
+				//controlVariable.getValue().intValue += incr.intValue;
+				
+				scanner.setPosition(lineNm,colPos);
+				
+			}
+			
+			endForCnt = 0;
+			while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
+				if (scanner.currentToken.tokenStr.equals("for"))
+					endForCnt++;
+				else if (scanner.currentToken.tokenStr.equals("endfor"))
+					endForCnt--;
+				scanner.getNext();
+			}
+			
+			assert(scanner.currentToken.tokenStr.equals("endfor"));
+			scanner.getNext();
+			assert(scanner.currentToken.tokenStr.equals(";"));
 			break;
 			
 		default:
