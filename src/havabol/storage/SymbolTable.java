@@ -60,11 +60,11 @@ public class SymbolTable {
 	 *            the symbol to get to the Symbol Table
 	 */
 
-	public STEntry getSymbol(String symbol){
+	public STEntry getSymbol(Parser parser, String symbol){
 		if (ST.containsKey(symbol)){
 			return (STEntry) ST.get(symbol);
 		} else {
-			throw new DeclarationError("Attempted to access value of undeclared identifier");
+			throw new DeclarationError("Attempted to access value of undeclared identifier", parser.scanner.currentToken);
 		}
 
 	}

@@ -380,7 +380,7 @@ public class Parser {
 			if(!symbolTable.containsSymbol(token.tokenStr)){
 				// TODO: exception
 			}
-			STIdentifier array = (STIdentifier) symbolTable.getSymbol(token.tokenStr);
+			STIdentifier array = (STIdentifier) symbolTable.getSymbol(this, token.tokenStr);
 			if(!(array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY)){
 				// TODO: exception
 			}
@@ -592,7 +592,7 @@ public class Parser {
 		// currentToken should be beginning of conditional expression
 		String cv = scanner.currentToken.tokenStr;
 		parseExpression(":"); // used to get to colon: 
-		STIdentifier sti = ((STIdentifier) symbolTable.getSymbol(cv));
+		STIdentifier sti = ((STIdentifier) symbolTable.getSymbol(this, cv));
 		STIdentifier controlVariable = sti;
 		
 		if (!controlVariable.getValue().asBoolean(this).booleanValue)
@@ -1145,7 +1145,7 @@ public class Parser {
 		
 		// Ensure identifier has been declared
 		//System.out.println("date toke = " + scanner.currentToken.primClassif);
-		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(identifier);
+		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(this, identifier);
 		
 		if (variable == null && !bfor) {
 			throw new DeclarationError("Reference to undeclared identifier found", scanner.currentToken);
@@ -1178,7 +1178,7 @@ public class Parser {
 								break;
 							}
 							
-							STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(scanner.currentToken.tokenStr);
+							STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(this, scanner.currentToken.tokenStr);
 						
 							int destSize = variable.declaredSize;
 							int srcSize = srcArray.declaredSize;
@@ -1220,7 +1220,7 @@ public class Parser {
 				case "+=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.subtract(this, res01, res02);
 					variable.setValue(rhsExpr);
@@ -1228,7 +1228,7 @@ public class Parser {
 				case "-=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.add(this, res01, res02);
 					variable.setValue(rhsExpr);
@@ -1236,7 +1236,7 @@ public class Parser {
 				case "*=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 	
 					rhsExpr = Operators.multiply(this, res01, res02);
@@ -1245,14 +1245,14 @@ public class Parser {
 				case "/=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
+					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.divide(this, res01, res02);
 					variable.setValue(rhsExpr);
 					break;
 				default:
 					if(bin){
-						rhsExpr = ((STIdentifier) symbolTable.getSymbol(identifier)).getValue();
+						rhsExpr = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
 						break;
 					}
 					throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
@@ -1322,7 +1322,7 @@ public class Parser {
 		
 		String arrayName = scanner.currentToken.tokenStr;
 		
-		STIdentifier array = (STIdentifier) symbolTable.getSymbol(arrayName);
+		STIdentifier array = (STIdentifier) symbolTable.getSymbol(this, arrayName);
 
 		if (array.structure != StorageStructure.FIXED_ARRAY && array.structure != StorageStructure.UNBOUNDED_ARRAY && array.getValue().dataType != DataType.STRING) {
 			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
@@ -1461,12 +1461,12 @@ public class Parser {
 			break;
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
-			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(this, argVar));
 			scanner.getNext();
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
-			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(argVar));
+			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(this, argVar));
 			scanner.getNext();
 			break;
 		case "LENGTH":
@@ -1540,14 +1540,14 @@ public class Parser {
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					//System.out.println("curTok = " + scanner.currentToken.tokenStr);
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ( 
-						  ((STIdentifier) symbolTable.getSymbol(token)).structure == StorageStructure.FIXED_ARRAY ||
-						  ((STIdentifier) symbolTable.getSymbol(token)).structure == StorageStructure.UNBOUNDED_ARRAY
+						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.FIXED_ARRAY ||
+						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.UNBOUNDED_ARRAY
 						)) {
 						Token array = parseArrayRef();
 						out.add(array);
 					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
 							&& symbolTable.containsSymbol(token) 
-							&& ((STIdentifier) symbolTable.getSymbol(token)).getValue().dataType == DataType.STRING 
+							&& ((STIdentifier) symbolTable.getSymbol(this, token)).getValue().dataType == DataType.STRING 
 							&& scanner.nextToken.tokenStr.equals("[") ) {
 						Token str = parseArrayRef();
 						out.add(str);
@@ -1644,7 +1644,7 @@ public class Parser {
 				//if not, convert to an actual value and push to stack
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
-						res = ((STIdentifier) symbolTable.getSymbol(token)).getValue();
+						res = ((STIdentifier) symbolTable.getSymbol(this, token)).getValue();
 						//System.out.println("----------->token = " + res);
 						//Array found?
 						stackResult.push(res);

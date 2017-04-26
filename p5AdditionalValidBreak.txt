@@ -1,0 +1,90 @@
+print("p5AdditionalValidBreak.txt");
+print("<--- This tests break and continue statements <---\n");
+Bool bFlag;
+Int i;
+String fruit;
+String climber;
+bFlag = T;
+i = 0;
+fruit = 'larry';
+climber = 'pike';
+
+print("\n** Test break and continue within while inside of if's and else's **\n");
+
+while bFlag:
+    i = i + 1;
+    print("i=", i);
+    if fruit == "apple" or fruit == "orange" or fruit == "larry":
+        print("it is a fruit");
+        if i > 2:
+           print("i is greater than 2");
+           climber = "comfort";
+           //break;
+        else:
+           print("i is <= 2");
+        endif;
+        print("inside while, after first inner if");
+        if climber == "pike":
+             print("it is pike");
+             continue;
+        else:
+             print("it is not pike");
+             print("It is", climber);
+             //break;
+             if(i == 10):
+             	break;
+             else:
+             	continue;
+             endif;
+        endif;
+        print("after inner if");
+    endif;
+    print("after outer if");    
+endwhile;
+
+print("The current climber is our dear", climber);
+print("\n** Test break in any part of for outside of if's and else's **\n");
+
+for letter in climber:
+    if(letter != 'f'):
+		print("letter = ", letter);
+		continue;
+	else:
+		print("letter = e");
+	endif;
+	break;
+endfor; 
+
+print("after while loop i=", i);
+
+print("\n** Test for loop within if Stmt within for loop **\n");
+print("** Pay attention to iTemp values **);
+print("Unsorted array");
+Int iDM[20] = 60,30,20,10,5,50,70,25,35,45,15;
+Int iTemp;
+Int iAlt;
+for iTemp in iDM:
+	print("iTemp in 1st for loop is", iTemp);
+    if(iTemp == 10):
+    	for iTemp in iDM:
+    		print("iTemp in 2nd for loop is", iTemp);
+    		break;
+    	endfor;
+    else:
+        print("\t", iTemp);
+    endif;
+endfor;
+
+//continue;
+
+print("\n** Test continue statement without if Statement **\n");
+for iTemp in iDM:
+	print("\t", iTemp);
+	continue;
+endfor;
+
+print("\n** Test break statement without if Statement **\n");
+for iTemp in iDM:
+	print("\t", iTemp);
+	break;
+endfor;
