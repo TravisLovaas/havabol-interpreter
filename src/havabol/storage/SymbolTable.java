@@ -64,7 +64,6 @@ public class SymbolTable {
 		if (ST.containsKey(symbol)){
 			return (STEntry) ST.get(symbol);
 		} else {
-			System.out.println("symbol = " + symbol);
 			throw new DeclarationError("Attempted to access value of undeclared identifier");
 		}
 

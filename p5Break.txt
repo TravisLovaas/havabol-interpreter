@@ -19,11 +19,12 @@ while bFlag:
            print("i is <= 2");
         endif;
         print("inside while, after first inner if");
-        if climber == "pike":
+        if climber == "bike":
              print("it is pike");
              continue;
         else:
              print("it is not pike");
+             break;
         endif;
         print("after inner if");
     endif;
@@ -38,8 +39,25 @@ for iTemp in iDM:
     print("\t", iTemp);
 endfor;
 
+print("Test for tokenizing with String");
+String santa = 'He said ';
+String team = "Peju$ Travis$ Andrew";
+for cv from santa by ' ':
+    print ('cv=', cv);
+    for name from team by "$ ":
+    	if name == "Travis":
+    	    print("name=", name);
+    	else:
+    		continue;
+    	endif;
+    endfor;
+    santa = santa # 'ho ';
+    break;
+endfor;
+
 print("Nested for loops, sorting the array");
 Bool bChange;
+break;
 Int j;
 for i=0 to ELEM(iDM)-1:
     bChange = F;

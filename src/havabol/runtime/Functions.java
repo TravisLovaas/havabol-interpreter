@@ -19,7 +19,6 @@ public class Functions {
 	 * @return			Value type of print function (void)
 	 */
 	
-	
 	public static Value print(Parser parser, List<Value> args) {
 		if (args.size() == 0) {
 			return new Value().asVoid();
@@ -127,6 +126,24 @@ public class Functions {
 	}
 
 
+	/**
+	 * Function: dateDiff
+	 * Purpose:				calculates the difference between two dates
+	 * Notes:
+	 *					    1. We validate/convert the days to Julian Date format.  If the date is
+	 *					       invalid, we exit and show a message.
+	 *					    2. For each of the dates, we determine the number of days since
+	 *					       "0000-03-01" by starting the count at 1 for 0000-03-01. Using
+	 *					       March 1st eliminates some leap day issues. 
+	 *					    3. Return the difference in days
+	 * @param parser:		information about  values being parsed
+	 * @param dateVal1:		first date value for calculating the difference between
+	 * 						two dates
+	 * @param dateVal2:		second date value for calculating the difference between
+	 * 						two dates 
+	 * @return				returns the Value containing the difference in dates
+	 * 						between two dates
+	 */
 	public static Value dateDiff(Parser parser, Value dateVal1, Value dateVal2)
 	{
 		// TODO Auto-generated method stub
@@ -144,6 +161,16 @@ public class Functions {
 	}
 	
 
+	/**
+	 * Function: dateAdj
+	 * Purpose:				adjusts a date based on offset
+	 * @param parser:		information about  values being parsed
+	 * @param dateVal:		date value used as offset for calculating a new date that is
+	 * 						a specified number of days more or less than the offset
+	 * @param days			the specified number of days to apply to original date as
+	 * 						offset for a new date
+	 * @return				the Value containing an adjusted date based on offset
+	 */
 	public static Value dateAdj(Parser parser, Value dateVal, Value days)
 	{
 		// TODO Auto-generated method stub
@@ -154,16 +181,23 @@ public class Functions {
 			 throw new SyntaxError("Invalid 1st date for dateDiff: ", dateVal.toToken(parser));
 
 		Calendar calendar = new GregorianCalendar(dateVal.year, (dateVal.month - 1), dateVal.day);
-		//System.out.println("Date : " + sdf.format(calendar.getTime()));
 		 
 		//subtract 10 days
 		calendar.add(Calendar.DAY_OF_MONTH, days.intValue);
-		//System.out.println("Date : " + sdf.format(calendar.getTime()));
-
 		return new Value(sdf.format(calendar.getTime()));
 	}
 
-
+	/**
+	 * Function:	dateAge
+	 * Purpose:				calculates the number of years between two dates 
+	 * @param parser:		information about  values being parsed
+	 * @param dateVal1		the first date used to calculate the number of
+	 * 						years between two date
+	 * @param dateVal2		the second date used to calculate the number of
+	 * 						years between two date
+	 * @return				the value containing the number of years between 
+	 * 						two dates
+	 */
 	public static Value dateAge(Parser parser, Value dateVal1, Value dateVal2)
 	{
 		// TODO Auto-generated method stub
@@ -178,6 +212,46 @@ public class Functions {
 		return new Value(Math.abs(Period.between(date1, date2).getYears()));
 	}
 	
+	/**
+	 * Function:	DateToJulian
+	 * Purpose:				 Converts a date to a Julian Days value.  This will
+	 * 						 start numbering at 1 for 0000-03-01. Making dates
+	 *  					 relative to March 1st helps eliminate some leap day issues. 
+	 * Notes:				 
+	 *					     1 We replace the month with the number of months since March.  
+	 *					       March is 0, Apr is 1, May is 2, ..., Jan is 10, Feb is 11.
+	 *					     2 Since Jan and Feb are before Mar, we subtract 1 from the year
+	 *					       for those months.
+	 *					     3 Jan 1 is 306 days from Mar 1.
+	 *					     4 The days per month is in a pattern that begins with March
+	 *					       and repeats every 5 months:
+	 *					           Mar 31 Aug 31 Jan 31
+	 *					           Apr 30 Sep 30
+	 *					           May 31 Oct 31
+	 *					           Jun 30 Nov 30
+	 *					           Jul 31 Dec 31
+	 *					        Therefore:
+	 *					           Mon  AdjMon  NumberDaysFromMarch (AdjMon*306 + 5)/10
+	 *					           Jan    10      306
+	 *					           Feb    11      337
+	 *					           Mar     0        0
+	 *					           Apr     1       31
+	 *					           May     2       61
+	 *					           Jun     3       92
+	 *					           Jul     4      122 
+	 *					           Aug     5      153
+	 *					           Sep     6      184
+	 *					           Oct     7      214
+	 *					           Nov     8      245
+	 *					           Dec     9      275
+	 *					     5 Leap years are 
+	 *					       years that are divisible by 4 and
+	 *					       either years that are not divisible by 100 or 
+	 *					       years that are divisible by 400
+	 * @param dateVal:		 The date to be converted to a julian value
+	 * @return				 the number of days since 0000-03-01 beginning with 1 for 
+     *						 0000-03-01.
+	 */
 	private static int DateToJulian(Value dateVal)
 	{
 		// TODO Auto-generated method stub
@@ -202,6 +276,29 @@ public class Functions {
 	}
 
 
+	/**
+	 * Function:	validateDate
+	 * Purpose:				Ensures that a date is valid 
+	 * Notes:
+	 *					    1. The length must be 10 characters.
+	 *					    2. The date must be in the form "yyyy-mm-dd".
+	 *					    3. The month must be 01-12.
+	 *					    4. The day must be between 1 and the max for each month
+	 *					               Mar 31 Aug 31 Jan 31
+	 *					               Apr 30 Sep 30 Feb 29
+	 *					               May 31 Oct 31
+	 *					               Jun 30 Nov 30
+	 *					               Jul 31 Dec 31
+	 *					    5. If Feb 29 was specified, validate that the year is a leap year.									
+	 * @param dateVal:		date to be validated
+	 * @return				an int value depending on the validity of
+	 * 						a date:
+	 * 						0     date is valid
+	 *					    1     year is invalid
+	 *					    2     month is invalid
+	 *					    3     day is invalid
+	 *					    4     invalid length or format
+	 */
 	private static int validateDate(Value dateVal)
 	{
 		int iDaysPerMonth[] = 
@@ -248,7 +345,5 @@ public class Functions {
 		    
 		return 0;
 	}
-
-
 
 }
