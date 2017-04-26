@@ -69,6 +69,9 @@ public class Token
 	public static final int OPERAND_SUB_CLASS_MAX = 7;
 	public static final int CONTROL_SUB_CLASS_MIN = 10;
 	public static final int CONTROL_SUB_CLASS_MAX = 12;
+	
+	public Value tempValue;
+	public boolean isValueContainer = false;
 
 	public Token(String value)
 	{
@@ -251,6 +254,13 @@ public class Token
 	 */
 	public Value toResult()
 	{
+		
+		if (this.tempValue != null) {
+			Value val = tempValue;
+			tempValue = null;
+			return val;
+		}
+		
 		Value res = new Value();
 		
 		switch (this.subClassif) {
@@ -278,6 +288,10 @@ public class Token
 		
 		return res;
 
+	}
+	
+	public void storeValue(Value value) {
+		this.tempValue = value;
 	}
 
 }

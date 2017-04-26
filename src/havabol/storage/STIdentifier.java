@@ -187,7 +187,7 @@ public class STIdentifier extends STEntry
 				if (this.arrayValue[i] == null) {
 					throw new IndexError("Included an uninitialized array index inside slice", parser.scanner.currentToken);
 				}
-				retVal.arrayValue.add(this.arrayValue[i].clone());
+				retVal.add(parser, this.arrayValue[i].clone());
 			}
 			
 			return retVal;
@@ -218,10 +218,14 @@ public class STIdentifier extends STEntry
 			}
 		} else if (value.structure == Structure.MULTIVALUE) {
 			if (this.structure == StorageStructure.FIXED_ARRAY) {
+				//System.out.println("declared size of " + this.symbol + " = " + this.declaredSize);
+				//System.out.println(value + " numItems = " + value.numItems);
 				// multivalue into fixed array
 				if (value.numItems > this.declaredSize) {
 					throw new IndexError("Array does not have enough space to store array value");
 				} else {
+					// clear array
+					this.arrayValue = new Value[this.declaredSize];
 					for (int i = 0; i < value.numItems; i++) {
 						this.arrayValue[i] = value.arrayValue.get(i).clone();
 					}
