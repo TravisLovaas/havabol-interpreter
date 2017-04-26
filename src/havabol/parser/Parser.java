@@ -482,11 +482,11 @@ public class Parser {
 			controlVariable.setValue(controlVariable.getValue().asString(this));
 			//System.out.println("cur tok = " + scanner.currentToken.tokenStr);
 			limit = limit.asString(this);
-			
+			String delim = "\\" + limit.strValue;
 			assert(scanner.currentToken.tokenStr.equals(":"));
 			
 			scanner.getNext();
-			String[] splitString = controlVariable.getValue().strValue.split(limit.strValue);
+			String[] splitString = controlVariable.getValue().strValue.split(delim);
 			
 			//for (String word: splitString){
 			//System.out.println("limit = '" + limit.strValue + "'");

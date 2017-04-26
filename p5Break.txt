@@ -40,10 +40,10 @@ endfor;
 
 print("Test for tokenizing with String");
 String santa = 'He said ';
-String team = "Peju& Travis& Andrew";
+String team = "Peju$ Travis$ Andrew";
 for cv from santa by ' ':
     print ('cv=', cv);
-    for name from team by "&":
+    for name from team by "$ ":
     	print("name=", name);
     endfor;
     santa = santa # 'ho ';
