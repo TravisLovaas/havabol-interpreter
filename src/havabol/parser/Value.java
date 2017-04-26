@@ -134,6 +134,9 @@ public class Value {
 			endIndex = this.strValue.length();
 		}
 		
+		//System.out.println("slicing: " + this.strValue + " from " + beginIndex + " to " + endIndex);
+		//System.out.println("inserting: " + splice);
+		
 		// Remove sliced value from string
 		String sliced = this.strValue.substring(0, beginIndex) + splice + this.strValue.substring(endIndex, this.strValue.length());
 

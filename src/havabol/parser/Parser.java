@@ -1344,6 +1344,7 @@ public class Parser {
 			
 			if (scanner.currentToken.tokenStr.equals("~")) {
 				isSlice = true;
+				isEnded = true;
 				scanner.getNext();
 				endIndex = parseExpression("]").asInteger(this).intValue;
 			} else {
@@ -1442,7 +1443,10 @@ public class Parser {
 			
 			int endIndex = parseExpression("]").asInteger(this).intValue;
 			
-			Value res = array.sliceWithoutBegin(this, endIndex);
+			Value res;
+
+			res = array.sliceWithoutBegin(this, endIndex);
+
 			
 			return res.toToken(this);
 			
