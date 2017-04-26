@@ -1071,11 +1071,20 @@ public class Parser {
 			switch (token) {
 				case "=":
 					
-					if (variable.structure == StorageStructure.FIXED_ARRAY || variable.structure == StorageStructure.UNBOUNDED_ARRAY) {
+					if (variable.structure == StorageStructure.FIXED_ARRAY) {
 						
 						scanner.getNext();
 						
 						if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+							
+							if (!scanner.nextToken.tokenStr.equals(";")) {
+								Value srcForAll = parseExpression(";");
+								
+								for (int i = 0; i < variable.declaredSize; i++) {
+									variable.arrayValue[i] = srcForAll.clone();
+								}
+								break;
+							}
 							
 							STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(scanner.currentToken.tokenStr);
 						
@@ -1104,6 +1113,8 @@ public class Parser {
 							
 						}
 						
+					} else if (variable.structure == StorageStructure.UNBOUNDED_ARRAY) { 
+						throw new TypeError("Cannot perform scalar assignment to an unbounded array", scanner.currentToken);
 					} else { // primitive
 						
 						scanner.getNext();
@@ -1236,13 +1247,6 @@ public class Parser {
 		//   tArray[~4]
 		//   tArray[2~]
 		//   tArray[2]
-		//System.out.println("something = " + scanner.currentToken.subClassif);
-		
-		/*if (!scanner.currentToken.tokenStr.equals("~") && (scanner.currentToken.subClassif != Token.INTEGER)){
-			throw new SyntaxError("Expected index or beginning of slice", scanner.currentToken);
-		}*/
-		
-		//System.out.println("Array ref inside begin symbol: " + scanner.currentToken.tokenStr);
 		
 		Value indexVal = parseExpression("]");
 		
@@ -1253,8 +1257,6 @@ public class Parser {
 		// index may be an expression
 		int beginSliceIndex = indexVal.asInteger(this).intValue;
 		Value result = null;
-		
-		assert(scanner.currentToken.tokenStr.equals("]"));
 		
 		switch (scanner.currentToken.tokenStr) {
 		case "]":
@@ -1275,31 +1277,26 @@ public class Parser {
 		case "~":
 			// Slice
 			
-			throw new UnsupportedOperationError("Array slicing not supported");
+			//throw new UnsupportedOperationError("Array slicing not supported");
 			
-//			int endSliceIndex = 0;
-//			
-//			scanner.getNext();
-//			if (scanner.currentToken.tokenStr.equals("]")) {
-//				endSliceIndex = array.getValue().numItems;
-//			} else if (scanner.currentToken.subClassif == Token.INTEGER) {
-//				endSliceIndex = scanner.currentToken.toResult().asInteger(this).intValue;
-//			} else {
-//				throw new SyntaxError("Expected index to end slice", scanner.currentToken);
-//			}
-//			
-//			// TODO: check and fetch multivalue
-//			
-//			if (!scanner.getNext().equals("]")) {
-//				throw new SyntaxError("Expected ] to end array slice", scanner.currentToken);
-//			}
-//			
-//			break;
+			int endSliceIndex = 0;
+			
+			scanner.getNext();
+			if (scanner.currentToken.tokenStr.equals("]")) {
+				result = array.sliceWithoutEnd(this, beginSliceIndex);
+			} else {
+				endSliceIndex = parseExpression("]").asInteger(this).intValue;
+				result = array.fetchSlice(this, beginSliceIndex, endSliceIndex);
+			}
+			
+			if (!scanner.currentToken.tokenStr.equals("]")) {
+				throw new SyntaxError("Expected ] to end array slice", scanner.currentToken);
+			}
+			
+			break;
 		default:
 			throw new SyntaxError("Expected ] or slice operator ~", scanner.currentToken);
 		}
-		
-		
 		
 		return result.toToken(this);
 	}
@@ -1445,7 +1442,7 @@ public class Parser {
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 		
 		//System.out.println("termsTr = " + terminatingStr);
-		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
+		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("~") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
