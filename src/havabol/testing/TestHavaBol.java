@@ -47,7 +47,7 @@ public class TestHavaBol
     		System.out.println("===========================================");
     		System.out.println("Testing: " + f.getName());
     		System.out.println(f.getAbsolutePath());
-    		System.out.println("===========================================");
+    		System.out.println("===========================================\n");
     		
     		//testSuccessful = testSourceFileScanning(f.getAbsolutePath());
     		//assert testSuccessful;
@@ -57,7 +57,7 @@ public class TestHavaBol
     		
     	   	System.out.println("===========================================");
     		System.out.println("Test completed for: " + f.getName());
-    		System.out.println("===========================================");
+    		System.out.println("===========================================\n");
     	}
         
     }
