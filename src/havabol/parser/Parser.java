@@ -841,8 +841,7 @@ public class Parser {
 	 *     ...
 	 * enddef;
 	 */
-	private void parseDef()
-	{
+	private void parseDef() {
 		
 		assert(scanner.currentToken.tokenStr.equals("def"));
 		
