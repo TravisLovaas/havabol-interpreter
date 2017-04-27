@@ -1,0 +1,4 @@
+print("** Attempting to coerce the string `Hello` to an Integer **");
+String query ="Hello";
+Int iSayQuery = query;
+print(iSayQuery);

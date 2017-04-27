@@ -1,0 +1,20 @@
+print("p5Coerce.txt\n");
+
+print("** This should coerce the value of string, `1` into an integer, `1` **\n");
+String x = "1";
+Int one = x;
+print("I am number", one);
+
+print("\n**This should coerce a string char that is T or F into a boolean**\n");
+String boolean = 'Tafeeti';
+for i in boolean:
+	if i == "T":
+		print("letter =", i);
+		Bool status = i;	//should coerce
+		print("Now printing the boolean `", status, "`");
+		continue;
+	else:
+		print("letter =", i);	//should be an error
+	endif;
+endfor;
+

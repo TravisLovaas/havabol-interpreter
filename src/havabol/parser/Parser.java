@@ -20,6 +20,7 @@ public class Parser {
 	public boolean debugAssignment = false;
 	public boolean whileStmt = false;
 	public boolean forStmt = false;
+	public boolean print = false;
 	public int whileCnt = 0;
 	public int endForCnt = 0;
 	public int surWhile = 0;
@@ -1477,7 +1478,7 @@ public class Parser {
 		switch (calledFunction) {
 		case "print":
 			List<Value> args = new ArrayList<>();
-			
+			print = true;
 			if (scanner.currentToken.tokenStr.equals(")")) {
 				
 			} else {
@@ -1486,10 +1487,9 @@ public class Parser {
 				for (;;) {
 					
 					Value arg = parseExpression(")");
-			
+					//System.out.println("value = " + arg.strValue);
 					args.add(arg);
-					//System.out.println("----> cur token " + scanner.currentToken.tokenStr);
-					//System.out.println("----> next token " + scanner.nextToken.tokenStr);
+					//System.out.println("cur tok = " + scanner.currentToken.tokenStr);
 					if (scanner.currentToken.tokenStr.equals(",")) {
 						scanner.getNext();
 						continue;
@@ -1497,12 +1497,13 @@ public class Parser {
 						break;
 					} 
 					else {
-						throw new SyntaxError("Expected , or ) in function call", scanner.currentToken);
+						throw new SyntaxError("Expected `,` or `)` in function call", scanner.currentToken);
 					}
 					
 				}
 			}
 			Functions.print(this, args);
+			print = false;
 			break;
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
@@ -1571,9 +1572,13 @@ public class Parser {
 		String token = scanner.currentToken.tokenStr;
 		Token popped;
 		boolean containsOperator = false;
-		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 		
-		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("~") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
+		//System.out.println("****************in");
+		//System.out.println("token = " + scanner.currentToken.tokenStr);
+		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("~") || token.equals("]") ||
+				token.equals("to") || token.equals("in") ||  token.equals("by"))) 
+		{
+			
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
@@ -1594,7 +1599,6 @@ public class Parser {
 					}
 				}
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
-
 					Token funcResult = parseFunctionCall();
 					if (funcResult != null)
 						out.add(funcResult);
@@ -1615,6 +1619,7 @@ public class Parser {
 				}
 			}
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
+				
 				containsOperator = true;
 				while(!stackToken.isEmpty()){
 					//if operator, check precedence
@@ -1646,10 +1651,11 @@ public class Parser {
 						break;
 					}
 				}
-				else if (token.equals(",")){
-					token = scanner.getNext();
-					continue;
-				}
+				//else if (!token.equals(",")){
+					//System.out.println("***************************");
+					//token = scanner.getNext();
+					//continue;
+				//}
 				else {
 						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
 							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
@@ -1673,7 +1679,7 @@ public class Parser {
 				
 		//At this point, our postfix expression is already populated
 		//check for possible errors
-		for(Token entry : out){		
+		for(Token entry : out){	
 			Value res = null, res2 = null;
 			token = entry.tokenStr;
 			if (entry.isValueContainer) {
@@ -1684,6 +1690,7 @@ public class Parser {
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
 						res = ((STIdentifier) symbolTable.getSymbol(this, token)).getValue();
+						//System.out.println("before end 1= " + res);
 						stackResult.push(res);
 						break;
 					case Token.INTEGER:
@@ -1692,6 +1699,7 @@ public class Parser {
 					case Token.STRING:
 					case Token.DATE :
 						res = entry.toResult();
+						//System.out.println("before end 2= " + res);
 						stackResult.push(res);
 						break;
 					default:
@@ -1854,22 +1862,28 @@ public class Parser {
 				throw new UnsupportedOperationError("Invalid token entry found in expression.", entry);
 		}
 		
+		/*@SuppressWarnings("unchecked")
+		Stack<Value> newStack = (Stack<Value>) stackResult.clone();
+		
+		while(!newStack.isEmpty()){
+			System.out.println("POPPED = " + newStack.pop());
+		}*/
+		
 		//if stack is not empty
 		//what's left in stack should be the final result
-		if (!stackResult.isEmpty() && !evaluated){
+		if (!stackResult.isEmpty()){
 			finalValue = stackResult.pop();
-			evaluated = true;
+			if(print && !stackResult.isEmpty())
+				throw new SyntaxError("Expected a `,` to separate values in print", scanner.previous);
 			if (debugExpr && containsOperator){
 				System.out.println("\t\t... Expression result = " + finalValue);
 			}
-		}else if(stackResult.isEmpty() && evaluated){
+		}else
 			throw new UnsupportedOperationError("Invalid Expression found. There are too few operands for the operators provided"
-					, scanner.currentToken.iSourceLineNr);
-		}else if(!stackResult.isEmpty() && evaluated){
-			throw new UnsupportedOperationError("Invalid Expression found. There are too many operands for the operators provided"
-					, scanner.currentToken.iSourceLineNr);
-		}
-		 
+					, scanner.currentToken);
+
+		//System.out.println(finalValue);
+		//System.out.println("*******************out");
 		return finalValue;
 	}
 

@@ -147,7 +147,7 @@ public class Operators {
 			
 		} else {
 			// TODO: handle str as first operand, etc
-			throw new UnsupportedOperationError("First operand type cannot be used in addition.");
+			throw new UnsupportedOperationError("\nFirst operand type cannot be used in multiplication.", parser.scanner.iSourceLineNr);
 		}
 		
 		//System.out.println(" = " + res);
