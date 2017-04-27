@@ -275,24 +275,16 @@ public class Value {
 		res.structure = Structure.PRIMITIVE;
 		res.dataType = DataType.STRING;
 		
-		if (this.dataType == DataType.INTEGER) {
-			if (this.intValue == 0) {
+		if (this.dataType == DataType.STRING) {
+			if (this.strValue.equals("T")) {
+				res.booleanValue = true;
+			} else if (this.strValue.equals("F")) {
 				res.booleanValue = false;
 			} else {
-				res.booleanValue = true;
+				throw new TypeError("Invalid string value for coercion to Bool", parser.scanner.currentToken);
 			}
-		} else if (this.dataType == DataType.FLOAT) {
-			if (this.floatValue == 0) {
-				res.booleanValue = false;
-			} else {
-				res.booleanValue = true;
-			}
-		} else if (this.dataType == DataType.STRING) {
-			if (this.strValue.isEmpty() || this.strValue.equals("F")) {
-				res.booleanValue = false;
-			} else {
-				res.booleanValue = true;
-			}
+		} else {
+			throw new TypeError("Cannot coerce " + this.dataType + " to Bool", parser.scanner.currentToken);
 		}
 		
 		return res;
