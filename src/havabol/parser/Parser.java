@@ -136,10 +136,11 @@ public class Parser {
 				scanner.getNext(); // currentToken is :
 				scanner.getNext();
 				while (!scanner.currentToken.tokenStr.equals("endif")) {
-					parseStatement(execute);
 					if (scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
+						scanner.getNext();
 						return;
 					}
+					parseStatement(execute);
 				}
 			}
 			scanner.getNext(); // pass "endif"
@@ -169,9 +170,7 @@ public class Parser {
 		
 		outerloop:
 		for (;;) {
-			
-			System.out.println("hi");
-			
+						
 			// Evaluate while condition
 			whileCond = parseExpression(execute, ":");
 			
@@ -186,8 +185,6 @@ public class Parser {
 				// Evaluated to true, execute loop
 				while (!scanner.currentToken.tokenStr.equals("endwhile")) {
 					parseStatement(execute);
-					
-					System.out.println("hello");
 					
 					// if we find a continue, reset scanner and evaluate condition again
 					if (scanner.currentToken.tokenStr.equals("continue") ){
