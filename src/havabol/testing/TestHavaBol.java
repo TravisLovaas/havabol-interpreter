@@ -52,8 +52,7 @@ public class TestHavaBol
     		//testSuccessful = testSourceFileScanning(f.getAbsolutePath());
     		//assert testSuccessful;
     		
-    		testSuccessful = testSourceFileParsing(f.getAbsolutePath());
-    		assert testSuccessful;
+    		testSourceFileParsing(f.getAbsolutePath());
     		
     	   	System.out.println("===========================================");
     		System.out.println("Test completed for: " + f.getName());
