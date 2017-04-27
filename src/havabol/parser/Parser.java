@@ -1604,8 +1604,45 @@ public class Parser {
 				//    calledFunc("hello", "world");
 				//               ^^^^^^^
 				
+				STFunction calledFuncEntry = (STFunction) environment.getSymbol(this, calledFunction);
+				
+				SymbolTable functionFrame = new SymbolTable(calledFunction);
+				functionFrame.enclosingFunctions = calledFuncEntry.enclosingFunctions;
+				
+				int onArgIndex = 0;
+				STIdentifier argumentVar;
+				
+				while (!scanner.currentToken.tokenStr.equals(")")) {
+					
+					// Two possibilities: lone identifier or expression as argument
+					
+					if (scanner.currentToken.subClassif == Token.IDENTIFIER &&
+						  (scanner.nextToken.tokenStr.equals(",") ||
+						   scanner.nextToken.tokenStr.equals(")")) ) {
+						// Argument is a lone identifier (pass by reference)
+						
+						argumentVar = (STIdentifier) environment.getSymbol(this, scanner.currentToken.tokenStr);
+						
+						//if (argumentVar.declaredType != calledFuncEntry.formalParameters.)
+						
+					} else {
+						// Argument is an expression (pass by value)
+						
+					}
+					
+				}
+				
+				environment.pushVector(functionFrame);
+				
+				int lineBeforeCall = scanner.iSourceLineNr;
+				int colPosBeforeCall = scanner.iColPos;
+				// Execute function code
 				
 				
+				// End code execution
+				environment.destroyVector();
+				
+				scanner.setPosition(lineBeforeCall, colPosBeforeCall);
 				
 			} else {
 				throw new DeclarationError("Attempted to call undefined function " + calledFunction);
