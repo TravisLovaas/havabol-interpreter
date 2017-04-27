@@ -110,12 +110,19 @@ print("goodbye moon:", myStr);
 
 myStr[4~7] = "night";
 
-print("goodnight moon", myStr);
+print("goodnight moon:", myStr);
 
 print("\nString slice in for ... in loop");
 for x in myStr[~9]:
 	print(x);
 endfor;
 
+print("\nString slice to slice");
+String morning = "bad morning everyone!";
+myStr[4~] = morning[3~];
+print("good morning everyone!: " # myStr);
+
+print("\nMore string slices (slicing morning)");
+print(morning[~3], morning[4~11], morning[12~]);
 
 

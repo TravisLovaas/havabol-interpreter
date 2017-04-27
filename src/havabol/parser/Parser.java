@@ -1265,7 +1265,28 @@ public class Parser {
 			// Array
 			scanner.getNext(); // get array index for assignment
 			
-			int assignmentIndex = parseExpression("]").asInteger(this).intValue;
+			int beginIndex = 0;
+			int endIndex = 0;
+			boolean isEnded = false;
+			boolean isSlice = false;
+			
+			if (scanner.currentToken.tokenStr.equals("~")) {
+				isSlice = true;
+				isEnded = true;
+				scanner.getNext();
+				endIndex = parseExpression("]").asInteger(this).intValue;
+			} else {
+				beginIndex = parseExpression("]").asInteger(this).intValue;
+			}
+			
+			if (scanner.currentToken.tokenStr.equals("~")) {
+				isSlice = true;
+				scanner.getNext();
+				if (!scanner.currentToken.tokenStr.equals("]")) {
+					isEnded = true;
+					endIndex = parseExpression("]").asInteger(this).intValue;
+				}
+			}
 			
 			// next token should be "]"
 //			if (!scanner.getNext().equals("]")) {
@@ -1285,9 +1306,13 @@ public class Parser {
 			rhsExpr = parseExpression(";");
 			
 			if (variable.structure == StorageStructure.FIXED_ARRAY || variable.structure == StorageStructure.UNBOUNDED_ARRAY) {
-				variable.set(this, assignmentIndex, rhsExpr);
+				variable.set(this, beginIndex, rhsExpr);
 			} else if (variable.getValue().dataType == DataType.STRING) {
-				variable.getValue().spliceString(this, assignmentIndex, rhsExpr.asString(this).strValue);
+				if (isSlice) {
+					variable.getValue().spliceString(this, beginIndex, endIndex, isEnded, rhsExpr.asString(this).strValue);
+				} else {
+					variable.getValue().spliceString(this, beginIndex, rhsExpr.asString(this).strValue);
+				}
 			} else {
 				throw new TypeError("Cannot assign to non-string / non-array value", scanner.currentToken);
 			}
@@ -1346,7 +1371,10 @@ public class Parser {
 			
 			int endIndex = parseExpression("]").asInteger(this).intValue;
 			
-			Value res = array.sliceWithoutBegin(this, endIndex);
+			Value res;
+
+			res = array.sliceWithoutBegin(this, endIndex);
+
 			
 			return res.toToken(this);
 			

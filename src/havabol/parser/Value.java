@@ -115,6 +115,42 @@ public class Value {
 		
 	}
 	
+	/**
+	 * Splices the given string, replacing chars [beginIndex => endIndex] in the original
+	 * string.
+	 * @param parser Parser that called this method
+	 * @param beginIndex Inclusive begin replacement index
+	 * @param endIndex Exclusive end replacement index
+	 * @param isEnded true if an end index was included in slice
+	 * @param splice String to insert into the location
+	 */
+	public void spliceString(Parser parser, int beginIndex, int endIndex, boolean isEnded, String splice) {
+		
+		if (this.dataType != DataType.STRING) {
+			throw new TypeError("Cannot slice character for non-string type");
+		}
+		
+		if (!isEnded) {
+			endIndex = this.strValue.length();
+		}
+		
+		//System.out.println("slicing: " + this.strValue + " from " + beginIndex + " to " + endIndex);
+		//System.out.println("inserting: " + splice);
+		
+		// Remove sliced value from string
+		String sliced = this.strValue.substring(0, beginIndex) + splice + this.strValue.substring(endIndex, this.strValue.length());
+
+		this.strValue = sliced;
+		
+	}
+	
+	/**
+	 * Splices the given string, replacing the char at index in the original
+	 * string.
+	 * @param parser Parser that called this method
+	 * @param index Index to replace
+	 * @param splice String to insert into the location
+	 */
 	public void spliceString(Parser parser, int index, String splice) {
 		
 		if (this.dataType != DataType.STRING) {

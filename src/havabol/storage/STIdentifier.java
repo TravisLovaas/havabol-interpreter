@@ -110,8 +110,10 @@ public class STIdentifier extends STEntry
 		
 		if (this.structure == StorageStructure.FIXED_ARRAY) {
 			endIndex = this.declaredSize;
-		} else {
+		} else if (this.structure == StorageStructure.UNBOUNDED_ARRAY) {
 			endIndex = this.maxPopulatedIndex + 1;
+		} else {
+			endIndex = this.getValue().asString(parser).strValue.length();
 		}
 		
 		return fetchSlice(parser, beginIndex, endIndex);
