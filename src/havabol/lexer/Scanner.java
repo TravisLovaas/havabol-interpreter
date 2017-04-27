@@ -11,6 +11,7 @@ import java.util.List;
 
 import havabol.error.SyntaxError;
 import havabol.parser.Parser;
+import havabol.storage.Environment;
 import havabol.storage.SymbolTable;
 
 public class Scanner {
@@ -75,7 +76,7 @@ public class Scanner {
 	 * @throws IOException Exception encountered while reading file
 	 * @throws FileNotFoundException Source file not found or inaccessible
 	 */
-	public Scanner(String sourceFileNm, SymbolTable symbolTable) throws IOException, FileNotFoundException {
+	public Scanner(String sourceFileNm, Environment environment) throws IOException, FileNotFoundException {
 		
 		// Read all source lines into an ArrayList
 		try (BufferedReader sourceIn = new BufferedReader(new FileReader(sourceFileNm))) {
@@ -340,7 +341,7 @@ public class Scanner {
 			case "when":
 			case "by":
 			case "to":
-			//case "def":
+			case "def":
 				token.primClassif = Token.CONTROL;
 				token.subClassif = Token.FLOW;
 				return;

@@ -16,7 +16,6 @@ public class SymbolTable {
 	 */
 
 	public SymbolTable(){
-		initGlobal();  
 	}
 
 	/**
@@ -24,7 +23,7 @@ public class SymbolTable {
 	 * functions.
 	 */
 
-	private void initGlobal(){
+	public void initGlobal(){
 		ST.put("def", new STControl("def", Token.CONTROL, Token.FLOW));
 		ST.put("enddef", new STControl("def", Token.CONTROL, Token.END));
 		ST.put("if", new STControl("if", Token.CONTROL, Token.FLOW));
@@ -34,23 +33,31 @@ public class SymbolTable {
 		ST.put("endfor", new STControl("endfor", Token.CONTROL, Token.END));
 		ST.put("while", new STControl("while", Token.CONTROL, Token.FLOW));
 		ST.put("endwhile", new STControl("endwhile", Token.CONTROL, Token.END));
-		ST.put("print", new STFunction("print", Token.FUNCTION, DataType.VOID, Token.BUILTIN, VAR_ARGS));
+		//ST.put("print", new STFunction("print", Token.FUNCTION, DataType.VOID, Token.BUILTIN, VAR_ARGS));
 		ST.put("Int", new STControl("Int", Token.CONTROL, Token.DECLARE));
 		ST.put("Float", new STControl("Float", Token.CONTROL, Token.DECLARE));
 		ST.put("String", new STControl("String", Token.CONTROL, Token.DECLARE));
 		ST.put("Bool", new STControl("Bool", Token.CONTROL, Token.DECLARE));
 		ST.put("Date", new STControl("Date", Token.CONTROL, Token.DECLARE));
-		ST.put("LENGTH", new STFunction("LENGTH", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
-		ST.put("MAXLENGTH", new STFunction("MAXLENGTH", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
-		ST.put("SPACES", new STFunction("SPACES", Token.FUNCTION, DataType.BOOLEAN, Token.BUILTIN, VAR_ARGS));
-		ST.put("ELEM", new STFunction("ELEM", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
-		ST.put("MAXELEM", new STFunction("MAXELEM", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
+		//ST.put("LENGTH", new STFunction("LENGTH", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
+		//ST.put("MAXLENGTH", new STFunction("MAXLENGTH", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
+		//ST.put("SPACES", new STFunction("SPACES", Token.FUNCTION, DataType.BOOLEAN, Token.BUILTIN, VAR_ARGS));
+		//ST.put("ELEM", new STFunction("ELEM", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
+		//ST.put("MAXELEM", new STFunction("MAXELEM", Token.FUNCTION, DataType.INTEGER, Token.BUILTIN, VAR_ARGS));
 		ST.put("and", new STEntry("and", Token.OPERATOR));
 		ST.put("or", new STEntry("or", Token.OPERATOR));
 		ST.put("not", new STEntry("not", Token.OPERATOR));
 		ST.put("in", new STEntry("in", Token.OPERATOR));
 		ST.put("notin", new STEntry("notin", Token.OPERATOR));
 
+	}
+	
+	public boolean isFunction(String symbol) {
+		if (ST.containsKey(symbol)) {
+			return ST.get(symbol) instanceof STFunction;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -59,7 +66,6 @@ public class SymbolTable {
 	 * @param symbol:
 	 *            the symbol to get to the Symbol Table
 	 */
-
 	public STEntry getSymbol(Parser parser, String symbol){
 		if (ST.containsKey(symbol)){
 			return (STEntry) ST.get(symbol);

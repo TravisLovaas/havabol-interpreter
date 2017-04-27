@@ -22,6 +22,7 @@ import java.io.FilenameFilter;
 
 import havabol.lexer.Scanner;
 import havabol.parser.Parser;
+import havabol.storage.Environment;
 import havabol.storage.SymbolTable;
 
 public class TestHavaBol 
@@ -65,7 +66,7 @@ public class TestHavaBol
     public static boolean testSourceFileScanning(String sourceFile) {
     	
     	
-    	SymbolTable symbolTable = new SymbolTable();
+    	Environment environment = new Environment();
     	try
         {
             // Print a column heading 
@@ -74,7 +75,7 @@ public class TestHavaBol
                     , "subClassif"
                     , "tokenStr");
             
-            Scanner scan = new Scanner(sourceFile, symbolTable);
+            Scanner scan = new Scanner(sourceFile, environment);
             while (! scan.getNext().isEmpty())
             {
                 scan.currentToken.printToken();
@@ -94,17 +95,17 @@ public class TestHavaBol
     
     public static boolean testSourceFileParsing(String sourceFile) {
     	
-    	try
-        {
-    		SymbolTable st = new SymbolTable();
-            Parser parser = new Parser(sourceFile, st);
+    	try {
+    		Environment environment = new Environment();
+            Parser parser = new Parser(sourceFile, environment);
             parser.beginParsing();
             //st.printSymbolTable();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } catch (Error e) {
+        	e.printStackTrace();
+        	return false;
         }
     	
     	return true;

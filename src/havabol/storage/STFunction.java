@@ -1,5 +1,7 @@
 package havabol.storage;
 
+import java.util.Map;
+
 import havabol.lexer.Token;
 
 /*
@@ -9,18 +11,19 @@ public class STFunction extends STEntry
 {
 	
 	public DataType returnType;
-	public int subClassif;
-	public int numArgs;
-	public SymbolTable symbolTable;
+	public Map<String, DataType> formalParameters;
+	public int beginExecSrcLine;
+	public int beginExecColPos;
 	
 	/*
 	 * Constructor for STFunction subclass
 	 */
-	public STFunction(String tokenStr, int primClassif, DataType returnType, int subClassif, int numArgs) {
-		super(tokenStr, primClassif);
+	public STFunction(String tokenStr, DataType returnType, Map<String, DataType> formalParameters, int beginExecSrcLine, int beginExecColPos) {
+		super(tokenStr);
 		this.returnType = returnType;
-		this.subClassif = subClassif;
-		this.numArgs = numArgs;
+		this.formalParameters = formalParameters;
+		this.beginExecColPos = beginExecColPos;
+		this.beginExecSrcLine = beginExecSrcLine;		
 	}
 
 	/**
@@ -28,7 +31,7 @@ public class STFunction extends STEntry
 	 * Purpose:		returns string representation of function
 	 */
 	public String toString() {
-		return String.format("FUNCTION: %s: returns: %s classification: %s num args: %d", symbol, returnType, subClassif, numArgs);
+		return String.format("FUNCTION: %s: returns: %s num args: %d", symbol, returnType, formalParameters.size());
 	}
 	
 }

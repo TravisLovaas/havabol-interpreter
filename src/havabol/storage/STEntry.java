@@ -15,6 +15,10 @@ public class STEntry
 		this.symbol = tokenStr;
 		this.primClassif = primClassif;
 	}
+	
+	public STEntry(String tokenStr) {
+		this.symbol = tokenStr;
+	}
 
 	public String symbol;
 	public int primClassif;

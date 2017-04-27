@@ -19,6 +19,7 @@ package havabol;
 
 import havabol.lexer.Scanner;
 import havabol.parser.Parser;
+import havabol.storage.Environment;
 import havabol.storage.SymbolTable;
 
 public class HavaBol 
@@ -26,7 +27,7 @@ public class HavaBol
     public static void main(String[] args) 
     {
         // Create the SymbolTable
-        SymbolTable symbolTable = new SymbolTable();
+        Environment environment = new Environment();
         
         if (args.length < 1) {
         	System.err.println("Error: no arguments given");
@@ -42,7 +43,7 @@ public class HavaBol
 //                    , "subClassif"
 //                    , "tokenStr");
             
-            Parser parser = new Parser(args[0], symbolTable);
+            Parser parser = new Parser(args[0], environment);
             
             parser.beginParsing();
         }

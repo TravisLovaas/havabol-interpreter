@@ -14,7 +14,7 @@ import havabol.storage.*;
 public class Parser {
 	
 	public Scanner scanner;
-	public SymbolTable symbolTable;
+	public Environment environment;
 	
 	public boolean debugExpr = false;
 	public boolean debugAssignment = false;
@@ -49,14 +49,14 @@ public class Parser {
 	/**
 	 * Function/Constructor: Parser
 	 * @param sourceFilename
-	 * @param symbolTable
+	 * @param environment
 	 */
-	public Parser(String sourceFilename, SymbolTable symbolTable) {
+	public Parser(String sourceFilename, Environment environment) {
 		
-		this.symbolTable = symbolTable;
+		this.environment = environment;
 		
 		try {
-			scanner = new Scanner(sourceFilename, symbolTable);
+			scanner = new Scanner(sourceFilename, environment);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -71,8 +71,7 @@ public class Parser {
 	public void beginParsing() {
 		scanner.getNext();
 		while (scanner.currentToken.primClassif != Token.EOF) {
-			//System.out.println("current = " + scanner.currentToken.tokenStr);
-			parseStatement();
+			parseStatement(true);
 		}
 	}
 	
@@ -81,10 +80,10 @@ public class Parser {
 	 * Purpose: to call parseExpression and to get the conditional path to take.
 	 * 			In the if-then-else it will call parseStatement until else or endif
 	 * 			to correctly execute desired statements.
-	 * @param bExec
+	 * @param execute true if this if-else-endif should be evaluated
 	 */
 	
-	private void parseIf() {
+	private void parseIf(boolean execute) {
 		scanner.getNext();
 		
 		// currentToken should be beginning of conditional expression
@@ -165,9 +164,10 @@ public class Parser {
 	 * Purpose: to evaluate the expression given to while statement and 
 	 * parseStatement will evaluate all the statements within the while loop
 	 * until the condition value is no longer true
+	 * @param execute true if this while loop should be evaluated
 	 */
 	
-	private void parseWhile() {
+	private void parseWhile(boolean execute) {
 		
 		int loopSrcLine = scanner.iSourceLineNr;
 		int loopColPos = scanner.iColPos;
@@ -251,14 +251,14 @@ public class Parser {
 	 * Purpose:
 	 * 		purpose is to loop statements until requirements are
 	 * 		no longer met.
-	 */
-	/**
 	 * Possible for loops:
 	 * for 1 to 10 :
 	 * for i = 1 to 15 by 3 :
 	 * for x = "t" in "test" :
+	 * 
+	 * @param execute true if this while loop should be evaluated
 	 */
-	private void parseFor(){
+	private void parseFor(boolean execute){
 		
 		scanner.getNext(); // get past for
 		
@@ -280,7 +280,7 @@ public class Parser {
 			DataType dt = value.dataType;
 			controlVariable = new STIdentifier(cv, dt, StorageStructure.PRIMITIVE);
 			controlVariable.setValue(value);
-			symbolTable.createSymbol(this, cv, controlVariable);
+			environment.createSymbol(this, cv, controlVariable);
 			
 			assert(scanner.currentToken.tokenStr.equals("to"));
 			scanner.getNext(); // get past "to"
@@ -370,10 +370,10 @@ public class Parser {
 			assert(scanner.currentToken.subClassif == Token.IDENTIFIER);
 			
 			Token token = scanner.currentToken;
-			if(!symbolTable.containsSymbol(token.tokenStr)){
+			if(!environment.containsSymbol(token.tokenStr)){
 				throw new InternalError("Implictly generated symbol does not exist");
 			}
-			STIdentifier array = (STIdentifier) symbolTable.getSymbol(this, token.tokenStr);
+			STIdentifier array = (STIdentifier) environment.getSymbol(this, token.tokenStr);
 			if(array.structure != StorageStructure.FIXED_ARRAY && 
 			   array.structure != StorageStructure.UNBOUNDED_ARRAY &&
 			   array.declaredType != DataType.STRING){
@@ -381,7 +381,7 @@ public class Parser {
 			}
 			
 			controlVariable = new STIdentifier(cv, array.declaredType, StorageStructure.PRIMITIVE);
-			symbolTable.createSymbol(this, cv, controlVariable);
+			environment.createSymbol(this, cv, controlVariable);
 			
 			Value iterable = null;
 			
@@ -484,7 +484,7 @@ public class Parser {
 			//DataType dt = value.dataType;
 			controlVariable = new STIdentifier(cv, value.dataType, StorageStructure.PRIMITIVE);
 			controlVariable.setValue(value);
-			symbolTable.createSymbol(this, cv, controlVariable);
+			environment.createSymbol(this, cv, controlVariable);
 			
 			assert(scanner.currentToken.tokenStr.equals("by"));
 			scanner.getNext(); // get past "by"
@@ -564,8 +564,6 @@ public class Parser {
 	 * Purpose:
 	 * 		purpose is to execute statements that match the case
 	 * 		value.
-	 */
-	/**
 	 * Possible select statements:
 	 * select i:
 	 * 		when 1, 2, 5, 6:
@@ -583,8 +581,9 @@ public class Parser {
 	 * 		when Rick:
 	 * 			print("Let's get SHWIFTY!");
 	 * endselect;
+	 * @param execute true if this select should be evaluated
 	 */
-	private void parseSelect() {
+	private void parseSelect(boolean execute) {
 		
 		Value caseVal;
 		int selects = 1;
@@ -594,7 +593,7 @@ public class Parser {
 		// currentToken should be beginning of conditional expression
 		String cv = scanner.currentToken.tokenStr;
 		parseExpression(":"); // used to get to colon: 
-		STIdentifier sti = ((STIdentifier) symbolTable.getSymbol(this, cv));
+		STIdentifier sti = ((STIdentifier) environment.getSymbol(this, cv));
 		STIdentifier controlVariable = sti;
 		
 		if (!controlVariable.getValue().asBoolean(this).booleanValue)
@@ -742,8 +741,9 @@ public class Parser {
 	 *  			myVar = 1;
 	 *              ^^^^^
 	 * Purpose: Parses a statement, ending with a semicolon.
+	 * @param execute true if this statement should be executed
 	 */
-	private void parseStatement() {
+	private void parseStatement(boolean execute) {
 		/* Possible types of statements:
 		 * 
 		 * 	Int i = 0;       		declaration
@@ -757,9 +757,6 @@ public class Parser {
 		 *  return ...;
 		 * 
 		 */
-		
-		
-		
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 			if (scanner.currentToken.tokenStr.equals("debug")) {
 				parseDebugStatement();
@@ -796,6 +793,9 @@ public class Parser {
 					return;
 				case "select":
 					parseSelect();
+					break;
+				case "def":
+					parseDef();
 					break;
 				default:
 					throw new UnsupportedOperationError("Unsupported FLOW token found.");
@@ -861,7 +861,7 @@ public class Parser {
 		// entry inside the symbol table
 		String functionName = scanner.currentToken.tokenStr;
 		
-		if (symbolTable.containsSymbol(functionName)) {
+		if (environment.containsSymbol(functionName)) {
 			throw new DeclarationError("Name " + functionName + " is already defined", scanner.currentToken);
 		}
 		
@@ -927,6 +927,11 @@ public class Parser {
 		// ; follows enddef
 		assert(scanner.currentToken.tokenStr.equals(";"));
 		
+		// Create a symbol table entry for this function
+		STFunction functionEntry = new STFunction(functionName, returnType, formalParameters, beginExecLine, beginExecColPos);
+		
+		environment.createSymbol(this, functionName, functionEntry);
+		
 	}
 
 	/**
@@ -944,8 +949,9 @@ public class Parser {
 	 * Purpose: to accurately declare tokens based on 
 	 * 			their driving data types .i.e for
 	 * 			primitives, homogenous/heterogenous arrays
+	 * @param execute true if this declaration should have an effect
 	 */
-	private void parseDeclaration() {
+	private void parseDeclaration(boolean execute) {
 		// Parse declared type
 		DataType declaredType = DataType.stringToType(scanner.currentToken.tokenStr);
 		String identifier;
@@ -1071,7 +1077,7 @@ public class Parser {
 				default:
 					throw new SyntaxError("Expected an assignment '=', array type specifier, or semicolon in declaration", scanner.currentToken);
 		}
-		symbolTable.createSymbol(this, identifier, variable);
+		environment.createSymbol(this, identifier, variable);
 	}
 	
 	/**
@@ -1144,9 +1150,10 @@ public class Parser {
 	 * Purpose:
 	 * 		to parseAssignment's that are called for all lines
 	 * 		of an assignment within parseExpression
+	 * @param execute true if this assignment should affect program state
 	 * @return the evaluated value of the assignment
 	 */
-	private Value parseAssignment() {
+	private Value parseAssignment(boolean execute) {
 		// assignment := identifier '=' expr
 		boolean bfor = false;
 		boolean bin = false;
@@ -1192,8 +1199,8 @@ public class Parser {
 				else{
 					scanner.getNext();
 					if(scanner.currentToken.tokenStr.equals("to") || scanner.currentToken.tokenStr.equals("in")){
-						// check if token is in symbolTable
-						if(symbolTable.containsSymbol(token.tokenStr)){
+						// check if token is in environment
+						if(environment.containsSymbol(token.tokenStr)){
 							return token.toResult();
 						}
 					}
@@ -1202,7 +1209,7 @@ public class Parser {
 		}
 		
 		// Ensure identifier has been declared
-		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(this, identifier);
+		STIdentifier variable = (STIdentifier) environment.getSymbol(this, identifier);
 		
 		if (variable == null && !bfor) {
 			throw new DeclarationError("Reference to undeclared identifier found", scanner.currentToken);
@@ -1232,7 +1239,7 @@ public class Parser {
 							
 							if (scanner.nextToken.tokenStr.equals(";")) {
 								// case 3
-								STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(this, scanner.currentToken.tokenStr);
+								STIdentifier srcArray = (STIdentifier) environment.getSymbol(this, scanner.currentToken.tokenStr);
 								
 								int destSize = variable.declaredSize;
 								int srcSize = srcArray.declaredSize;
@@ -1266,7 +1273,7 @@ public class Parser {
 							
 							}
 							
-							STIdentifier srcArray = (STIdentifier) symbolTable.getSymbol(this, scanner.currentToken.tokenStr);
+							STIdentifier srcArray = (STIdentifier) environment.getSymbol(this, scanner.currentToken.tokenStr);
 						
 							int destSize = variable.declaredSize;
 							int srcSize = srcArray.declaredSize;
@@ -1319,7 +1326,7 @@ public class Parser {
 				case "+=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
+					res01 = ((STIdentifier) environment.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.subtract(this, res01, res02);
 					variable.setValue(rhsExpr);
@@ -1327,7 +1334,7 @@ public class Parser {
 				case "-=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
+					res01 = ((STIdentifier) environment.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.add(this, res01, res02);
 					variable.setValue(rhsExpr);
@@ -1335,7 +1342,7 @@ public class Parser {
 				case "*=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
+					res01 = ((STIdentifier) environment.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 	
 					rhsExpr = Operators.multiply(this, res01, res02);
@@ -1344,14 +1351,14 @@ public class Parser {
 				case "/=":
 					scanner.getNext();
 					res02 = parseExpression(";");
-					res01 = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
+					res01 = ((STIdentifier) environment.getSymbol(this, identifier)).getValue();
 					//run the subtract, Operators should figure out if it is valid
 					rhsExpr = Operators.divide(this, res01, res02);
 					variable.setValue(rhsExpr);
 					break;
 				default:
 					if(bin){
-						rhsExpr = ((STIdentifier) symbolTable.getSymbol(this, identifier)).getValue();
+						rhsExpr = ((STIdentifier) environment.getSymbol(this, identifier)).getValue();
 						break;
 					}
 					throw new SyntaxError("Expected assignment operator as part of assignment", scanner.nextToken);
@@ -1436,9 +1443,10 @@ public class Parser {
 	 * 	- currentToken is an array type identifier, e.g.
 	 * 		j = tArray[2~4];
 	 *          ^^^^^^		
+	 * @param true if this array reference should affect program state
 	 * @return a ResultValue with the values of the referenced array
 	 */
-	private Token parseArrayRef() {
+	private Token parseArrayRef(boolean execute) {
 		
 		if (scanner.currentToken.subClassif != Token.IDENTIFIER) {
 			throw new SyntaxError("Expected identifer at beginning of array reference", scanner.currentToken);
@@ -1446,7 +1454,7 @@ public class Parser {
 		
 		String arrayName = scanner.currentToken.tokenStr;
 		
-		STIdentifier array = (STIdentifier) symbolTable.getSymbol(this, arrayName);
+		STIdentifier array = (STIdentifier) environment.getSymbol(this, arrayName);
 
 		if (array.structure != StorageStructure.FIXED_ARRAY && array.structure != StorageStructure.UNBOUNDED_ARRAY && array.getValue().dataType != DataType.STRING) {
 			throw new TypeError("Expected an array type but found " + array.structure, scanner.currentToken);
@@ -1546,11 +1554,12 @@ public class Parser {
 	 * 			 print("hello", "world");
 	 *                                 ^
 	 * Purpose: Parses a function call
+	 * @param execute true if this function call should be executed
 	 * @return the result of function call
 	 */
-	private Token parseFunctionCall() {
+	private Token parseFunctionCall(boolean execute) {
 		
-		if (scanner.currentToken.primClassif != Token.FUNCTION) {
+		if (scanner.currentToken.primClassif != Token.FUNCTION && !environment.isFunction(this, scanner.currentToken.tokenStr)) {
 			throw new SyntaxError("Expected name of a function", scanner.currentToken);
 		}
 		
@@ -1571,6 +1580,7 @@ public class Parser {
 		Value dateVal1, dateVal2;
 		
 		switch (calledFunction) {
+		// built-in function definitions
 		case "print":
 			List<Value> args = new ArrayList<>();
 			
@@ -1602,12 +1612,12 @@ public class Parser {
 			break;
 		case "ELEM":
 			argVar = scanner.currentToken.tokenStr;
-			retVal = Functions.elem(this, (STIdentifier) symbolTable.getSymbol(this, argVar));
+			retVal = Functions.elem(this, (STIdentifier) environment.getSymbol(this, argVar));
 			scanner.getNext();
 			break;
 		case "MAXELEM":
 			argVar = scanner.currentToken.tokenStr;
-			retVal = Functions.maxElem(this, (STIdentifier) symbolTable.getSymbol(this, argVar));
+			retVal = Functions.maxElem(this, (STIdentifier) environment.getSymbol(this, argVar));
 			scanner.getNext();
 			break;
 		case "LENGTH":
@@ -1637,7 +1647,28 @@ public class Parser {
 			retVal = Functions.dateAge(this, dateVal1, dateVal2);
 			break;
 		default:
-			throw new DeclarationError("Attempted to call undefined function " + calledFunction);
+			if (environment.isFunction(this, calledFunction)) {
+				
+				// Called a user-defined function
+				//
+				// The process for a function call is the following:
+				// 1. scan and parse arguments
+				// 2. verify arguments against formal parameters of called function
+				// 3. build new symbol table for this function with parameters
+				// 4. make the new symbol table the current scope
+				// 5. execute function code
+				// 6. destroy this function's scope
+				
+				// currentToken is first argument or )
+				//    calledFunc("hello", "world");
+				//               ^^^^^^^
+				
+				
+				
+				
+			} else {
+				throw new DeclarationError("Attempted to call undefined function " + calledFunction);
+			}
 		}
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
@@ -1657,9 +1688,10 @@ public class Parser {
 	 * Purpose: to create a postFix expression from an input 
 	 *			infix expression and evaluate the expression
 	 *			correctly depending on its operator.
+	 * @param execute true if parsing this expression should have any effect on program state
 	 * @return the evaluated value of an expression
 	 */
-	private Value parseExpression(String terminatingStr) throws SyntaxError{
+	private Value parseExpression(boolean execute, String terminatingStr) throws SyntaxError{
 		ArrayList <Token> out = new ArrayList<Token>();
 		Stack<Token> stackToken = new Stack<>();
 		Stack<Value> stackResult = new Stack<>();
@@ -1672,16 +1704,22 @@ public class Parser {
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("~") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
+				if (environment.isFunction(this, scanner.currentToken.tokenStr)) {
+					Token funcResult = parseFunctionCall();
+					if (funcResult != null)
+						out.add(funcResult);
+					continue;
+				}
 				if (scanner.currentToken.primClassif == Token.OPERAND){
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ( 
-						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.FIXED_ARRAY ||
-						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.UNBOUNDED_ARRAY
+						  ((STIdentifier) environment.getSymbol(this, token)).structure == StorageStructure.FIXED_ARRAY ||
+						  ((STIdentifier) environment.getSymbol(this, token)).structure == StorageStructure.UNBOUNDED_ARRAY
 						)) {
 						Token array = parseArrayRef();
 						out.add(array);
 					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
-							&& symbolTable.containsSymbol(token) 
-							&& ((STIdentifier) symbolTable.getSymbol(this, token)).getValue().dataType == DataType.STRING 
+							&& environment.containsSymbol(token) 
+							&& ((STIdentifier) environment.getSymbol(this, token)).getValue().dataType == DataType.STRING 
 							&& scanner.nextToken.tokenStr.equals("[") ) {
 						Token str = parseArrayRef();
 						out.add(str);
@@ -1779,7 +1817,7 @@ public class Parser {
 				//if not, convert to an actual value and push to stack
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
-						res = ((STIdentifier) symbolTable.getSymbol(this, token)).getValue();
+						res = ((STIdentifier) environment.getSymbol(this, token)).getValue();
 						stackResult.push(res);
 						break;
 					case Token.INTEGER:
