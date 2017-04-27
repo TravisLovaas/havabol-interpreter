@@ -94,17 +94,17 @@ public class TestHavaBol
     
     public static boolean testSourceFileParsing(String sourceFile) {
     	
-    	try
-        {
+    	try {
     		SymbolTable st = new SymbolTable();
             Parser parser = new Parser(sourceFile, st);
             parser.beginParsing();
             //st.printSymbolTable();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } catch (Error e) {
+        	e.printStackTrace();
+        	return false;
         }
     	
     	return true;
