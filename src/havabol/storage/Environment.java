@@ -21,7 +21,7 @@ public class Environment {
 	
 	public Environment() {
 		
-		SymbolTable globalTable = new SymbolTable();
+		SymbolTable globalTable = new SymbolTable(null);
 		globalTable.initGlobal();
 		
 		environmentVectors.add(globalTable);
@@ -56,9 +56,14 @@ public class Environment {
 	 */
 	public boolean isFunction(Parser parser, String symbol) {
 		
+		SymbolTable callingFrame = environmentVectors.get(environmentVectors.size() - 1);
 		SymbolTable currentFrame;
 		for (int i = environmentVectors.size() - 1; i >= 0; i--) {
 			currentFrame = environmentVectors.get(i);
+			
+			if (currentFrame.functionName != null && !callingFrame.enclosingFunctions.contains(currentFrame.functionName)) {
+				continue;
+			}
 			
 			if (currentFrame.containsSymbol(symbol)) {
 				if (currentFrame.getSymbol(parser, symbol) instanceof STFunction) {
@@ -79,9 +84,14 @@ public class Environment {
 	 */
 	public STEntry getSymbol(Parser parser, String symbol) {
 		
+		SymbolTable callingFrame = environmentVectors.get(environmentVectors.size() - 1);
 		SymbolTable currentFrame;
 		for (int i = environmentVectors.size() - 1; i >= 0; i--) {
 			currentFrame = environmentVectors.get(i);
+			
+			if (currentFrame.functionName != null && !callingFrame.enclosingFunctions.contains(currentFrame.functionName)) {
+				continue;
+			}
 			
 			if (currentFrame.containsSymbol(symbol)) {
 				return currentFrame.getSymbol(parser, symbol);
@@ -100,9 +110,14 @@ public class Environment {
 	 */
 	public boolean containsSymbol(String symbol) {
 		
+		SymbolTable callingFrame = environmentVectors.get(environmentVectors.size() - 1);
 		SymbolTable currentFrame;
 		for (int i = environmentVectors.size() - 1; i >= 0; i--) {
 			currentFrame = environmentVectors.get(i);
+			
+			if (currentFrame.functionName != null && !callingFrame.enclosingFunctions.contains(currentFrame.functionName)) {
+				continue;
+			}
 			
 			if (currentFrame.containsSymbol(symbol)) {
 				return true;

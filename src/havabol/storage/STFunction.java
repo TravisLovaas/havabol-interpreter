@@ -1,5 +1,7 @@
 package havabol.storage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import havabol.lexer.Token;
@@ -14,6 +16,7 @@ public class STFunction extends STEntry
 	public Map<String, DataType> formalParameters;
 	public int beginExecSrcLine;
 	public int beginExecColPos;
+	public List<String> enclosingFunctions = new ArrayList<>();
 	
 	/*
 	 * Constructor for STFunction subclass

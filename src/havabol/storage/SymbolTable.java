@@ -7,15 +7,16 @@ import havabol.lexer.Token;
 import havabol.parser.*;
 
 public class SymbolTable {
+	
 	public HashMap<String, STEntry> ST = new HashMap<>();
-	Parser parser;
-	int VAR_ARGS;
+	public String functionName;
+	public List<String> enclosingFunctions = new ArrayList<>();
 
 	/**
 	 * main function for Symbol Table class which calls initGlobal
 	 */
-
-	public SymbolTable(){
+	public SymbolTable(String functionName){
+		this.functionName = functionName;
 	}
 
 	/**

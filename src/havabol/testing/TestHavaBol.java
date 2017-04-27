@@ -54,10 +54,9 @@ public class TestHavaBol
     		//assert testSuccessful;
     		
     		testSuccessful = testSourceFileParsing(f.getAbsolutePath());
-    		assert testSuccessful;
     		
     	   	System.out.println("===========================================");
-    		System.out.println("Test completed for: " + f.getName());
+    		System.out.println("Test " + (testSuccessful ? "successful" : "failed") + " for: " + f.getName());
     		System.out.println("===========================================");
     	}
         
