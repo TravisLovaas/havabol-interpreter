@@ -45,6 +45,7 @@ public class Scanner {
 	
 	public boolean debugToken = false;
 	
+	
 	private final static String DELIMITERS = " \t;:()\'\"~=!<>+-*/[]#^,\n"; // terminate a token
 	private final static String WHITESPACE = " \t\n";
 	private final static String QUOTES = "\"'";

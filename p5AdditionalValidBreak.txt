@@ -42,15 +42,17 @@ while bFlag:
     print("after outer if");    
 endwhile;
 
+
 print("The current climber is our dear", climber);
 print("\n** Test break in any part of for outside of if's and else's **\n");
 
 for letter in climber:
     if(letter != 'f'):
-		print("letter = ", letter);
+		print("letter here = ", letter);
 		continue;
 	else:
-		print("letter = e");
+		//print("letter = e");		
+		continue;
 	endif;
 	break;
 endfor; 
@@ -64,15 +66,18 @@ Int iDM[20] = 60,30,20,10,5,50,70,25,35,45,15;
 Int iTemp;
 Int iAlt;
 for iTemp in iDM:
-	print("iTemp in 1st for loop is", iTemp);
-    if(iTemp == 10):
-    	for iTemp in iDM:
-    		print("iTemp in 2nd for loop is", iTemp);
+	print("iTemp =", iTemp);
+    if(iTemp == 60):
+    	for iAlt in iDM:
+    		print("\t", iAlt);
     		break;
     	endfor;
     else:
-        print("\t", iTemp);
+       //print("\t condition failed for if Stmt iTemp =", iTemp);
+       //Int k = 0
+       continue;
     endif;
+    print("****************************");
 endfor;
 
 //continue;

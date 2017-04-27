@@ -15,6 +15,8 @@ public class Token
 	public int iSourceLineNr = 0;
 	public int iColPos = 0;
 	public boolean nonPrintable = false;
+	public boolean whileStmt = false;
+	public boolean forStmt = false;
 
 	// Constants for primClassif
 	public static final int OPERAND = 1; // constants, identifier

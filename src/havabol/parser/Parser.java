@@ -20,7 +20,10 @@ public class Parser {
 	public boolean debugAssignment = false;
 	public boolean whileStmt = false;
 	public boolean forStmt = false;
-	
+	public int whileCnt = 0;
+	public int endForCnt = 0;
+	public int surWhile = 0;
+	public int surFor = 0;
 	
 	//precedence values while operator tokens are outside of stack
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
@@ -189,12 +192,10 @@ public class Parser {
 			if (whileCond.asBoolean(this).booleanValue) {
 				// Evaluated to true, execute loop
 				while (!scanner.currentToken.tokenStr.equals("endwhile")) {
-					//System.out.println("tok = " + scanner.currentToken.tokenStr);
 					parseStatement();
 					
 					//continue for whileStmt
 					if (scanner.currentToken.tokenStr.equals("continue") ){
-						int whileCnt = 0;
 						while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
 							if (scanner.currentToken.tokenStr.equals("while")) {
 								whileCnt++;
@@ -208,7 +209,6 @@ public class Parser {
 					//break for whileStmt
 					if(scanner.currentToken.tokenStr.equals("break")){
 						// Evaluated to false, skip loop past endwhile and return				
-						int whileCnt = 0;
 						while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
 							if (scanner.currentToken.tokenStr.equals("while")) {
 								whileCnt++;
@@ -229,7 +229,7 @@ public class Parser {
 				scanner.setPosition(loopSrcLine, loopColPos);	
 			} else {
 				// Evaluated to false, skip loop past endwhile and return				
-				int whileCnt = 0;
+				//int whileCnt = 0;
 				while (!scanner.currentToken.tokenStr.equals("endwhile") || whileCnt > 0) {
 					if (scanner.currentToken.tokenStr.equals("while")) {
 						whileCnt++;
@@ -268,7 +268,7 @@ public class Parser {
 		Value value, limit = null, incr = new Value(1);
 		STIdentifier controlVariable = null;
 		int lineNm;
-		int endForCnt = 0;
+		//int endForCnt = 0;
 		int colPos;
 		
 		scanner.getNext();
@@ -285,14 +285,9 @@ public class Parser {
 			assert(scanner.currentToken.tokenStr.equals("to"));
 			scanner.getNext(); // get past "to"
 			
-			//System.out.println(scanner.currentToken.tokenStr);
 			
 			limit = parseExpression("by");
-			//System.out.println("*********" + limit);
-
-			//System.out.println("past limit");
-
-			//scanner.getNext();
+			
 			switch(scanner.currentToken.tokenStr){
 			case "by":
 				scanner.getNext();
@@ -319,19 +314,17 @@ public class Parser {
 			
 			while (controlVariable.getValue().intValue < limit.intValue) {
 				
-				//System.out.println("begin for body");
-				
-				//System.out.println("Control var: " + controlVariable.getValue() + " symbol " + controlVariable.symbol);
-				
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
 					//continue for forStmt
 					if(scanner.currentToken.tokenStr.equals("continue")){
 						while (!scanner.currentToken.tokenStr.equals("endfor") || endForCnt > 0) {
-							if (scanner.currentToken.tokenStr.equals("for"))
+							if (scanner.currentToken.tokenStr.equals("for")){
 								endForCnt++;
-							else if (scanner.currentToken.tokenStr.equals("endfor"))
+							}
+							else if (scanner.currentToken.tokenStr.equals("endfor")){
 								endForCnt--;
+							}
 							scanner.getNext();
 						}
 					}
@@ -403,9 +396,7 @@ public class Parser {
 			lineNm = scanner.iSourceLineNr;
 			colPos = scanner.iColPos;
 			int internalIndex = 0;
-			
-			//System.out.println(lineNm + 1 + " " + (colPos + 1));
-			
+						
 			scanner.getNext();
 			
 			Value[] loopOver;
@@ -441,10 +432,6 @@ public class Parser {
 				}
 				
 				controlVariable.setValue(value);
-				
-				//System.out.println("looping...");
-				//System.out.println("begin loop on " + scanner.currentToken.tokenStr);
-				//System.out.println("parse = " + scanner.nextToken.tokenStr);
 
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
@@ -456,8 +443,7 @@ public class Parser {
 								endForCnt--;
 							scanner.getNext();
 						}
-					}
-					if(scanner.currentToken.tokenStr.equals("break")){
+					}else if(scanner.currentToken.tokenStr.equals("break")){
 						while (!scanner.currentToken.tokenStr.equals("endfor")) {
 							if (scanner.currentToken.tokenStr.equals("for"))
 								endForCnt++;
@@ -469,9 +455,7 @@ public class Parser {
 						return;
 					}
 				}
-				
-				//System.out.println("end loop body on " + scanner.currentToken.tokenStr);
-				
+								
 				scanner.setPosition(lineNm,colPos);
 				
 			}
@@ -505,20 +489,13 @@ public class Parser {
 			assert(scanner.currentToken.tokenStr.equals("by"));
 			scanner.getNext(); // get past "by"
 			
-			//System.out.println(scanner.currentToken.tokenStr);
 			
 			limit = parseExpression(":");
-			//System.out.println("*********'" + limit + "'");
-
-			//System.out.println("past limit");
-
-			//scanner.getNext();
 			
 			lineNm = scanner.iSourceLineNr;
 			colPos = scanner.iColPos;
 			
 			controlVariable.setValue(controlVariable.getValue().asString(this));
-			//System.out.println("cur tok = " + scanner.currentToken.tokenStr);
 			limit = limit.asString(this);
 			String delim = "\\" + limit.strValue;
 			assert(scanner.currentToken.tokenStr.equals(":"));
@@ -526,13 +503,9 @@ public class Parser {
 			scanner.getNext();
 			String[] splitString = controlVariable.getValue().strValue.split(delim);
 			
-			//for (String word: splitString){
-			//System.out.println("limit = '" + limit.strValue + "'");
-			//}
 			for (String word: splitString) {
 				value = new Value(word);
 				controlVariable.setValue(value);
-				//System.out.println("word = '" + controlVariable.getValue().strValue + "'");
 
 				while (!scanner.currentToken.tokenStr.equals("endfor")) {
 					parseStatement();
@@ -560,9 +533,7 @@ public class Parser {
 					}
 					
 				}
-				
-				//controlVariable.getValue().intValue += incr.intValue;
-				
+								
 				scanner.setPosition(lineNm,colPos);
 				
 			}
@@ -584,7 +555,6 @@ public class Parser {
 		default:
 			// TODO: throw exception
 		}
-//		System.out.println("CV: "+cv+" value: "+controlVariable.getValue()+" limit: "+limit+" incr: "+incr);
 	}
 	
 	/**
@@ -786,21 +756,19 @@ public class Parser {
 		 * 
 		 */
 		
-		//System.out.println("current = " + scanner.currentToken.tokenStr);
-		//System.out.println("next = " + scanner.nextToken.tokenStr);
 		
-		//System.out.println("tok = " + scanner.currentToken.tokenStr);
-
+		
 		if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
 			if (scanner.currentToken.tokenStr.equals("debug")) {
 				parseDebugStatement();
 			}
-			if(scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break"))
-				if(whileStmt || forStmt){
+			if(scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
+				if(surWhile > 0 || surFor > 0){
 					return;
 				}else{
 					throw new SyntaxError("Statement needs to be within a for or a while loop", scanner.currentToken);
 				}
+			}
 		}
 		
 		if (scanner.currentToken.primClassif == Token.CONTROL) {
@@ -811,32 +779,26 @@ public class Parser {
 				case "if":
 					parseIf();
 					if (scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
-						//System.out.println("sooooo");
 						return;
 					}
 					break;
 				case "while":
-					whileStmt = true;
+					surWhile++;
 					parseWhile();
-					whileStmt = false;
+					surWhile--;
 					break;
 				case "for":
-					forStmt = true;
+					surFor++;
 					parseFor();	// Exceptions handled in parseFor function
-					forStmt = false;
+					surFor--;
 					return;
-				//case "def":
-					//parseDef();
-					//scanner.getNext();
-					//return;
 				case "select":
 					parseSelect();
 					break;
 				default:
 					throw new UnsupportedOperationError("Unsupported FLOW token found.");
 				}
-			} //else if (scanner.currentToken.tokenStr.equals("endif")) {
-				//scanner.getNext();
+			} 
 			 else {
 				throw new SyntaxError("Unexpected control token found: " + scanner.currentToken.tokenStr, scanner.currentToken);
 			}
@@ -846,22 +808,6 @@ public class Parser {
 			scanner.getNext();
 		} else if (scanner.currentToken.primClassif == Token.OPERAND) {
 			if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-				/*if(scanner.currentToken.tokenStr.equals("def")){
-					int enddef = 0;
-					scanner.getNext(); //return value
-					scanner.getNext(); //name of function
-					while(!scanner.currentToken.tokenStr.equals("enddef") || enddef > 0){
-						if (scanner.currentToken.tokenStr.equals("def")){
-							scanner.getNext();
-							scanner.getNext();
-							enddef++;
-						}
-						else if (scanner.currentToken.tokenStr.equals("enddef"))
-							enddef--;
-						scanner.getNext();
-					}
-					scanner.getNext();	//get ";"
-				}else*/
 					parseAssignment();
 			} else {
 				throw new UnsupportedOperationError("Left value must be identifier.");
@@ -887,13 +833,6 @@ public class Parser {
 		}
 	}
 	
-	private void parseDef()
-	{
-		// TODO Auto-generated method stub
-		System.out.println("parse def");
-		return;
-	}
-
 	/**
 	 * Function: parseDeclaration
 	 * Parses a declaration statement.
@@ -932,7 +871,6 @@ public class Parser {
 			case "=": // expecting a primitive value
 				
 				variable = new STIdentifier(identifier, declaredType, StorageStructure.PRIMITIVE);
-				//System.out.println("variable = " + variable);
 				// Get value of right hand side
 				scanner.getNext();
 				rhsExpr = parseExpression(";");
@@ -942,7 +880,6 @@ public class Parser {
 				}
 				
 				// Check and cast (if necessary) type and store value
-				//System.out.println("where = " + scanner.currentToken.tokenStr);
 				rhsExpr = rhsExpr.asType(this, variable.declaredType);
 				variable.setValue(rhsExpr);
 				
@@ -1016,20 +953,15 @@ public class Parser {
 							// Int array[10] = 1, 2, 3;
 							scanner.getNext(); // advance past =
 							//could be assigned
-							//scanner.getNext();
 							rhsExpr = parseValueList(";");
 							
-							//System.out.println("rhsMultiVal.numItems = " + rhsMultiVal.numItems);
 							if (rhsExpr.numItems > variable.declaredSize) {
 								throw new IndexError("Value list contains too many elements to fit into given array");
 							}
 							
 							for (int i = 0; i < rhsExpr.numItems; i++) {
 								variable.arrayValue[i] = rhsExpr.arrayValue.get(i);
-							}
-							
-							//System.out.println("Created array with given size and given value list.");
-							
+							}							
 							break;
 						default:
 							throw new SyntaxError("Expected = or ; after array declaration", scanner.currentToken);
@@ -1043,7 +975,6 @@ public class Parser {
 				default:
 					throw new SyntaxError("Expected an assignment '=', array type specifier, or semicolon in declaration", scanner.currentToken);
 		}
-		//System.out.println("Added symbol: " + identifier);
 		symbolTable.createSymbol(this, identifier, variable);
 	}
 	
@@ -1167,7 +1098,6 @@ public class Parser {
 					if(scanner.currentToken.tokenStr.equals("to") || scanner.currentToken.tokenStr.equals("in")){
 						// check if token is in symbolTable
 						if(symbolTable.containsSymbol(token.tokenStr)){
-							//System.out.println("Found token: "+token.tokenStr);
 							return token.toResult();
 						}
 					}
@@ -1176,7 +1106,6 @@ public class Parser {
 		}
 		
 		// Ensure identifier has been declared
-		//System.out.println("date toke = " + scanner.currentToken.primClassif);
 		STIdentifier variable = (STIdentifier) symbolTable.getSymbol(this, identifier);
 		
 		if (variable == null && !bfor) {
@@ -1234,7 +1163,6 @@ public class Parser {
 									}
 								
 								} else {
-									//System.out.println(toAssign);
 									variable.setValue(toAssign);
 								}
 								
@@ -1504,10 +1432,9 @@ public class Parser {
 		
 		String calledFunction = scanner.currentToken.tokenStr;
 		String argVar = null;
-		String argVar2 = null;
 		//System.out.println("Called: " + calledFunction); 
 		// currentToken should be open paren "("
-		String check = scanner.getNext();
+		scanner.getNext();
 		
 		assert(scanner.currentToken.tokenStr.equals("("));
 		
@@ -1571,21 +1498,18 @@ public class Parser {
 			dateVal1 = parseExpression(",");
 			scanner.getNext(); //get ","
 			dateVal2 = parseExpression(")");
-			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
 			retVal = Functions.dateDiff(this, dateVal1, dateVal2);
 			break;
 		case "dateAdj":
 			dateVal1 = parseExpression(",");
 			scanner.getNext(); //get ","
 			dateVal2 = parseExpression(")");
-			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
 			retVal = Functions.dateAdj(this, dateVal1, dateVal2);
 			break;
 		case "dateAge":
 			dateVal1 = parseExpression(",");
 			scanner.getNext(); //get ","
 			dateVal2 = parseExpression(")");
-			//System.out.println("arg1 = " + argVar + " arg2 = " + argVar2);
 			retVal = Functions.dateAge(this, dateVal1, dateVal2);
 			break;
 		default:
@@ -1593,7 +1517,6 @@ public class Parser {
 		}
 		
 		assert(scanner.currentToken.tokenStr.equals(")"));
-		//scanner.getNext();		
 
 		if (retVal == null) {
 			return null;
@@ -1613,7 +1536,6 @@ public class Parser {
 	 * @return the evaluated value of an expression
 	 */
 	private Value parseExpression(String terminatingStr) throws SyntaxError{
-		//System.out.println("---------> In parse");
 		ArrayList <Token> out = new ArrayList<Token>();
 		Stack<Token> stackToken = new Stack<>();
 		Stack<Value> stackResult = new Stack<>();
@@ -1623,12 +1545,10 @@ public class Parser {
 		boolean containsOperator = false;
 		boolean evaluated = false; //is true when final evaluated result of expression is obtained
 		
-		//System.out.println("termsTr = " + terminatingStr);
 		while (!(token.equals(";") || token.equals(":") || token.equals(",") || token.equals("~") || token.equals("]") || token.equals("to") || token.equals("in") ||  token.equals("by"))) {
 			if (scanner.currentToken.primClassif == Token.OPERAND || scanner.currentToken.primClassif == Token.FUNCTION) {
 				//if function or operand place in postfix out
 				if (scanner.currentToken.primClassif == Token.OPERAND){
-					//System.out.println("curTok = " + scanner.currentToken.tokenStr);
 					if(scanner.currentToken.subClassif == Token.IDENTIFIER && ( 
 						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.FIXED_ARRAY ||
 						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.UNBOUNDED_ARRAY
@@ -1648,7 +1568,6 @@ public class Parser {
 				if (scanner.currentToken.primClassif == Token.FUNCTION){
 
 					Token funcResult = parseFunctionCall();
-					//System.out.println("************funccur= " + scanner.currentToken.tokenStr);					
 					if (funcResult != null)
 						out.add(funcResult);
 					if(scanner.nextToken.tokenStr.equals(";") || scanner.currentToken.tokenStr.equals(":") || scanner.currentToken.tokenStr.equals("by")){
@@ -1737,8 +1656,6 @@ public class Parser {
 				switch(entry.subClassif){
 					case Token.IDENTIFIER:
 						res = ((STIdentifier) symbolTable.getSymbol(this, token)).getValue();
-						//System.out.println("----------->token = " + res);
-						//Array found?
 						stackResult.push(res);
 						break;
 					case Token.INTEGER:
@@ -1925,7 +1842,6 @@ public class Parser {
 					, scanner.currentToken.iSourceLineNr);
 		}
 		 
-		//System.out.println("----------> Exit parse expression <---------" + finalValue);
 		return finalValue;
 	}
 

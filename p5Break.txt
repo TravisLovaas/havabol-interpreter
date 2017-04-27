@@ -57,7 +57,7 @@ endfor;
 
 print("Nested for loops, sorting the array");
 Bool bChange;
-break;
+//break;
 Int j;
 for i=0 to ELEM(iDM)-1:
     bChange = F;
