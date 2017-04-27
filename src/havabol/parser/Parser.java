@@ -753,6 +753,8 @@ public class Parser {
 		 *  for ... endfor;			for
 		 * 	debug type setting;		debug
 		 * 	print( ... );			function call
+		 * 	def ... enddef;
+		 *  return ...;
 		 * 
 		 */
 		
@@ -833,6 +835,101 @@ public class Parser {
 		}
 	}
 	
+	/**
+	 * Parses a function definition given by:
+	 * def DataType FunctionName ( parameters ... ):
+	 *     ...
+	 * enddef;
+	 */
+	private void parseDef()
+	{
+		
+		assert(scanner.currentToken.tokenStr.equals("def"));
+		
+		scanner.getNext();
+		
+		// Parse return data type
+		DataType returnType = DataType.stringToType(scanner.currentToken.tokenStr);
+		
+		if (returnType == null) {
+			throw new SyntaxError("Invalid return type in function definition", scanner.currentToken);
+		}
+		
+		scanner.getNext();
+		
+		// Parse function name
+		// Functions name must be unique and cannot be the same as any other
+		// entry inside the symbol table
+		String functionName = scanner.currentToken.tokenStr;
+		
+		if (symbolTable.containsSymbol(functionName)) {
+			throw new DeclarationError("Name " + functionName + " is already defined", scanner.currentToken);
+		}
+		
+		scanner.getNext();
+		
+		// Parse parameters
+		if (!scanner.currentToken.tokenStr.equals("(")) {
+			throw new SyntaxError("Expected ( to begin parameter list after function name", scanner.currentToken);
+		}
+		
+		scanner.getNext();
+		
+		HashMap<String, DataType> formalParameters = new HashMap<>();
+		DataType paramType;
+		String paramIdentifier;
+		
+		// currentToken should be a parameter dataType on loop entrance
+		while (!scanner.currentToken.tokenStr.equals(")")) {
+			paramType = DataType.stringToType(scanner.currentToken.tokenStr);
+			
+			if (paramType == null) {
+				throw new SyntaxError("Invalid parameter type in function definition", scanner.currentToken);
+			}
+			
+			scanner.getNext(); // currentToken should now be the parameter name
+			
+			paramIdentifier = scanner.currentToken.tokenStr;
+			
+			formalParameters.put(paramIdentifier, paramType);
+			
+			switch (scanner.getNext()) {
+			case ",":
+				scanner.getNext();
+				break;
+			case ")":
+				break;
+			default:
+				throw new SyntaxError("Unknown symbol found in function parameter definition", scanner.currentToken);
+			}
+		}
+		
+		// while loop must end on )
+		assert(scanner.currentToken.tokenStr.equals(")"));
+		
+		if (!scanner.getNext().equals(":")) {
+			throw new SyntaxError("Function header must end with :", scanner.currentToken);
+		}
+		
+		scanner.getNext(); // currentToken is now the first token inside the function (or enddef)
+		
+		// save cursor position as first token inside function
+		int beginExecLine = scanner.iSourceLineNr;
+		int beginExecColPos = scanner.iColPos;
+		
+		// Pass through body of the function until enddef
+		while (!scanner.currentToken.tokenStr.equals("enddef")) {
+			scanner.getNext();
+		}
+		
+		// currentToken must be enddef here
+		scanner.getNext();
+		
+		// ; follows enddef
+		assert(scanner.currentToken.tokenStr.equals(";"));
+		
+	}
+
 	/**
 	 * Function: parseDeclaration
 	 * Parses a declaration statement.
