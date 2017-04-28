@@ -1,0 +1,5 @@
+print("p5AssignmnetErrorSemiColon.txt");
+
+print("** Missing semicolon causes overflow, Syntax error **\n")
+Float i = 4
+print(4);

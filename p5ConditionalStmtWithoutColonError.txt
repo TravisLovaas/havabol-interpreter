@@ -1,0 +1,10 @@
+print("p5ConditionalStmtWithoutColonError.txt");
+
+print("** Attempting to use conditional statement without `:` **\n");
+Int i = 1; 
+
+//it's not entirely working right, why does it print?
+
+if 3 < i
+	print("What are you on, bro?");
+endif;

@@ -2,7 +2,7 @@ print("p5DividebyZero\n");
 
 print("Trump will attempt to divide his fortunes by 0, because, well... **\n");
 
-Int i = 0
+Int i = 0;
 Int iTrumpFortune = 250;
 
 print(iTrumpFortune/i);

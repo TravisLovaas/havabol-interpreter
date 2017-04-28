@@ -1,0 +1,4 @@
+print("p5DeclarationError.txt");
+
+print("** Attempting to use an undefined Datatype `int` instead of `Int` **\n");
+int x = 4;

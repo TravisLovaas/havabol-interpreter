@@ -1,0 +1,9 @@
+print("p5StringtoDateError.txt");
+
+print("Attempting to coerce a string to a date");
+
+Date date;
+String dateStr = "1997-07jj-13";
+date = dateStr
+
+//print("date from dateStr =", date); 

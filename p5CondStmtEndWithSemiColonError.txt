@@ -1,0 +1,8 @@
+print("p5CondStmtEndWithSemiColonError.txt");
+
+print("** WhileStmt with semi-colon ending the line **");
+
+String name = "Comfort";
+while name == "Comfort";
+	print("This would be an infinite loop");
+endwhile;

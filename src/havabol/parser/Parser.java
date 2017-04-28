@@ -72,7 +72,6 @@ public class Parser {
 	public void beginParsing() {
 		scanner.getNext();
 		while (scanner.currentToken.primClassif != Token.EOF) {
-			//System.out.println("current = " + scanner.currentToken.tokenStr);
 			parseStatement();
 		}
 	}
@@ -91,7 +90,7 @@ public class Parser {
 		// currentToken should be beginning of conditional expression
 		Value resCond = parseExpression(":");
 		if (!scanner.currentToken.tokenStr.equals(":")){
-			throw new SyntaxError("Expected ':' after conditional expression in if", scanner.currentToken);
+			throw new SyntaxError("Expected ':' after conditional expression in if", scanner.iSourceLineNr);
 		}
 		
 		scanner.getNext(); // advance past :
@@ -830,7 +829,7 @@ public class Parser {
 		if (scanner.currentToken.tokenStr.equals(";")) {
 			scanner.getNext();
 		} else {
-			throw new SyntaxError("Expected semi-colon to end statement", scanner.currentToken);
+			throw new SyntaxError("Expected semi-colon to end statement\n", scanner.currentToken);
 		}
 	}
 	

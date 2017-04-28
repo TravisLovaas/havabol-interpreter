@@ -1,0 +1,11 @@
+print("p5UnboundedArrayHoleAccessError.txt");
+
+
+print("** Attempting to reference a hole in an unbound array **\n");
+Int a[unbound] = 0, 2, 4, 6, 8;
+print("** The unbound array `a` is populated up to `a[4]` **");
+print("\n** Making a hole in `a` at a[5] by setting a[6] **");
+a[6] = 12;
+print("a[6] should equal 12, a[6] =", a[6]);
+print("If we reference a[5], it will be an IndexError");
+print("a[5] =", a[5]);

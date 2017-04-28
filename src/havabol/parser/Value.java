@@ -291,6 +291,10 @@ public class Value {
 		
 	}
 	
+	public Value asDate(Parser parser){
+		return new Value(null);
+	}
+	
 	/**
 	 * Function:	asType 	
 	 * @param parser information about  values being parsed

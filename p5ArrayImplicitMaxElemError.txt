@@ -1,0 +1,17 @@
+print("p5ArrayImplicitMaxElemError.txt");
+
+print("** Attempting to initialized past original implicit Max Elem number: **\n");
+print("** Int iBM[] = 10, 20, 30; **");
+print("** Int iBM[10] = 50; **");
+// arrays, element assignment, for loops
+// do simple variables still work?
+print("p4Array.txt");
+Int iSimp = 50;
+print ("iSimp=", iSimp);
+Int iCM[10] = 10, 20, 30, 40, 50, 60;
+
+
+print("Array B with expressions for subscripts");
+Int iBM[] = 10, 20, 30;
+iBM[iSimp] = 50;
+print("\tB", iBM[iSimp], 10*iBM[iSimp+1], iBM[1+iSimp+1]);
