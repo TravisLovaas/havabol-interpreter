@@ -597,8 +597,8 @@ public class Parser {
 		STIdentifier sti = ((STIdentifier) symbolTable.getSymbol(this, cv));
 		STIdentifier controlVariable = sti;
 		
-		if (!controlVariable.getValue().asBoolean(this).booleanValue)
-			throw new TypeError("Expected boolean value", scanner.currentToken);
+		//if (!controlVariable.getValue().asBoolean(this).booleanValue)
+			//throw new TypeError("Expected boolean value", scanner.currentToken);
 		
 		if (!scanner.currentToken.tokenStr.equals(":")){
 			throw new SyntaxError("Expected ':' after conditional expression in select", scanner.currentToken);
