@@ -188,7 +188,11 @@ public class Value {
 		if (this.dataType == DataType.FLOAT) {
 			res.intValue = (int) this.floatValue;
 		} else if (this.dataType == DataType.STRING) {
-			res.intValue = Integer.parseInt(this.strValue);
+			try {
+				res.intValue = Integer.parseInt(this.strValue);
+			} catch (NumberFormatException e) {
+				throw new TypeError("Invalid format of String to Int coercion", parser.scanner.currentToken);
+			}		
 		} else if (this.dataType == DataType.BOOLEAN) {
 			// incompatible types
 			throw new TypeError("Cannot coerce BOOLEAN type into INTEGER.");
@@ -217,7 +221,11 @@ public class Value {
 		if (this.dataType == DataType.INTEGER) {
 			res.floatValue = (double) this.intValue;
 		} else if (this.dataType == DataType.STRING) {
-			res.floatValue = Double.parseDouble(this.strValue);
+			try {
+				res.floatValue = Double.parseDouble(this.strValue);
+			} catch (NumberFormatException e) {
+				throw new TypeError("Invalid format of string to double coercion", parser.scanner.currentToken);
+			}
 		} else if (this.dataType == DataType.BOOLEAN) {
 			// incompatible types
 			throw new TypeError("Cannot coerce BOOLEAN type into FLOAT.");
