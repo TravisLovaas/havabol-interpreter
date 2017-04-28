@@ -8,6 +8,7 @@ import java.util.List;
 import havabol.error.IndexError;
 import havabol.error.TypeError;
 import havabol.lexer.*;
+import havabol.runtime.*;
 
 /**
  * Represents a primitive value in Havabol
@@ -300,8 +301,25 @@ public class Value {
 	}
 	
 	public Value asDate(Parser parser){
-		return new Value(null);
-	}
+		if (this.dataType == DataType.DATE) {
+			// nothing to do
+			return this;
+		}
+		
+		Value res = new Value();
+		res.structure = Structure.PRIMITIVE;
+		res.strValue = this.strValue;
+		res.dataType = DataType.DATE;
+		
+		if (this.dataType == DataType.STRING) {
+			if (Functions.validateDate(res) != 0) {
+				throw new TypeError("Invalid string value for coercion to Date", parser.scanner.currentToken);
+			} else {
+				return res;
+			}
+		}else
+			throw new TypeError("Cannot coerce " + this.dataType + " to Date", parser.scanner.currentToken);
+		}
 	
 	/**
 	 * Function:	asType 	
@@ -316,9 +334,8 @@ public class Value {
 		case FLOAT:
 			return this.asFloat(parser);
 		case STRING:
-			return this.asString(parser);
 		case DATE:
-			return this.asDate(parser);
+			return this.asString(parser);
 		case BOOLEAN:
 			return this.asBoolean(parser);
 		default:

@@ -299,7 +299,7 @@ public class Functions {
 	 *					    3     day is invalid
 	 *					    4     invalid length or format
 	 */
-	private static int validateDate(Value dateVal)
+	public static int validateDate(Value dateVal)
 	{
 		int iDaysPerMonth[] = 
 		       { 0, 31, 29, 31
