@@ -87,6 +87,8 @@ public class Parser {
 	private void parseIf() {
 		scanner.getNext();
 		
+		//System.out.println("called if");
+		
 		// currentToken should be beginning of conditional expression
 		Value resCond = parseExpression(":");
 		if (!scanner.currentToken.tokenStr.equals(":")){
@@ -989,6 +991,7 @@ public class Parser {
 	 */
 	private Token parseValueList(String terminatingStr) {
 		
+		//System.out.println("started on " + scanner.currentToken.tokenStr);
 		if (scanner.currentToken.tokenStr.equals("{")) {
 			scanner.getNext();
 		}
@@ -1018,6 +1021,7 @@ public class Parser {
 		
 		scanner.getNext(); // pass ","
 		
+		outerwhile:
 		while (!scanner.currentToken.tokenStr.equals(terminatingStr)) {			
 			elem = scanner.currentToken.toResult();
 			elem = elem.asType(this, array.dataType);
@@ -1030,16 +1034,18 @@ public class Parser {
 				scanner.getNext();
 				continue;
 			case ";":
-				break;
+				break outerwhile;
 			case ":":
-				break;
+				break outerwhile;
 			case "}":
 				scanner.getNext();
-				break;
+				break outerwhile;
 			default:
 				throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
 			}			
 		}
+		
+		//System.out.println("ended on " + scanner.currentToken.tokenStr);
 		
 		//assert(scanner.currentToken.tokenStr.equals(";"));
 		

@@ -1,14 +1,18 @@
-String fruit = "apple";
-if(fruit IN {"apple", "orange", "clark"}){
-	print("\tFruit IN");
-}
+print("Testing basic IN operations with if statements");
 
-Int gradePt 2;
-if(gradePt IN {4, 3, 2, 1, 0}){
+debug token on;
+
+String fruit = "apple";
+if fruit IN {"apple", "orange", "clark"}:
+	print("\tFruit IN");
+endif;
+
+Int gradePt = 2;
+if gradePt IN {4, 3, 2, 1, 0}:
 	print("\tGrade IN");
-}
+endif;
 
 Int gradePtM[] = 0, 1, 2, 3, 4;
-if(gradePt IN gradePtM){
+if gradePt IN gradePtM:
 	print("\tGrade2 IN");
-}
+endif;

@@ -56,7 +56,7 @@ public class TestHavaBol
     		
     	   	System.out.println("===========================================");
     		System.out.println("Test completed for: " + f.getName());
-    		System.out.println("===========================================\n");
+    		System.out.println("===========================================");
     	}
         
     }
