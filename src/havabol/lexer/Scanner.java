@@ -46,11 +46,11 @@ public class Scanner {
 	public boolean debugToken = false;
 	
 	
-	private final static String DELIMITERS = " \t;:()\'\"~=!<>+-*/[]#^,\n"; // terminate a token
+	private final static String DELIMITERS = " {}\t;:()\'\"~=!<>+-*/[]#^,\n"; // terminate a token
 	private final static String WHITESPACE = " \t\n";
 	private final static String QUOTES = "\"'";
 	private final static String OPERATORS = "!=<>+-*/#^\'IN\'\'NOTIN\'";
-	private final static String SEPARATORS = ",;:[]()";
+	private final static String SEPARATORS = ",;:[](){}";
 	private final static String ESCAPEPRINT ="\\'\"";
 	
 	private final static HashMap<Character, Character> escapeMap = new HashMap<Character, Character>(){
@@ -357,8 +357,8 @@ public class Scanner {
 			case "not":
 				token.primClassif = Token.OPERATOR;
 				return;
-			case "in":
-			case "notin":
+			case "IN":
+			case "NOTIN":
 				token.primClassif = Token.OPERATOR;
 				return;
 			case "T":

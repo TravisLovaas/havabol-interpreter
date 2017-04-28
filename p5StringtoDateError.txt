@@ -4,6 +4,6 @@ print("Attempting to coerce a string to a date");
 
 Date date;
 String dateStr = "1997-07jj-13";
-date = dateStr
+date = dateStr;
 
-//print("date from dateStr =", date); 
+print("date from dateStr =", date); 

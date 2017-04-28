@@ -30,7 +30,7 @@ public class Parser {
 	private final static HashMap<String, Integer> precedence = new HashMap<String, Integer>(){
 		private static final long serialVersionUID = 1L;
 	{
-		put("and", 3); put("or", 3); put("not", 4); put("in", 5); put("notin", 5);    
+		put("and", 3); put("or", 3); put("not", 4); put("IN", 5); put("NOTIN", 5);    
 		put("<", 5); put(">", 5); put("<=", 5); put(">=", 5); put("==", 5); put("!=", 5);
 		put("#", 6);  put("+", 7); put("-", 7); put("*", 8); put("/", 8); put("^", 10); put("u-", 11);
 		put("(", 15); put("[", 16);
@@ -41,7 +41,7 @@ public class Parser {
 		private static final long serialVersionUID = 1L;
 
 	{
-		put("and", 3); put("or", 3); put("not", 4); put("in", 5); put("notin", 5);    
+		put("and", 3); put("or", 3); put("not", 4); put("IN", 5); put("NOTIN", 5);    
 		put("<", 5); put(">", 5); put("<=", 5); put(">=", 5); put("==", 5); put("!=", 5);
 		put("#", 6);  put("+", 7); put("-", 7); put("*", 8); put("/", 8); put("^", 9); put("u-", 11);
 		put("(", 2); put("[", 0);
@@ -610,7 +610,7 @@ public class Parser {
 		for(;;){
 			if(scanner.currentToken.tokenStr.equals("when")){ // if first case is a when
 				scanner.getNext();
-				caseVal = parseValueList(":");
+				caseVal = parseValueList(":").tempValue;
 				for(Value v : caseVal.arrayValue){
 					if(controlVariable.declaredType.toString().equals("STRING")){
 						if(controlVariable.getValue().strValue.equals(v.strValue)){
@@ -898,7 +898,7 @@ public class Parser {
 						
 						case "=": // value list will follow
 							scanner.getNext();
-							rhsExpr = parseValueList(";");
+							rhsExpr = parseValueList(";").tempValue;
 							variable.setValue(rhsExpr);
 							break;
 						case ";": // init empty array value and we're done
@@ -914,7 +914,7 @@ public class Parser {
 						scanner.getNext(); // pass "]". Int array[] = 1, 2, 3;
 						scanner.getNext(); // pass =
 						
-						rhsExpr = parseValueList(";");
+						rhsExpr = parseValueList(";").tempValue;
 						variable.arrayValue = new Value[rhsExpr.numItems];
 						for (int i = 0; i < rhsExpr.numItems; i++) {
 							variable.arrayValue[i] = rhsExpr.arrayValue.get(i);
@@ -953,7 +953,7 @@ public class Parser {
 							// Int array[10] = 1, 2, 3;
 							scanner.getNext(); // advance past =
 							//could be assigned
-							rhsExpr = parseValueList(";");
+							rhsExpr = parseValueList(";").tempValue;
 							
 							if (rhsExpr.numItems > variable.declaredSize) {
 								throw new IndexError("Value list contains too many elements to fit into given array");
@@ -987,7 +987,11 @@ public class Parser {
 	 * @param terminatingStr the token string that says to stop parsing values
 	 * @return a ResultValue representing a value list
 	 */
-	private Value parseValueList(String terminatingStr) {
+	private Token parseValueList(String terminatingStr) {
+		
+		if (scanner.currentToken.tokenStr.equals("{")) {
+			scanner.getNext();
+		}
 		
 		Value array = new Value();
 		array.structure = Structure.MULTIVALUE;
@@ -1003,9 +1007,9 @@ public class Parser {
 		case ",":
 			break;
 		case ";":
-			return array;
+			return array.toToken(this);
 		case ":":
-			return array;
+			return array.toToken(this);
 		default:
 			throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
 		}
@@ -1029,6 +1033,9 @@ public class Parser {
 				break;
 			case ":":
 				break;
+			case "}":
+				scanner.getNext();
+				break;
 			default:
 				throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
 			}			
@@ -1038,7 +1045,7 @@ public class Parser {
 		
 		//System.out.println("Value list: " + array);
 		
-		return array;
+		return array.toToken(this);
 	}
 	
 	/**
@@ -1616,6 +1623,10 @@ public class Parser {
 						stackToken.push(scanner.currentToken); 
 					}
 				}
+			} else if (scanner.currentToken.tokenStr.equals("{")) {
+				// Parse value list (inline array declaration)
+				Token valList = parseValueList("}");
+				out.add(valList);
 			}
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
 				
@@ -1656,8 +1667,8 @@ public class Parser {
 					//continue;
 				//}
 				else {
-						throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
-							scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
+					throw new SyntaxError("Invalid separator token '" + token + "' found in expression",
+						scanner.currentToken.iSourceLineNr, scanner.currentToken.iColPos);
 				}
 				
 			}

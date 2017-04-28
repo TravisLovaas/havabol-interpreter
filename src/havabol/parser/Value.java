@@ -316,8 +316,9 @@ public class Value {
 		case FLOAT:
 			return this.asFloat(parser);
 		case STRING:
-		case DATE:
 			return this.asString(parser);
+		case DATE:
+			return this.asDate(parser);
 		case BOOLEAN:
 			return this.asBoolean(parser);
 		default:
