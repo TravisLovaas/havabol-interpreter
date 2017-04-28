@@ -313,7 +313,7 @@ public class Value {
 		
 		if (this.dataType == DataType.STRING) {
 			if (Functions.validateDate(res) != 0) {
-				throw new TypeError("Invalid string value for coercion to Date", parser.scanner.currentToken);
+				throw new TypeError("Invalid string value for coercion to Date\nActual format of valid date should be `YYYY-MM-DD`", parser.scanner.iSourceLineNr);
 			} else {
 				return res;
 			}
@@ -334,8 +334,9 @@ public class Value {
 		case FLOAT:
 			return this.asFloat(parser);
 		case STRING:
-		case DATE:
 			return this.asString(parser);
+		case DATE:
+			return this.asDate(parser);
 		case BOOLEAN:
 			return this.asBoolean(parser);
 		default:
