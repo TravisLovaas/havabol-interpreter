@@ -87,10 +87,13 @@ public class Parser {
 	private void parseIf() {
 		scanner.getNext();
 		
-		//System.out.println("called if");
+		//System.out.println("called if on " + scanner.currentToken.tokenStr);
 		
 		// currentToken should be beginning of conditional expression
 		Value resCond = parseExpression(":");
+		
+		//System.out.println(resCond + " ended on " + scanner.currentToken.tokenStr);
+		
 		if (!scanner.currentToken.tokenStr.equals(":")){
 			throw new SyntaxError("Expected ':' after conditional expression in if", scanner.iSourceLineNr);
 		}
@@ -105,6 +108,7 @@ public class Parser {
 					//System.out.println("here = " + scanner.currentToken.tokenStr);
 					break;
 				} else if (scanner.currentToken.tokenStr.equals("endif")) {
+					//System.out.println("done i guess");
 					scanner.getNext();
 					return; // currentToken should be ;, handled by parseStatement
 				}else if (scanner.currentToken.tokenStr.equals("continue") || scanner.currentToken.tokenStr.equals("break")){
@@ -1038,7 +1042,6 @@ public class Parser {
 			case ":":
 				break outerwhile;
 			case "}":
-				scanner.getNext();
 				break outerwhile;
 			default:
 				throw new SyntaxError("Expected , or ; after element in value list", scanner.currentToken);
@@ -1598,8 +1601,12 @@ public class Parser {
 						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.FIXED_ARRAY ||
 						  ((STIdentifier) symbolTable.getSymbol(this, token)).structure == StorageStructure.UNBOUNDED_ARRAY
 						)) {
-						Token array = parseArrayRef();
-						out.add(array);
+						if (scanner.nextToken.tokenStr.equals("[")) {
+							Token array = parseArrayRef();
+							out.add(array);
+						} else {
+							out.add(((STIdentifier) symbolTable.getSymbol(this, token)).sliceWithoutEnd(this, 0).toToken(this));
+						}
 					} else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
 							&& symbolTable.containsSymbol(token) 
 							&& ((STIdentifier) symbolTable.getSymbol(this, token)).getValue().dataType == DataType.STRING 
@@ -1632,6 +1639,7 @@ public class Parser {
 			} else if (scanner.currentToken.tokenStr.equals("{")) {
 				// Parse value list (inline array declaration)
 				Token valList = parseValueList("}");
+				//System.out.println(valList.tempValue + " expr ended on " + scanner.currentToken.tokenStr);
 				out.add(valList);
 			}
 			else if (scanner.currentToken.primClassif == Token.OPERATOR){
@@ -1684,6 +1692,8 @@ public class Parser {
 			}
 			token = scanner.getNext();
 		}
+		
+		//System.out.println("stopped expr scanning");
 
 		while(!stackToken.isEmpty()){
 			popped = stackToken.pop();

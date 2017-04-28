@@ -1,7 +1,5 @@
 print("Testing basic IN operations with if statements");
 
-debug token on;
-
 String fruit = "apple";
 if fruit IN {"apple", "orange", "clark"}:
 	print("\tFruit IN");
