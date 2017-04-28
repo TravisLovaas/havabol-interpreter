@@ -1,6 +1,6 @@
 // arrays, element assignment, for loops
 // do simple variables still work?
-print("p4Array.txt");
+print("Array out-of-bounds error");
 Int iSimp = 50;
 print ("iSimp=", iSimp);
 Int iCM[10] = 10, 20, 30, 40, 50, 60;
