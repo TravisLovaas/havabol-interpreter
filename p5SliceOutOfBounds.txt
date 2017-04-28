@@ -1,0 +1,5 @@
+print("Testing out of bounds slice: array[1~8]");
+
+Int s[] = 1, 2, 3, 4, 5;
+
+print(s[1~8]);
