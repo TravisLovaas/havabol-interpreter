@@ -1418,9 +1418,20 @@ public class Parser {
 			if (array.structure == StorageStructure.FIXED_ARRAY || array.structure == StorageStructure.UNBOUNDED_ARRAY) {
 				//System.out.println("**********" + beginSliceIndex);
 				//if(beginSliceIndex < )
-				result = array.fetch(this, beginSliceIndex);
+				if (beginSliceIndex == -1) {
+					if (array.structure == StorageStructure.UNBOUNDED_ARRAY) {
+						result = array.fetch(this, array.maxPopulatedIndex);
+					} else {
+						result = array.fetch(this, array.declaredSize - 1);
+					}
+				} else 
+					result = array.fetch(this, beginSliceIndex);
 			} else {
-				result = new Value("" + array.getValue().asString(this).strValue.charAt(beginSliceIndex));
+				if (beginSliceIndex == -1) {
+					result = new Value("" + array.getValue().asString(this).strValue.charAt(array.getValue().asString(this).strValue.length() - 1));
+				} else {
+					result = new Value("" + array.getValue().asString(this).strValue.charAt(beginSliceIndex));
+				}
 			}
 			// Singular array value
 			

@@ -8,6 +8,9 @@ Int bFixed[] = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;
 print("\nInitialized `bFixed` with 1 2 3 4 5 6 7 8 9 10");
 print("ELEM(bFixed) =", ELEM(bFixed));
 
+print("\nTesting -1 index on aUn:", aUn[-1]);
+print("Testing -1 index on m:", m[-1]);
+
 print("\nSlicing into fixed array `m`");
 
 Int m[5];

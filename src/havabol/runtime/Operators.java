@@ -182,6 +182,11 @@ public class Operators {
 			
 			res.dataType = DataType.INTEGER;
 			res.structure = Structure.PRIMITIVE;
+			
+			if (op2.intValue == 0) {
+				throw new ArithmeticError("Division by zero", parser.scanner.iSourceLineNr);
+			}
+			
 			res.intValue = op1.intValue / op2.intValue;
 			
 		} else if (resultType == DataType.FLOAT) {

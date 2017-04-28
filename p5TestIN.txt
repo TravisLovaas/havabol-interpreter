@@ -1,16 +1,39 @@
 print("Testing basic IN operations with if statements");
 
+print("Testing string IN in-line {} string array");
 String fruit = "apple";
 if fruit IN {"apple", "orange", "clark"}:
 	print("\tFruit IN");
 endif;
 
+print("Testing int IN in-line {} int array");
 Int gradePt = 2;
 if gradePt IN {4, 3, 2, 1, 0}:
 	print("\tGrade IN");
 endif;
 
+print("Testing int IN declared int array");
 Int gradePtM[] = 0, 1, 2, 3, 4;
 if gradePt IN gradePtM:
 	print("\tGrade2 IN");
+endif;
+
+print("Testing NOTIN with in-line string array and expression");
+Bool result = "hello" NOTIN {"one", "two", "three"};
+if (result):
+	print("\thello NOTIN");
+endif;
+
+print("Testing not + NOTIN with declared array inside if conditional");
+if not 3 NOTIN gradePtM:
+	print("\t3 IN gradePtM - correct!");
+else:
+	print("\t3 NOTIN gradePtM - wrong!");
+endif;
+
+print("Testing bool IN with inline string array");
+if T IN {"F", "F", "F", "F"}:
+	print("\tT IN false array - wrong!");
+else:
+	print("\tT not in false array - correct!");
 endif;

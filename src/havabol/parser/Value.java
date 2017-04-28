@@ -282,7 +282,7 @@ public class Value {
 		
 		Value res = new Value();
 		res.structure = Structure.PRIMITIVE;
-		res.dataType = DataType.STRING;
+		res.dataType = DataType.BOOLEAN;
 		
 		if (this.dataType == DataType.STRING) {
 			if (this.strValue.equals("T")) {
